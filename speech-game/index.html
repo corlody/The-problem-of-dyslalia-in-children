@@ -1,0 +1,2185 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Говорю правильно — Путешествие к вулкану речи</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* ========================================================
+               CSS ПЕРЕМЕННЫЕ
+               ======================================================== */
+        :root {
+            --bg-primary: #0a0e27;
+            --bg-secondary: #12163b;
+            --bg-card: rgba(26, 30, 60, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            
+            --purple: #7c3aed;
+            --purple-light: #a78bfa;
+            --purple-dark: #5b21b6;
+            --gold: #f59e0b;
+            --gold-light: #fbbf24;
+            --pink: #ec4899;
+            --cyan: #06b6d4;
+            --green: #10b981;
+            --red: #ef4444;
+            
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            
+            --shadow-glow: 0 0 40px rgba(124, 58, 237, 0.15);
+            --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.4);
+            
+            --radius: 20px;
+            --radius-sm: 12px;
+            --transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            
+            --font-size-base: 16px;
+            --btn-padding: 12px 28px;
+        }
+        
+        /* ========================================================
+               ТЕМЫ
+               ======================================================== */
+        [data-theme="official"] {
+            --bg-primary: #f1f5f9;
+            --bg-secondary: #e2e8f0;
+            --bg-card: rgba(255, 255, 255, 0.92);
+            --glass-border: rgba(0, 0, 0, 0.08);
+            --purple: #1e40af;
+            --purple-light: #3b82f6;
+            --purple-dark: #1e3a8a;
+            --gold: #d97706;
+            --gold-light: #f59e0b;
+            --text-primary: #0f172a;
+            --text-secondary: #334155;
+            --text-muted: #64748b;
+            --shadow-glow: 0 0 40px rgba(30, 64, 175, 0.08);
+            --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+        
+        [data-theme="elderly"] {
+            --bg-primary: #ffffff;
+            --bg-secondary: #e5e7eb;
+            --bg-card: rgba(255, 255, 255, 0.96);
+            --glass-border: rgba(0, 0, 0, 0.2);
+            --purple: #1e40af;
+            --purple-light: #2563eb;
+            --purple-dark: #1e3a8a;
+            --gold: #b45309;
+            --text-primary: #000000;
+            --text-secondary: #1f2937;
+            --text-muted: #4b5563;
+            --shadow-glow: 0 0 60px rgba(30, 64, 175, 0.1);
+            --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --font-size-base: 22px;
+            --btn-padding: 18px 40px;
+            --radius: 24px;
+            --radius-sm: 16px;
+        }
+        
+        /* ========================================================
+               БАЗОВЫЕ СТИЛИ
+               ======================================================== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.6;
+            font-size: var(--font-size-base);
+            transition: background 0.5s ease, color 0.5s ease;
+        }
+        
+        #particles-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        [data-theme="official"] #particles-canvas,
+        [data-theme="elderly"] #particles-canvas {
+            display: none;
+        }
+        
+        .app {
+            position: relative;
+            z-index: 1;
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 0 20px 20px;
+        }
+        
+        /* ========================================================
+               НАСТРОЙКИ (шестерёнка)
+               ======================================================== */
+        .settings-gear {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: var(--shadow-card);
+        }
+        .settings-gear:hover { transform: scale(1.08) rotate(90deg); border-color: var(--purple); box-shadow: var(--shadow-glow); }
+        .settings-gear i { font-size: 1.6rem; color: var(--text-primary); transition: 0.6s; }
+        .settings-gear.open i { transform: rotate(180deg); }
+        
+        .settings-panel {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 340px;
+            max-width: calc(100vw - 40px);
+            background: var(--bg-card);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            padding: 28px 30px;
+            box-shadow: var(--shadow-card);
+            transform: scale(0);
+            transform-origin: bottom right;
+            opacity: 0;
+            transition: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 9998;
+        }
+        .settings-panel.open { transform: scale(1); opacity: 1; }
+        .settings-panel h4 { font-size: 1.2rem; margin-bottom: 20px; color: var(--text-primary); display: flex; align-items: center; gap: 10px; }
+        .settings-panel .setting-group { margin-bottom: 18px; }
+        .settings-panel .setting-group label { display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 6px; font-weight: 500; }
+        [data-theme="elderly"] .settings-panel .setting-group label { font-size: 1.1rem; }
+        
+        .settings-panel select {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: var(--transition);
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748b' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+        }
+        [data-theme="official"] .settings-panel select { background: #fff; border-color: #d1d5db; }
+        [data-theme="elderly"] .settings-panel select { padding: 16px 20px; font-size: 1.2rem; border-width: 2px; }
+        
+        .settings-panel .close-settings {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--purple), var(--purple-dark));
+            color: #fff;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Inter', sans-serif;
+            margin-top: 4px;
+        }
+        [data-theme="elderly"] .settings-panel .close-settings { padding: 16px; font-size: 1.3rem; border-radius: 16px; }
+        .settings-panel .close-settings:hover { transform: scale(1.02); box-shadow: var(--shadow-glow); }
+        
+        /* ========================================================
+               HEADER
+               ======================================================== */
+        header {
+            position: relative;
+            background: linear-gradient(135deg, 
+                rgba(124, 58, 237, 0.15) 0%,
+                rgba(236, 72, 153, 0.10) 25%,
+                rgba(6, 182, 212, 0.08) 50%,
+                rgba(124, 58, 237, 0.15) 100%
+            );
+            background-size: 300% 300%;
+            animation: gradientShift 10s ease-in-out infinite;
+            border-radius: 0 0 60px 60px;
+            padding: 50px 40px 45px;
+            text-align: center;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(20px);
+            margin-bottom: 30px;
+            overflow: hidden;
+            transition: background 0.5s ease;
+        }
+        [data-theme="official"] header { background: linear-gradient(135deg, #dbeafe, #eff6ff); animation: none; border-color: #d1d5db; }
+        [data-theme="elderly"] header { background: linear-gradient(135deg, #e0e7ff, #f0f0f0); animation: none; border-width: 2px; }
+        
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #fff 0%, var(--purple-light) 40%, var(--gold) 80%, #fff 100%);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmerText 6s ease-in-out infinite;
+        }
+        [data-theme="official"] header h1 { background: linear-gradient(135deg, #1e293b, #1e40af); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: none; }
+        [data-theme="elderly"] header h1 { background: linear-gradient(135deg, #000000, #1e40af); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: none; font-size: clamp(3rem, 7vw, 5rem); }
+        
+        @keyframes shimmerText {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        header .subtitle {
+            font-size: clamp(1rem, 2vw, 1.4rem);
+            font-weight: 300;
+            color: var(--text-secondary);
+            margin-bottom: 25px;
+            letter-spacing: 1px;
+        }
+        header .subtitle .highlight { color: var(--gold); font-weight: 600; }
+        [data-theme="official"] header .subtitle .highlight { color: var(--purple); }
+        
+        .authors-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            padding: 12px 28px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: clamp(0.75rem, 1vw, 0.95rem);
+            color: var(--text-secondary);
+            transition: var(--transition);
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        [data-theme="official"] .authors-badge { background: #fff; border-color: #d1d5db; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        [data-theme="elderly"] .authors-badge { background: rgba(0, 0, 0, 0.04); border-color: rgba(0, 0, 0, 0.15); padding: 16px 36px; font-size: 1.2rem; border-width: 2px; }
+        
+        /* ========================================================
+               НАВИГАЦИЯ
+               ======================================================== */
+        nav {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border-radius: 60px;
+            border: 1px solid var(--glass-border);
+            margin-bottom: 40px;
+            position: sticky;
+            top: 80px;
+            z-index: 100;
+            box-shadow: var(--shadow-card);
+        }
+        [data-theme="elderly"] nav { padding: 16px 24px; gap: 12px; border-width: 2px; }
+        
+        nav button {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            padding: clamp(8px, 1vw, 12px) clamp(16px, 2vw, 24px);
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: clamp(0.8rem, 1vw, 0.95rem);
+            font-weight: 500;
+            transition: var(--transition);
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        [data-theme="elderly"] nav button { font-size: 1.3rem; padding: 14px 32px; border: 2px solid transparent; }
+        nav button i { font-size: 1.1rem; transition: var(--transition); }
+        nav button:hover { color: var(--text-primary); background: rgba(124, 58, 237, 0.08); transform: translateY(-2px); }
+        [data-theme="official"] nav button:hover { background: rgba(30, 64, 175, 0.06); }
+        [data-theme="elderly"] nav button:hover { background: rgba(30, 64, 175, 0.08); transform: none; }
+        
+        nav button.active {
+            color: #fff;
+            background: linear-gradient(135deg, var(--purple), var(--purple-dark));
+            box-shadow: 0 4px 20px rgba(124, 58, 237, 0.3);
+        }
+        [data-theme="official"] nav button.active { box-shadow: 0 4px 20px rgba(30, 64, 175, 0.2); }
+        
+        /* ========================================================
+               СЕКЦИИ И КАРТОЧКИ
+               ======================================================== */
+        .section { display: none; animation: sectionIn 0.5s ease-out; padding: 20px 0 40px; }
+        .section.active-section { display: block; }
+        
+        @keyframes sectionIn {
+            from { opacity: 0; transform: translateY(30px) scale(0.98); filter: blur(6px); }
+            to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+        }
+        [data-theme="official"] .section { animation: none; }
+        [data-theme="elderly"] .section { animation-duration: 0.3s; }
+        
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 700;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: linear-gradient(135deg, var(--text-primary), var(--purple-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        [data-theme="official"] .section-title { background: linear-gradient(135deg, #0f172a, #1e40af); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        [data-theme="elderly"] .section-title { background: linear-gradient(135deg, #000000, #1e40af); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .section-title i { -webkit-text-fill-color: initial; color: var(--gold); font-size: 1.8rem; }
+        [data-theme="official"] .section-title i { color: var(--purple); }
+        
+        /* Стеклянные карточки */
+        .glass-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-radius: var(--radius);
+            border: 1px solid var(--glass-border);
+            padding: 25px 30px;
+            transition: var(--transition);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), var(--shadow-card);
+        }
+        .glass-card:hover { border-color: rgba(124, 58, 237, 0.3); box-shadow: var(--shadow-glow), inset 0 1px 0 rgba(255, 255, 255, 0.08); transform: translateY(-4px); }
+        [data-theme="official"] .glass-card { border-color: #d1d5db; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        [data-theme="official"] .glass-card:hover { border-color: var(--purple); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(30, 64, 175, 0.06); }
+        [data-theme="elderly"] .glass-card { border-width: 2px; padding: 30px 35px; }
+        [data-theme="elderly"] .glass-card:hover { transform: none; border-color: var(--purple); box-shadow: 0 4px 30px rgba(30, 64, 175, 0.08); }
+        
+        /* Задания */
+        .task-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(30px);
+            border-radius: var(--radius);
+            padding: 22px 24px;
+            border-left: 4px solid var(--purple);
+            transition: transform 0.1s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+            cursor: default;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-card);
+            transform: perspective(800px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1);
+            will-change: transform;
+        }
+        .task-card:hover { border-color: var(--purple); box-shadow: var(--shadow-glow), var(--shadow-card); }
+        [data-theme="official"] .task-card { border-left-width: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        [data-theme="official"] .task-card:hover { border-color: var(--purple); box-shadow: 0 4px 16px rgba(30, 64, 175, 0.06); transform: translateY(-2px); }
+        [data-theme="elderly"] .task-card { padding: 28px 30px; border-left-width: 6px; transform: none !important; }
+        [data-theme="elderly"] .task-card:hover { transform: none !important; border-color: var(--purple); box-shadow: 0 4px 30px rgba(30, 64, 175, 0.08); }
+        
+        .task-card .card-title { font-weight: 600; font-size: clamp(1rem, 1.2vw, 1.1rem); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 8px; }
+        [data-theme="elderly"] .task-card .card-title { font-size: 1.4rem; }
+        .task-card .card-desc { color: var(--text-secondary); font-size: clamp(0.85rem, 1vw, 0.95rem); line-height: 1.6; }
+        [data-theme="elderly"] .task-card .card-desc { font-size: 1.2rem; }
+        
+        .task-card.card-blue { border-left-color: #3b82f6; }
+        .task-card.card-red { border-left-color: #ef4444; }
+        .task-card.card-green { border-left-color: #10b981; }
+        .task-card.card-yellow { border-left-color: #f59e0b; }
+        .task-card.card-orange { border-left-color: #f97316; }
+        
+        .card-badge {
+            font-size: 0.7rem;
+            padding: 3px 12px;
+            border-radius: 30px;
+            font-weight: 500;
+        }
+        .badge-confirmed { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); }
+        .badge-developed { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.2); }
+        [data-theme="elderly"] .card-badge { font-size: 1rem; padding: 5px 16px; }
+        
+        /* Кнопки */
+        .btn {
+            padding: var(--btn-padding);
+            border: none;
+            border-radius: 40px;
+            font-size: clamp(0.85rem, 1vw, 1rem);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Inter', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        [data-theme="elderly"] .btn { font-size: 1.3rem; padding: 18px 40px; border-radius: 60px; }
+        
+        .btn-primary { background: linear-gradient(135deg, var(--purple), var(--purple-dark)); color: #fff; }
+        .btn-primary:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 8px 30px rgba(124, 58, 237, 0.4); }
+        .btn-success { background: linear-gradient(135deg, #10b981, #059669); color: #fff; }
+        .btn-success:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 8px 30px rgba(16, 185, 129, 0.4); }
+        .btn-danger { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; }
+        .btn-danger:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 8px 30px rgba(239, 68, 68, 0.4); }
+        .btn-outline { background: transparent; border: 2px solid var(--glass-border); color: var(--text-primary); }
+        .btn-outline:hover { border-color: var(--purple); background: rgba(124, 58, 237, 0.05); }
+        .btn-sm { padding: 6px 16px; font-size: 0.8rem; }
+        
+        /* ========================================================
+               КАРТА
+               ======================================================== */
+        .map-wrapper {
+            position: relative;
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+            background: var(--bg-card);
+            box-shadow: var(--shadow-card);
+        }
+        .map-wrapper .map-image { width: 100%; display: block; border-radius: var(--radius); user-select: none; -webkit-user-drag: none; }
+        .map-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+        
+        .map-marker {
+            position: absolute;
+            pointer-events: all;
+            cursor: pointer;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            transition: var(--transition);
+        }
+        .map-marker .marker-dot {
+            width: clamp(16px, 2.5vw, 26px);
+            height: clamp(16px, 2.5vw, 26px);
+            border-radius: 50%;
+            background: var(--purple);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(0.5rem, 0.7vw, 0.7rem);
+            font-weight: 700;
+            color: #fff;
+            box-shadow: 0 0 20px rgba(124, 58, 237, 0.3);
+            transition: var(--transition);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        .map-marker .marker-dot::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            border: 2px solid var(--purple);
+            opacity: 0.2;
+            animation: markerPulse 2.5s ease-in-out infinite;
+        }
+        @keyframes markerPulse {
+            0%, 100% { transform: scale(1); opacity: 0.2; }
+            50% { transform: scale(1.4); opacity: 0; }
+        }
+        .map-marker .marker-label {
+            font-size: clamp(0.45rem, 0.6vw, 0.6rem);
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            padding: 2px 8px;
+            border-radius: 8px;
+            color: #fff;
+            white-space: nowrap;
+            opacity: 0;
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            pointer-events: none;
+        }
+        .map-marker:hover .marker-label { opacity: 1; }
+        .map-marker:hover .marker-dot { transform: scale(1.15); }
+        
+        .map-editor-tools {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 15px;
+            padding: 15px 20px;
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius);
+            border: 1px solid var(--glass-border);
+            align-items: center;
+        }
+        .map-editor-tools .status { flex: 1; min-width: 150px; color: var(--text-secondary); font-size: 0.9rem; }
+        
+        /* ========================================================
+               МОДАЛКА
+               ======================================================== */
+        .zone-info-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .zone-info-modal.active { display: flex; }
+        
+        .zone-info-content {
+            background: var(--bg-card);
+            backdrop-filter: blur(40px);
+            border-radius: var(--radius);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            border: 1px solid var(--glass-border);
+            animation: modalIn 0.4s ease-out;
+            box-shadow: var(--shadow-card);
+        }
+        [data-theme="elderly"] .zone-info-content { padding: 50px; border-width: 2px; }
+        
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.9) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        
+        .zone-info-content .close-btn {
+            padding: var(--btn-padding);
+            border: none;
+            border-radius: 40px;
+            background: linear-gradient(135deg, var(--purple), var(--purple-dark));
+            color: #fff;
+            font-size: clamp(0.9rem, 1vw, 1rem);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Inter', sans-serif;
+        }
+        .zone-info-content .close-btn:hover { transform: scale(1.05); box-shadow: var(--shadow-glow); }
+        
+        /* ========================================================
+               ПРАВИЛА
+               ======================================================== */
+        .rules-content {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius);
+            padding: clamp(20px, 3vw, 40px);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-card);
+        }
+        [data-theme="elderly"] .rules-content { font-size: 1.2rem; }
+        .rules-content h3 { font-size: clamp(1.2rem, 1.8vw, 1.4rem); color: var(--purple-light); margin: 30px 0 15px; display: flex; align-items: center; gap: 12px; }
+        [data-theme="official"] .rules-content h3 { color: var(--purple-dark); }
+        [data-theme="elderly"] .rules-content h3 { font-size: 1.8rem; color: var(--purple-dark); }
+        .rules-content ul, .rules-content ol { padding-left: 25px; margin: 12px 0; }
+        .rules-content li { margin: 8px 0; color: var(--text-secondary); }
+        
+        .rules-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+        }
+        .rules-content th, .rules-content td { border: 1px solid var(--glass-border); padding: 12px 16px; text-align: left; }
+        [data-theme="elderly"] .rules-content th, [data-theme="elderly"] .rules-content td { padding: 16px 20px; font-size: 1.1rem; }
+        .rules-content th { background: rgba(124, 58, 237, 0.12); color: var(--text-primary); font-weight: 600; }
+        [data-theme="official"] .rules-content th { background: rgba(30, 64, 175, 0.06); }
+        [data-theme="elderly"] .rules-content th { background: rgba(30, 64, 175, 0.08); font-size: 1.2rem; }
+        
+        /* ========================================================
+               ФИЛЬТРЫ
+               ======================================================== */
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 20px;
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border-radius: 60px;
+            border: 1px solid var(--glass-border);
+            margin: 20px 0;
+        }
+        .motor-filter-group {
+            display: flex;
+            gap: 8px;
+            background: rgba(0,0,0,0.2);
+            padding: 4px;
+            border-radius: 50px;
+        }
+        .motor-filter-btn {
+            padding: 7px 18px;
+            border: none;
+            border-radius: 40px;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.3s;
+            font-family: 'Inter', sans-serif;
+        }
+        .motor-filter-btn.active {
+            background: linear-gradient(135deg, var(--purple), var(--purple-dark));
+            color: #fff;
+        }
+        
+        /* ========================================================
+               ФУТЕР
+               ======================================================== */
+        footer {
+            margin-top: 60px;
+            padding: 30px 20px;
+            text-align: center;
+            border-top: 1px solid var(--glass-border);
+            color: var(--text-muted);
+            font-size: clamp(0.8rem, 1vw, 0.9rem);
+        }
+        [data-theme="elderly"] footer { font-size: 1.2rem; padding: 40px 20px; border-top-width: 2px; }
+        
+        /* ========================================================
+               МОБИЛЬНАЯ АДАПТАЦИЯ
+               ======================================================== */
+        @media (max-width: 1024px) {
+            .settings-gear { bottom: 20px; right: 20px; width: 48px; height: 48px; }
+            .settings-gear i { font-size: 1.3rem; }
+            .settings-panel { bottom: 80px; right: 20px; width: 300px; padding: 20px 22px; }
+        }
+        
+        @media (max-width: 768px) {
+            .app { padding: 0 10px 10px; }
+            .settings-gear { bottom: 16px; right: 16px; width: 44px; height: 44px; }
+            .settings-gear i { font-size: 1.1rem; }
+            .settings-panel { bottom: 70px; right: 16px; width: calc(100vw - 32px); max-width: 320px; padding: 18px 20px; }
+            header { padding: 30px 20px 25px; border-radius: 0 0 30px 30px; }
+            nav { border-radius: 30px; padding: 10px 12px; gap: 4px; top: 10px; overflow-x: auto; flex-wrap: nowrap; justify-content: flex-start; }
+            nav button { padding: 6px 12px; font-size: 0.75rem; white-space: nowrap; }
+            nav button .nav-label { display: none; }
+            nav button i { font-size: 1.2rem; }
+            .section { padding: 10px 0 20px; }
+            .map-editor-tools { flex-direction: column; align-items: stretch; padding: 12px 16px; gap: 10px; }
+            .map-editor-tools .status { text-align: center; font-size: 0.8rem; }
+            .map-editor-tools .btn { justify-content: center; padding: 10px 20px; font-size: 0.85rem; }
+            .rules-content { padding: 16px; }
+            .rules-content table { font-size: 0.8rem; }
+            .rules-content th, .rules-content td { padding: 6px 10px; }
+        }
+        
+        @media (max-width: 480px) {
+            header h1 { font-size: 1.8rem; }
+            header { padding: 20px 14px 18px; }
+            .authors-badge { font-size: 0.7rem; padding: 6px 14px; }
+            .map-editor-tools .btn { font-size: 0.75rem; padding: 8px 14px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ========================================================
+       ШЕСТЕРЁНКА НАСТРОЕК
+       ======================================================== -->
+<div class="settings-gear" id="settingsGear" onclick="toggleSettings()">
+    <i class="fas fa-cog"></i>
+</div>
+
+<div class="settings-panel" id="settingsPanel">
+    <h4><i class="fas fa-sliders-h"></i> <span data-i18n="settings.title">Настройки</span></h4>
+    <div class="setting-group">
+        <label><i class="fas fa-palette"></i> <span data-i18n="settings.theme">Тема</span></label>
+        <select id="themeSelect" onchange="changeTheme(this.value)">
+            <option value="game">🎮 <span data-i18n="settings.themeGame">Игровая</span></option>
+            <option value="official">📄 <span data-i18n="settings.themeOfficial">Официальная</span></option>
+            <option value="elderly">👴 <span data-i18n="settings.themeElderly">Для пожилых</span></option>
+        </select>
+    </div>
+    <div class="setting-group">
+        <label><i class="fas fa-language"></i> <span data-i18n="settings.language">Язык</span></label>
+        <select id="langSelect" onchange="changeLanguage(this.value)">
+            <option value="ru">🇷🇺 <span data-i18n="settings.langRu">Русский</span></option>
+            <option value="en">🇬🇧 <span data-i18n="settings.langEn">English</span></option>
+        </select>
+    </div>
+    <button class="close-settings" onclick="toggleSettings()">
+        <i class="fas fa-check"></i> <span data-i18n="settings.close">Закрыть</span>
+    </button>
+</div>
+
+<!-- ========================================================
+       CANVAS ДЛЯ ЧАСТИЦ
+       ======================================================== -->
+<canvas id="particles-canvas"></canvas>
+
+<!-- ========================================================
+       ОСНОВНОЙ КОНТЕЙНЕР
+       ======================================================== -->
+<div class="app">
+
+    <!-- HEADER -->
+    <header>
+        <h1><i class="fas fa-dice-d6"></i> <span data-i18n="title">Говорю правильно</span></h1>
+        <p class="subtitle">
+            <span data-i18n="subtitle">Путешествие к <span class="highlight">вулкану речи</span></span>
+        </p>
+        <div class="authors-badge">
+            <span class="icon"><i class="fas fa-users"></i></span>
+            <span><strong data-i18n="authors">Участники проекта:</strong> Гусев Алексей, Толстова Софья</span>
+            <span>•</span>
+            <span data-i18n="school">Школа №7</span>
+            <span>•</span>
+            <span data-i18n="year">Москва 2026</span>
+        </div>
+    </header>
+
+    <!-- НАВИГАЦИЯ -->
+    <nav id="mainNav">
+        <button data-section="about" class="active">
+            <i class="fas fa-rocket"></i>
+            <span class="nav-label" data-i18n="nav.about">О проекте</span>
+        </button>
+        <button data-section="rules">
+            <i class="fas fa-book-open"></i>
+            <span class="nav-label" data-i18n="nav.rules">Правила</span>
+        </button>
+        <button data-section="cards">
+            <i class="fas fa-layer-group"></i>
+            <span class="nav-label" data-i18n="nav.cards">Карточки</span>
+        </button>
+        <button data-section="map">
+            <i class="fas fa-map"></i>
+            <span class="nav-label" data-i18n="nav.map">Карта</span>
+        </button>
+        <button data-section="parent">
+            <i class="fas fa-heart"></i>
+            <span class="nav-label" data-i18n="nav.parent">Родителям</span>
+        </button>
+    </nav>
+
+    <!-- ========================================================
+           СЕКЦИЯ: О ПРОЕКТЕ
+           ======================================================== -->
+    <section id="about" class="section active-section">
+        <h2 class="section-title">
+            <i class="fas fa-bullseye"></i> <span data-i18n="about.title">О проекте</span>
+        </h2>
+        <p class="section-subtitle" data-i18n="about.desc">
+            Дети с дислалией теряют интерес к рутинным логопедическим занятиям. 
+            Наша игра превращает артикуляционную гимнастику, постановку звуков 
+            и автоматизацию в увлекательное приключение.
+        </p>
+
+        <div class="photo-row" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(250px,1fr)); gap:25px; margin:25px 0;">
+            <div class="glass-card" style="text-align:center; padding:15px;">
+                <img src="images/figures.jpg" loading="lazy" alt="3D фигурки" style="width:100%; border-radius:12px; max-height:250px; object-fit:cover;">
+                <p style="margin-top:10px; color:var(--text-secondary); font-size:0.9rem;" data-i18n="about.figures">🎲 Фигурки, напечатанные на 3D-принтере</p>
+            </div>
+            <div class="glass-card" style="text-align:center; padding:15px;">
+                <img src="images/mirror.jpg" loading="lazy" alt="Зеркало" style="width:100%; border-radius:12px; max-height:250px; object-fit:cover;">
+                <p style="margin-top:10px; color:var(--text-secondary); font-size:0.9rem;" data-i18n="about.mirror">🪞 Зеркало для контроля артикуляции</p>
+            </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:20px;">
+            <div class="glass-card" style="text-align:center;">
+                <div style="font-size:2.5rem; font-weight:900; color:var(--gold);" id="statCells">89</div>
+                <div style="color:var(--text-secondary);" data-i18n="about.cells">Клеток на карте</div>
+            </div>
+            <div class="glass-card" style="text-align:center;">
+                <div style="font-size:2.5rem; font-weight:900; color:var(--gold);" id="statCards">0</div>
+                <div style="color:var(--text-secondary);" data-i18n="about.cards">Карточек заданий</div>
+            </div>
+            <div class="glass-card" style="text-align:center;">
+                <div style="font-size:2.5rem; font-weight:900; color:var(--gold);" id="statProgress">0%</div>
+                <div style="color:var(--text-secondary);" data-i18n="about.progress">Прогресс</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+           СЕКЦИЯ: ПРАВИЛА
+           ======================================================== -->
+    <section id="rules" class="section">
+        <h2 class="section-title">
+            <i class="fas fa-dice"></i> <span data-i18n="rules.title">Правила игры</span>
+        </h2>
+        <div class="rules-content" id="rulesContent"></div>
+    </section>
+
+    <!-- ========================================================
+           СЕКЦИЯ: КАРТОЧКИ
+           ======================================================== -->
+    <section id="cards" class="section">
+        <h2 class="section-title">
+            <i class="fas fa-id-card"></i> <span data-i18n="cards.title">Карточки заданий</span>
+        </h2>
+        
+        <button class="btn btn-primary" onclick="openCardsGallery()">
+            <i class="fas fa-image"></i> <span data-i18n="cards.gallery">Посмотреть реальные карточки</span>
+        </button>
+
+        <div class="filter-bar">
+            <span style="display:flex; align-items:center; gap:10px; color:var(--text-secondary);">
+                <i class="fas fa-sliders-h"></i> <span data-i18n="cards.filter">Режим:</span>
+            </span>
+            <div style="display:flex; align-items:center; gap:12px;">
+                <span style="color:var(--text-secondary); font-size:0.9rem;" data-i18n="cards.all">Все</span>
+                <div class="toggle" id="toggleCards" onclick="toggleCardFilter()" style="position:relative; width:52px; height:28px; background:rgba(100,116,139,0.3); border-radius:30px; cursor:pointer; transition:0.3s; border:1px solid var(--glass-border); flex-shrink:0;">
+                    <div class="toggle-slider" style="position:absolute; top:2px; left:2px; width:22px; height:22px; background:#fff; border-radius:50%; transition:0.3s; box-shadow:0 2px 8px rgba(0,0,0,0.3);"></div>
+                </div>
+                <span style="color:var(--text-secondary); font-size:0.9rem;" data-i18n="cards.confirmed">Только подтверждённые</span>
+            </div>
+        </div>
+
+        <!-- Синие -->
+        <div class="card-section-header" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:15px; margin:30px 0 15px;">
+            <h3 style="font-size:1.4rem; display:flex; align-items:center; gap:12px;"><span style="font-size:1.8rem;">😊</span> <span data-i18n="cards.blue">Артикуляционная гимнастика</span></h3>
+            <span class="card-count-badge" id="blueCount" style="background:rgba(124,58,237,0.2); color:var(--purple-light); padding:4px 16px; border-radius:50px; font-size:0.8rem; font-weight:600; border:1px solid rgba(124,58,237,0.2);">0</span>
+        </div>
+        <div id="blueCards" class="card-grid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:20px;"></div>
+
+        <!-- Красные -->
+        <div class="card-section-header" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:15px; margin:30px 0 15px;">
+            <h3 style="font-size:1.4rem; display:flex; align-items:center; gap:12px;"><span style="font-size:1.8rem;">🎤</span> <span data-i18n="cards.red">Произнеси звук</span></h3>
+            <span class="card-count-badge" id="redCount" style="background:rgba(124,58,237,0.2); color:var(--purple-light); padding:4px 16px; border-radius:50px; font-size:0.8rem; font-weight:600; border:1px solid rgba(124,58,237,0.2);">0</span>
+        </div>
+        <div id="redCards" class="card-grid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:20px;"></div>
+
+        <!-- Зелёные -->
+        <div class="card-section-header" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:15px; margin:30px 0 15px;">
+            <h3 style="font-size:1.4rem; display:flex; align-items:center; gap:12px;"><span style="font-size:1.8rem;">🔍</span> <span data-i18n="cards.green">Найди слово</span></h3>
+            <span class="card-count-badge" id="greenCount" style="background:rgba(124,58,237,0.2); color:var(--purple-light); padding:4px 16px; border-radius:50px; font-size:0.8rem; font-weight:600; border:1px solid rgba(124,58,237,0.2);">0</span>
+        </div>
+        <div id="greenCards" class="card-grid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:20px;"></div>
+
+        <!-- Жёлтые -->
+        <div class="card-section-header" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:15px; margin:30px 0 15px;">
+            <h3 style="font-size:1.4rem; display:flex; align-items:center; gap:12px;"><span style="font-size:1.8rem;">💬</span> <span data-i18n="cards.yellow">Скороговорки</span></h3>
+            <span class="card-count-badge" id="yellowCount" style="background:rgba(124,58,237,0.2); color:var(--purple-light); padding:4px 16px; border-radius:50px; font-size:0.8rem; font-weight:600; border:1px solid rgba(124,58,237,0.2);">0</span>
+        </div>
+        <div id="yellowCards" class="card-grid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:20px;"></div>
+
+        <!-- Оранжевые -->
+        <div class="card-section-header" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:15px; margin:30px 0 15px;">
+            <h3 style="font-size:1.4rem; display:flex; align-items:center; gap:12px;"><span style="font-size:1.8rem;">🤲</span> <span data-i18n="cards.orange">Развитие моторики</span></h3>
+            <span class="card-count-badge" id="orangeCount" style="background:rgba(124,58,237,0.2); color:var(--purple-light); padding:4px 16px; border-radius:50px; font-size:0.8rem; font-weight:600; border:1px solid rgba(124,58,237,0.2);">0</span>
+        </div>
+
+        <div class="filter-bar">
+            <span style="display:flex; align-items:center; gap:10px; color:var(--text-secondary);">
+                <i class="fas fa-filter"></i> <span data-i18n="cards.motorFilter">Фильтр моторики:</span>
+            </span>
+            <div class="motor-filter-group">
+                <button class="motor-filter-btn active" data-filter="all" onclick="setMotorFilter('all', this)">🧩 <span data-i18n="cards.all">Все</span></button>
+                <button class="motor-filter-btn" data-filter="fine" onclick="setMotorFilter('fine', this)">✋ <span data-i18n="cards.fine">Мелкая</span></button>
+                <button class="motor-filter-btn" data-filter="gross" onclick="setMotorFilter('gross', this)">🏃 <span data-i18n="cards.gross">Крупная</span></button>
+            </div>
+        </div>
+
+        <div id="orangeCards" class="card-grid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:20px;"></div>
+    </section>
+
+    <!-- ========================================================
+           СЕКЦИЯ: КАРТА
+           ======================================================== -->
+    <section id="map" class="section">
+        <h2 class="section-title">
+            <i class="fas fa-map-marked-alt"></i> <span data-i18n="map.title">Карта путешествия</span>
+        </h2>
+
+        <div class="map-wrapper" id="mapWrapper">
+            <img src="images/map.png" loading="lazy" alt="Игровое поле" class="map-image" id="mapImage">
+            <div class="map-overlay" id="mapOverlay"></div>
+        </div>
+
+        <div class="map-editor-tools" id="mapEditorTools">
+            <div class="status" id="editorStatus">
+                <span data-i18n="map.editor.status">📌 <strong>Все 89 клеток</strong> уже отмечены на карте!</span>
+            </div>
+            <button class="btn btn-outline" id="toggleEditorBtn" onclick="toggleMapEditor()">
+                <i class="fas fa-pen"></i> <span data-i18n="map.editor.start">Режим разметки</span>
+            </button>
+            <button class="btn btn-success" id="exportCoordsBtn" onclick="exportCoordinates()" style="display:none;">
+                <i class="fas fa-download"></i> <span data-i18n="map.editor.export">Экспортировать JSON</span>
+            </button>
+            <button class="btn btn-danger" id="clearMarkersBtn" onclick="clearMarkers()" style="display:none;">
+                <i class="fas fa-trash"></i> <span data-i18n="map.editor.clear">Очистить</span>
+            </button>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-top:20px;">
+            <div class="glass-card" style="text-align:center; padding:12px; font-size:0.9rem;">❌ <strong data-i18n="map.cells.cross">Крест</strong><br><span style="color:var(--text-secondary); font-size:0.8rem;" data-i18n="map.cells.crossDesc">Проверка заданий</span></div>
+            <div class="glass-card" style="text-align:center; padding:12px; font-size:0.9rem;">🔥 <strong data-i18n="map.cells.fire">Костёр</strong><br><span style="color:var(--text-secondary); font-size:0.8rem;" data-i18n="map.cells.fireDesc">Доп. ход</span></div>
+            <div class="glass-card" style="text-align:center; padding:12px; font-size:0.9rem;">🧙 <strong data-i18n="map.cells.wizards">Волшебники</strong><br><span style="color:var(--text-secondary); font-size:0.8rem;" data-i18n="map.cells.wizardsDesc">Выбор задания</span></div>
+            <div class="glass-card" style="text-align:center; padding:12px; font-size:0.9rem;">🌊 <strong data-i18n="map.cells.waterfall">Водопад</strong><br><span style="color:var(--text-secondary); font-size:0.8rem;" data-i18n="map.cells.waterfallDesc">Вниз по течению</span></div>
+            <div class="glass-card" style="text-align:center; padding:12px; font-size:0.9rem;">🧗 <strong data-i18n="map.cells.rope">Переправа</strong><br><span style="color:var(--text-secondary); font-size:0.8rem;" data-i18n="map.cells.ropeDesc">Скатывание</span></div>
+            <div class="glass-card" style="text-align:center; padding:12px; font-size:0.9rem;">🏁 <strong data-i18n="map.cells.finish">Вулкан</strong><br><span style="color:var(--text-secondary); font-size:0.8rem;" data-i18n="map.cells.finishDesc">ПОБЕДА!</span></div>
+        </div>
+
+        <div class="glass-card" style="margin-top:25px; text-align:center;">
+            <h3 style="color:var(--gold);"><i class="fas fa-download"></i> <span data-i18n="map.download.title">Индивидуальная карта игрока</span></h3>
+            <p style="color:var(--text-secondary); margin:10px 0;" data-i18n="map.download.desc">Скачайте и распечатайте для отслеживания прогресса ребёнка.</p>
+            <button class="btn btn-primary" onclick="downloadWordCard()">
+                <i class="fas fa-file-word"></i> <span data-i18n="map.download.btn">Скачать Word-карту</span>
+            </button>
+        </div>
+    </section>
+
+    <!-- ========================================================
+           СЕКЦИЯ: РОДИТЕЛЯМ
+           ======================================================== -->
+    <section id="parent" class="section">
+        <h2 class="section-title">
+            <i class="fas fa-chalkboard-user"></i> <span data-i18n="parent.title">Рекомендации родителям</span>
+        </h2>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:20px;">
+            <div class="glass-card">
+                <div style="font-size:2rem; color:var(--gold);">👁️</div>
+                <h4 style="margin:10px 0;" data-i18n="parent.tip1.title">Не пропускайте ошибки</h4>
+                <p style="color:var(--text-secondary);" data-i18n="parent.tip1.desc">Если звук произнесён неверно — задание не засчитывается. Только правильное произношение ведёт к победе!</p>
+            </div>
+            <div class="glass-card">
+                <div style="font-size:2rem; color:var(--gold);">🪞</div>
+                <h4 style="margin:10px 0;" data-i18n="parent.tip2.title">Используйте зеркало</h4>
+                <p style="color:var(--text-secondary);" data-i18n="parent.tip2.desc">Показывайте правильную артикуляцию и просите ребёнка смотреть на себя. Визуальный контроль — ключ к успеху.</p>
+            </div>
+            <div class="glass-card">
+                <div style="font-size:2rem; color:var(--gold);">📅</div>
+                <h4 style="margin:10px 0;" data-i18n="parent.tip3.title">Регулярность</h4>
+                <p style="color:var(--text-secondary);" data-i18n="parent.tip3.desc">Играйте 2-3 раза в неделю по 15-20 минут. Короткие, но регулярные занятия дают лучший результат.</p>
+            </div>
+        </div>
+
+        <div class="glass-card" style="margin-top:20px;">
+            <h3 style="color:var(--gold);"><i class="fas fa-chart-simple"></i> <span data-i18n="parent.effects.title">Ожидаемые эффекты</span></h3>
+            <ul style="list-style:none; padding:0; margin-top:15px;">
+                <li style="padding:8px 0; color:var(--text-secondary); display:flex; align-items:center; gap:12px; border-bottom:1px solid var(--glass-border);">
+                    <span style="color:var(--green); font-weight:700;">✓</span> <span data-i18n="parent.effects.1">Повышение мотивации к логопедическим занятиям</span>
+                </li>
+                <li style="padding:8px 0; color:var(--text-secondary); display:flex; align-items:center; gap:12px; border-bottom:1px solid var(--glass-border);">
+                    <span style="color:var(--green); font-weight:700;">✓</span> <span data-i18n="parent.effects.2">Увеличение количества правильных артикуляционных укладов</span>
+                </li>
+                <li style="padding:8px 0; color:var(--text-secondary); display:flex; align-items:center; gap:12px; border-bottom:1px solid var(--glass-border);">
+                    <span style="color:var(--green); font-weight:700;">✓</span> <span data-i18n="parent.effects.3">Ускорение автоматизации звуков в игровой среде</span>
+                </li>
+                <li style="padding:8px 0; color:var(--text-secondary); display:flex; align-items:center; gap:12px; border-bottom:1px solid var(--glass-border);">
+                    <span style="color:var(--green); font-weight:700;">✓</span> <span data-i18n="parent.effects.4">Развитие мелкой и крупной моторики, стимулирующей речь</span>
+                </li>
+                <li style="padding:8px 0; color:var(--text-secondary); display:flex; align-items:center; gap:12px;">
+                    <span style="color:var(--green); font-weight:700;">✓</span> <span data-i18n="parent.effects.5">Вовлечение родителей в коррекционный процесс</span>
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    <footer>
+        <span data-i18n="footer">🧠 Игра создана для коррекции дислалии у детей 5-7 лет • Москва 2026</span>
+    </footer>
+
+</div>
+
+<!-- ========================================================
+       МОДАЛКА ДЛЯ ЗОН
+       ======================================================== -->
+<div class="zone-info-modal" id="zoneModal">
+    <div class="zone-info-content">
+        <h3 id="zoneTitle">Название зоны</h3>
+        <p id="zoneDescription">Описание зоны</p>
+        <button class="close-btn" onclick="closeZoneInfo()"><span data-i18n="close">Закрыть</span></button>
+    </div>
+</div>
+
+<!-- ========================================================
+       JAVASCRIPT (ВСЁ В ОДНОМ ФАЙЛЕ)
+       ======================================================== -->
+<script>
+// ========================================================
+// ПЕРЕВОДЫ
+// ========================================================
+const TRANSLATIONS = {
+    ru: {
+        title: 'Говорю правильно',
+        subtitle: 'Путешествие к <span class="highlight">вулкану речи</span>',
+        authors: 'Участники проекта:',
+        school: 'Школа №7',
+        year: 'Москва 2026',
+        close: 'Закрыть',
+        footer: '🧠 Игра создана для коррекции дислалии у детей 5-7 лет • Москва 2026',
+        settings: {
+            title: 'Настройки',
+            theme: 'Тема',
+            themeGame: 'Игровая',
+            themeOfficial: 'Официальная',
+            themeElderly: 'Для пожилых',
+            language: 'Язык',
+            langRu: 'Русский',
+            langEn: 'English',
+            close: 'Закрыть'
+        },
+        nav: {
+            about: 'О проекте',
+            rules: 'Правила',
+            cards: 'Карточки',
+            map: 'Карта',
+            parent: 'Родителям'
+        },
+        about: {
+            title: 'О проекте',
+            desc: 'Дети с дислалией теряют интерес к рутинным логопедическим занятиям. Наша игра превращает артикуляционную гимнастику, постановку звуков и автоматизацию в увлекательное приключение.',
+            figures: '🎲 Фигурки, напечатанные на 3D-принтере',
+            mirror: '🪞 Зеркало для контроля артикуляции',
+            cells: 'Клеток на карте',
+            cards: 'Карточек заданий',
+            types: 'Типов заданий',
+            progress: 'Прогресс'
+        },
+        cards: {
+            title: 'Карточки заданий',
+            gallery: 'Посмотреть реальные карточки',
+            filter: 'Режим:',
+            all: 'Все',
+            confirmed: 'Только подтверждённые',
+            blue: 'Артикуляционная гимнастика',
+            red: 'Произнеси звук',
+            green: 'Найди слово',
+            yellow: 'Скороговорки',
+            orange: 'Развитие моторики',
+            motorFilter: 'Фильтр моторики:',
+            fine: 'Мелкая',
+            gross: 'Крупная'
+        },
+        map: {
+            title: 'Карта путешествия',
+            editor: {
+                status: '📌 <strong>Все 89 клеток</strong> уже отмечены на карте!',
+                start: 'Режим разметки',
+                export: 'Экспортировать JSON',
+                clear: 'Очистить'
+            },
+            cells: {
+                cross: 'Крест',
+                crossDesc: 'Проверка заданий',
+                fire: 'Костёр',
+                fireDesc: 'Доп. ход',
+                wizards: 'Волшебники',
+                wizardsDesc: 'Выбор задания',
+                waterfall: 'Водопад',
+                waterfallDesc: 'Вниз по течению',
+                rope: 'Переправа',
+                ropeDesc: 'Скатывание',
+                finish: 'Вулкан',
+                finishDesc: 'ПОБЕДА!'
+            },
+            download: {
+                title: 'Индивидуальная карта игрока',
+                desc: 'Скачайте и распечатайте для отслеживания прогресса ребёнка.',
+                btn: 'Скачать Word-карту'
+            }
+        },
+        parent: {
+            title: 'Рекомендации родителям',
+            tip1: {
+                title: 'Не пропускайте ошибки',
+                desc: 'Если звук произнесён неверно — задание не засчитывается. Только правильное произношение ведёт к победе!'
+            },
+            tip2: {
+                title: 'Используйте зеркало',
+                desc: 'Показывайте правильную артикуляцию и просите ребёнка смотреть на себя. Визуальный контроль — ключ к успеху.'
+            },
+            tip3: {
+                title: 'Регулярность',
+                desc: 'Играйте 2-3 раза в неделю по 15-20 минут. Короткие, но регулярные занятия дают лучший результат.'
+            },
+            effects: {
+                title: 'Ожидаемые эффекты',
+                1: 'Повышение мотивации к логопедическим занятиям',
+                2: 'Увеличение количества правильных артикуляционных укладов',
+                3: 'Ускорение автоматизации звуков в игровой среде',
+                4: 'Развитие мелкой и крупной моторики, стимулирующей речь',
+                5: 'Вовлечение родителей в коррекционный процесс'
+            }
+        }
+    },
+    en: {
+        title: 'Speak Correctly',
+        subtitle: 'Journey to the <span class="highlight">volcano of speech</span>',
+        authors: 'Project participants:',
+        school: 'School №7',
+        year: 'Moscow 2026',
+        close: 'Close',
+        footer: '🧠 Game created for speech correction in children 5-7 years old • Moscow 2026',
+        settings: {
+            title: 'Settings',
+            theme: 'Theme',
+            themeGame: 'Game',
+            themeOfficial: 'Official',
+            themeElderly: 'Elderly',
+            language: 'Language',
+            langRu: 'Russian',
+            langEn: 'English',
+            close: 'Close'
+        },
+        nav: {
+            about: 'About',
+            rules: 'Rules',
+            cards: 'Cards',
+            map: 'Map',
+            parent: 'For Parents'
+        },
+        about: {
+            title: 'About the Project',
+            desc: 'Children with dyslalia lose interest in routine speech therapy sessions. Our game turns articulation exercises, sound production, and automation into an exciting adventure.',
+            figures: '🎲 3D-printed figures',
+            mirror: '🪞 Mirror for articulation control',
+            cells: 'Cells on the map',
+            cards: 'Task cards',
+            types: 'Task types',
+            progress: 'Progress'
+        },
+        cards: {
+            title: 'Task Cards',
+            gallery: 'View actual cards',
+            filter: 'Mode:',
+            all: 'All',
+            confirmed: 'Only confirmed',
+            blue: 'Articulation exercises',
+            red: 'Say the sound',
+            green: 'Find the word',
+            yellow: 'Tongue twisters',
+            orange: 'Motor skills',
+            motorFilter: 'Motor filter:',
+            fine: 'Fine',
+            gross: 'Gross'
+        },
+        map: {
+            title: 'Journey Map',
+            editor: {
+                status: '📌 <strong>All 89 cells</strong> are already marked on the map!',
+                start: 'Edit mode',
+                export: 'Export JSON',
+                clear: 'Clear'
+            },
+            cells: {
+                cross: 'Cross',
+                crossDesc: 'Task check',
+                fire: 'Campfire',
+                fireDesc: 'Extra turn',
+                wizards: 'Wizards',
+                wizardsDesc: 'Choose task',
+                waterfall: 'Waterfall',
+                waterfallDesc: 'Downstream',
+                rope: 'Rope crossing',
+                ropeDesc: 'Slide down',
+                finish: 'Volcano',
+                finishDesc: 'VICTORY!'
+            },
+            download: {
+                title: 'Player Card',
+                desc: 'Download and print to track your child\'s progress.',
+                btn: 'Download Word Card'
+            }
+        },
+        parent: {
+            title: 'Recommendations for Parents',
+            tip1: {
+                title: 'Don\'t ignore mistakes',
+                desc: 'If a sound is pronounced incorrectly — the task doesn\'t count. Only correct pronunciation leads to victory!'
+            },
+            tip2: {
+                title: 'Use the mirror',
+                desc: 'Show the correct articulation and ask the child to watch themselves. Visual control is the key to success.'
+            },
+            tip3: {
+                title: 'Regularity',
+                desc: 'Play 2-3 times a week for 15-20 minutes. Short but regular sessions give the best results.'
+            },
+            effects: {
+                title: 'Expected Effects',
+                1: 'Increased motivation for speech therapy sessions',
+                2: 'More correct articulation patterns',
+                3: 'Faster automation of sounds in a game environment',
+                4: 'Development of fine and gross motor skills stimulating speech',
+                5: 'Parental involvement in the correction process'
+            }
+        }
+    }
+};
+
+// ========================================================
+// СОСТОЯНИЕ
+// ========================================================
+const AppState = {
+    theme: 'game',
+    lang: 'ru',
+    showOnlyConfirmed: false,
+    currentMotorFilter: 'all',
+    isEditorMode: false,
+    markers: [],
+    markerCounter: 0,
+    currentCell: 0,
+    completedTaskIds: [],
+    stats: { totalCorrect: 0, totalIncorrect: 0, gamesPlayed: 0, lastPlayed: null },
+    achievements: []
+};
+
+// ========================================================
+// ДАННЫЕ КАРТОЧЕК (из ваших фото)
+// ========================================================
+const CARDS_DATA = {
+    blue: [
+        { title: "Заборчик", desc: "Улыбнуться, с напряжением обнажив сомкнутые зубы.", confirmed: true },
+        { title: "Слоник пьёт", desc: "Вытянуть губы трубочкой — «хобот слоника». Набирать водичку, слегка причмокивая.", confirmed: true },
+        { title: "Лошадка", desc: "Поцокать узким языком, как цокают копытами лошадки.", confirmed: true },
+        { title: "Чашечка", desc: "Улыбнуться, широко открыть рот. Высунуть широкий язык и придать ему форму «чашечки».", confirmed: true },
+        { title: "Дудочка", desc: "С напряжением вытянуть губы вперёд. Зубы сомкнуты.", confirmed: true },
+        { title: "Барабанщик", desc: "Улыбнуться, открыть рот. Кончик языка за верхними зубами: «дэ-дэ-дэ...»", confirmed: true },
+        { title: "Месим тесто", desc: "Улыбнуться, покусать язык между зубами. Покусать кончик языка зубками. Чередовать.", confirmed: true },
+        { title: "Маляр", desc: "Улыбнуться, приоткрыть рот. Кончиком языка погладить нёбо.", confirmed: true },
+        { title: "Качели", desc: "Улыбнуться, открыть рот. Кончик языка за верхние зубы, затем за нижние.", confirmed: true },
+        { title: "Вкусное варенье", desc: "Улыбнуться, открыть рот. Широким языком облизать верхнюю губу.", confirmed: true },
+        { title: "Гармошка", desc: "Сделать «грибочек». Не отрывая языка, открывать и закрывать рот. Зубы не смыкать.", confirmed: true },
+        { title: "Блинчик", desc: "Улыбнуться, приоткрыть рот. Положить широкий язык на нижнюю губу.", confirmed: true },
+        { title: "Окошко (Бегемот)", desc: "Широко открыть рот — «жарко», закрыть рот — «холодно».", confirmed: true },
+        { title: "Поймали мышку", desc: "Губы в улыбке, приоткрыть рот. Произнести «а-а» и прикусить широкий кончик языка.", confirmed: true },
+        { title: "Масики", desc: "Улыбнуться, открыть рот. Кончик языка переводить из одного уголка рта в другой.", confirmed: true },
+        { title: "Грибочек", desc: "Улыбнуться, поцокать языком. Присосать широкий язык к нёбу.", confirmed: true },
+        { title: "Индюки болтают", desc: "Языком быстро двигать по верхней губе: «бл-бл-бл-бл...»", confirmed: true },
+        { title: "Орешки", desc: "Рот закрыт. Кончик языка с напряжением поочерёдно упирается в щёку.", confirmed: true },
+        { title: "Чистим зубки", desc: "Улыбнуться, открыть рот. Кончиком языка почистить зубы изнутри.", confirmed: true }
+    ],
+    red: [
+        { title: "Пароход гудит", desc: "Губы в улыбке, открыть рот. Произнести долгое «ы-ы-ы-ы...»", confirmed: true },
+        { title: "Загнать мяч в ворота", desc: "Высунуть широкий язык между зубами. Дуть на язык. Щёки не надувать.", confirmed: true },
+        { title: "Киска", desc: "Губы в улыбке, рот открыт. Кончик языка упирается в нижние зубы. Выгнуть язык горкой.", confirmed: true },
+        { title: "Парашютик", desc: "На кончик носа положить ватку. Сдуть ватку с носа вверх языком-«чашечкой».", confirmed: true },
+        { title: "Чистим зубки", desc: "Улыбнуться, открыть рот. Кончиком языка почистить зубы изнутри.", confirmed: true },
+        { title: "Орешки", desc: "Рот закрыт. Кончик языка с напряжением упирается в щёку.", confirmed: true },
+        { title: "Индюки болтают", desc: "Языком быстро двигать по верхней губе: «бл-бл-бл...»", confirmed: true },
+        { title: "Шарик", desc: "Надуть щёку, затем сдуть щёку.", confirmed: true }
+    ],
+    green: [
+        { title: "Слова на С", desc: "Назови 3 слова со звуком С в начале (сом, сок, сон).", confirmed: false },
+        { title: "Слова на З", desc: "Назови 3 слова со звуком З в начале (замок, зуб, зонт).", confirmed: false },
+        { title: "Слова на Ш", desc: "Назови 3 слова со звуком Ш в начале (шапка, шар, шум).", confirmed: false },
+        { title: "Слова на Ж в середине", desc: "Назови слова с Ж в середине (лужа, ножи, пижама).", confirmed: false },
+        { title: "Слова на Р в середине", desc: "Корова, ворона, дерево.", confirmed: false },
+        { title: "Слова на Р в конце", desc: "Топор, забор, помидор.", confirmed: false },
+        { title: "Слова на Л в начале", desc: "Луна, лук, лапа.", confirmed: false },
+        { title: "Слова на Л в середине", desc: "Полка, пила, молоко.", confirmed: false },
+        { title: "Слова на Ч в конце", desc: "Мяч, ключ, врач.", confirmed: false },
+        { title: "Слова с С и Ш", desc: "Суши, шасси, смешно.", confirmed: false }
+    ],
+    yellow: [
+        { title: "Сашина сушка", desc: "Шла Саша по шоссе и сосала сушку.", confirmed: false },
+        { title: "Карл и Клара", desc: "Карл у Клары украл кораллы.", confirmed: false },
+        { title: "Грека", desc: "Ехал Грека через реку, видит Грека — в реке рак.", confirmed: false },
+        { title: "Бараны", desc: "Белые бараны били в барабаны.", confirmed: false },
+        { title: "Мышата", desc: "Шесть мышат в камышах шуршат.", confirmed: false },
+        { title: "Ёлки-иголки", desc: "У ёлки иголки колки.", confirmed: false },
+        { title: "Пироги", desc: "Съел молодец тридцать три пирога с пирогом, да всё с творогом.", confirmed: false },
+        { title: "Жужелица", desc: "Жужжит жужелица, кружится, жужжит.", confirmed: false },
+        { title: "Лара и рояль", desc: "Лара играла на рояле, у Лары были алые лалы.", confirmed: false },
+        { title: "Трава-дрова", desc: "На дворе трава, на траве дрова.", confirmed: false }
+    ]
+};
+
+const MOTOR_CARDS = {
+    fine: [
+        { title: "Пальчики здороваются", desc: "Соедини большой палец с указательным — «здравствуй», затем со средним, безымянным и мизинцем. Повтори 2 раза." },
+        { title: "Колечки", desc: "Сделай колечко из большого и указательного пальцев, затем из большого и среднего, большого и безымянного, большого и мизинца." },
+        { title: "Щепотка", desc: "Собери пальцы в щепотку (большой, указательный и средний вместе), затем разожми. Повтори 3 раза." },
+        { title: "Сорока-ворона", desc: "Сделай круговые движения указательным пальцем по ладони другой руки — «сорока кашу варила»." },
+        { title: "Кулак-ладонь", desc: "Сожми руку в кулак, затем раскрой ладонь. Повтори 3 раза каждой рукой." },
+        { title: "Ножницы", desc: "Разведи указательный и средний пальцы в стороны — «ножницы», затем соедини обратно. Повтори 3 раза." },
+        { title: "Замок", desc: "Сцепи пальцы в замок, затем разомкни. Повтори 2 раза." },
+        { title: "Карандаш-каталка", desc: "Покатай карандаш между ладонями (или вообрази движение)." }
+    ],
+    gross: [
+        { title: "Хлопки над головой", desc: "Подними руки вверх и хлопни в ладоши 3 раза." },
+        { title: "Наклоны", desc: "Сделай наклон влево, затем вправо. Повтори 2 раза." },
+        { title: "Прыжки на месте", desc: "Попрыгай на месте 3 раза." },
+        { title: "Приседания", desc: "Присядь 2 раза, держа спину прямо." },
+        { title: "Повороты головы", desc: "Поверни голову влево, затем вправо. Повтори 2 раза." },
+        { title: "Потягушки", desc: "Подними руки вверх и потянись, как после сна." },
+        { title: "Цапля", desc: "Постой на одной ноге 3 секунды, затем на другой." },
+        { title: "Мельница", desc: "Вытяни руки в стороны и вращай ими, как мельница." }
+    ]
+};
+
+// ========================================================
+// КООРДИНАТЫ КАРТЫ (89 клеток)
+// ========================================================
+const MAP_COORDINATES = {
+    "total": 89,
+    "cells": [
+        {"number":1,"top":"94.85949017199017%","left":"8.026208026208026%"},
+        {"number":2,"top":"94.44998976248976%","left":"15.724815724815725%"},
+        {"number":3,"top":"94.36808968058969%","left":"22.52252252252252%"},
+        {"number":4,"top":"93.13958845208845%","left":"29.565929565929565%"},
+        {"number":5,"top":"93.3852886977887%","left":"34.72563472563473%"},
+        {"number":6,"top":"95.51469082719083%","left":"46.027846027846024%"},
+        {"number":7,"top":"94.36808968058969%","left":"55.528255528255535%"},
+        {"number":8,"top":"92.40248771498771%","left":"61.58886158886159%"},
+        {"number":9,"top":"89.86358517608518%","left":"66.5028665028665%"},
+        {"number":10,"top":"82.4925778050778%","left":"60.68796068796068%"},
+        {"number":11,"top":"81.26407657657657%","left":"54.463554463554466%"},
+        {"number":12,"top":"78.06997338247338%","left":"44.22604422604422%"},
+        {"number":13,"top":"77.90617321867322%","left":"30.303030303030305%"},
+        {"number":14,"top":"77.9880733005733%","left":"24.815724815724817%"},
+        {"number":15,"top":"78.06997338247338%","left":"19.901719901719904%"},
+        {"number":16,"top":"76.10437141687142%","left":"12.285012285012286%"},
+        {"number":17,"top":"66.76776208026209%","left":"21.375921375921376%"},
+        {"number":18,"top":"65.21166052416052%","left":"32.432432432432435%"},
+        {"number":19,"top":"68.32386363636364%","left":"42.91564291564291%"},
+        {"number":20,"top":"68.73336404586404%","left":"49.795249795249795%"},
+        {"number":21,"top":"70.12566543816544%","left":"57.24815724815725%"},
+        {"number":22,"top":"73.15596846846847%","left":"63.63636363636363%"},
+        {"number":23,"top":"69.22476453726453%","left":"72.97297297297297%"},
+        {"number":24,"top":"63.9831592956593%","left":"70.5978705978706%"},
+        {"number":25,"top":"64.22885954135954%","left":"65.02866502866503%"},
+        {"number":26,"top":"62.75465806715806%","left":"58.3947583947584%"},
+        {"number":27,"top":"62.42705773955773%","left":"48.157248157248155%"},
+        {"number":28,"top":"62.50895782145782%","left":"39.14823914823915%"},
+        {"number":29,"top":"62.26325757575758%","left":"29.4021294021294%"},
+        {"number":30,"top":"62.18135749385749%","left":"23.013923013923012%"},
+        {"number":31,"top":"61.36235667485668%","left":"12.694512694512694%"},
+        {"number":32,"top":"54.564649877149876%","left":"10.155610155610155%"},
+        {"number":33,"top":"53.0904484029484%","left":"24.324324324324326%"},
+        {"number":34,"top":"52.680947993447994%","left":"35.54463554463555%"},
+        {"number":35,"top":"52.92664823914824%","left":"45.37264537264537%"},
+        {"number":36,"top":"52.844748157248155%","left":"57.9033579033579%"},
+        {"number":37,"top":"51.780047092547086%","left":"66.09336609336609%"},
+        {"number":38,"top":"53.33614864864865%","left":"72.64537264537265%"},
+        {"number":39,"top":"56.694052006552006%","left":"76.65847665847666%"},
+        {"number":40,"top":"58.33205364455365%","left":"84.52088452088452%"},
+        {"number":41,"top":"68.07816339066339%","left":"83.04668304668304%"},
+        {"number":42,"top":"76.67767199017199%","left":"80.67158067158067%"},
+        {"number":43,"top":"84.7857800982801%","left":"78.78787878787878%"},
+        {"number":44,"top":"91.82918714168714%","left":"80.91728091728092%"},
+        {"number":45,"top":"95.35089066339066%","left":"87.87878787878788%"},
+        {"number":46,"top":"91.01018632268632%","left":"94.02129402129403%"},
+        {"number":47,"top":"85.85048116298117%","left":"98.36199836199836%"},
+        {"number":48,"top":"79.70797502047502%","left":"96.96969696969697%"},
+        {"number":49,"top":"73.56546887796888%","left":"94.51269451269452%"},
+        {"number":50,"top":"66.35826167076168%","left":"95.0859950859951%"},
+        {"number":51,"top":"59.64245495495496%","left":"96.47829647829647%"},
+        {"number":52,"top":"53.33614864864865%","left":"97.21539721539722%"},
+        {"number":53,"top":"47.27554258804259%","left":"95.24979524979526%"},
+        {"number":54,"top":"43.1805384930385%","left":"97.70679770679772%"},
+        {"number":55,"top":"42.27963759213759%","left":"92.54709254709255%"},
+        {"number":56,"top":"35.645730958230956%","left":"94.51269451269452%"},
+        {"number":57,"top":"30.404125716625718%","left":"94.26699426699426%"},
+        {"number":58,"top":"26.30912162162162%","left":"88.77968877968878%"},
+        {"number":59,"top":"25.817721130221134%","left":"81.49058149058149%"},
+        {"number":60,"top":"22.869318181818183%","left":"77.96887796887798%"},
+        {"number":61,"top":"28.684223996723997%","left":"67.4037674037674%"},
+        {"number":62,"top":"31.550726863226863%","left":"57.41195741195742%"},
+        {"number":63,"top":"32.451627764127764%","left":"49.631449631449634%"},
+        {"number":64,"top":"31.550726863226863%","left":"38.82063882063882%"},
+        {"number":65,"top":"40.31403562653563%","left":"39.72153972153972%"},
+        {"number":66,"top":"36.95613226863227%","left":"25.470925470925472%"},
+        {"number":67,"top":"33.925829238329236%","left":"16.134316134316133%"},
+        {"number":68,"top":"28.766124078624077%","left":"8.927108927108927%"},
+        {"number":69,"top":"24.261619574119575%","left":"5.569205569205569%"},
+        {"number":70,"top":"19.839015151515152%","left":"1.3923013923013923%"},
+        {"number":71,"top":"16.153511466011466%","left":"8.681408681408682%"},
+        {"number":72,"top":"12.386107698607699%","left":"5.241605241605242%"},
+        {"number":73,"top":"7.1445024570024565%","left":"8.435708435708436%"},
+        {"number":74,"top":"6.571201883701884%","left":"16.134316134316133%"},
+        {"number":75,"top":"6.980702293202293%","left":"21.457821457821456%"},
+        {"number":76,"top":"7.799703112203112%","left":"27.27272727272727%"},
+        {"number":77,"top":"7.1445024570024565%","left":"32.350532350532355%"},
+        {"number":78,"top":"7.062602375102375%","left":"36.77313677313677%"},
+        {"number":79,"top":"7.30830262080262%","left":"45.37264537264537%"},
+        {"number":80,"top":"16.153511466011466%","left":"45.12694512694513%"},
+        {"number":81,"top":"25.4901208026208%","left":"46.109746109746105%"},
+        {"number":82,"top":"26.30912162162162%","left":"54.95495495495496%"},
+        {"number":83,"top":"25.40822072072072%","left":"60.36036036036037%"},
+        {"number":84,"top":"23.36071867321867%","left":"65.02866502866503%"},
+        {"number":85,"top":"19.757115069615068%","left":"69.53316953316954%"},
+        {"number":86,"top":"17.054412366912366%","left":"74.93857493857494%"},
+        {"number":87,"top":"14.67930999180999%","left":"78.70597870597871%"},
+        {"number":88,"top":"11.97660728910729%","left":"82.30958230958231%"},
+        {"number":89,"top":"9.273904586404587%","left":"90.41769041769042%"}
+    ]
+};
+
+// ========================================================
+// СОХРАНЕНИЕ В localStorage
+// ========================================================
+const STORAGE_KEY = 'speech_game_state';
+
+function saveState() {
+    try {
+        const data = {
+            theme: AppState.theme,
+            lang: AppState.lang,
+            showOnlyConfirmed: AppState.showOnlyConfirmed,
+            currentMotorFilter: AppState.currentMotorFilter,
+            currentCell: AppState.currentCell,
+            completedTaskIds: AppState.completedTaskIds,
+            stats: AppState.stats,
+            achievements: AppState.achievements,
+            savedAt: new Date().toISOString()
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    } catch (e) { console.warn('Не удалось сохранить состояние:', e); }
+}
+
+function loadState() {
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const data = JSON.parse(raw);
+        if (data.theme) AppState.theme = data.theme;
+        if (data.lang) AppState.lang = data.lang;
+        if (typeof data.showOnlyConfirmed === 'boolean') AppState.showOnlyConfirmed = data.showOnlyConfirmed;
+        if (data.currentMotorFilter) AppState.currentMotorFilter = data.currentMotorFilter;
+        if (typeof data.currentCell === 'number') AppState.currentCell = data.currentCell;
+        if (Array.isArray(data.completedTaskIds)) AppState.completedTaskIds = data.completedTaskIds;
+        if (data.stats) {
+            AppState.stats.totalCorrect = data.stats.totalCorrect || 0;
+            AppState.stats.totalIncorrect = data.stats.totalIncorrect || 0;
+            AppState.stats.gamesPlayed = data.stats.gamesPlayed || 0;
+            AppState.stats.lastPlayed = data.stats.lastPlayed || null;
+        }
+        if (Array.isArray(data.achievements)) AppState.achievements = data.achievements;
+        console.log('📂 Состояние загружено из localStorage');
+    } catch (e) { console.warn('Не удалось загрузить состояние:', e); }
+}
+
+function markTaskCompleted(taskId) {
+    if (!AppState.completedTaskIds.includes(taskId)) {
+        AppState.completedTaskIds.push(taskId);
+        AppState.stats.totalCorrect++;
+        saveState();
+        checkAchievements();
+        renderCardsStats();
+        return true;
+    }
+    return false;
+}
+
+// ========================================================
+// ДОСТИЖЕНИЯ
+// ========================================================
+const ACHIEVEMENTS = {
+    first_step: { id: 'first_step', name: 'Первый шаг', desc: 'Выполнено первое задание', icon: '🌟' },
+    ten_tasks: { id: 'ten_tasks', name: 'Десять заданий', desc: 'Выполнено 10 заданий', icon: '⭐' },
+    fifty_tasks: { id: 'fifty_tasks', name: 'Полпути', desc: 'Выполнено 50 заданий', icon: '🏆' },
+    hundred_tasks: { id: 'hundred_tasks', name: 'Мастер речи', desc: 'Выполнено 100 заданий', icon: '👑' }
+};
+
+function checkAchievements() {
+    const count = AppState.completedTaskIds.length;
+    if (count >= 1 && !AppState.achievements.includes('first_step')) unlockAchievement('first_step');
+    if (count >= 10 && !AppState.achievements.includes('ten_tasks')) unlockAchievement('ten_tasks');
+    if (count >= 50 && !AppState.achievements.includes('fifty_tasks')) unlockAchievement('fifty_tasks');
+    if (count >= 100 && !AppState.achievements.includes('hundred_tasks')) unlockAchievement('hundred_tasks');
+}
+
+function unlockAchievement(id) {
+    if (AppState.achievements.includes(id)) return;
+    AppState.achievements.push(id);
+    saveState();
+    const ach = ACHIEVEMENTS[id];
+    showAchievementNotification(ach);
+}
+
+function showAchievementNotification(ach) {
+    const existing = document.querySelector('.achievement-notification');
+    if (existing) existing.remove();
+    const div = document.createElement('div');
+    div.className = 'achievement-notification';
+    div.innerHTML = `
+        <div style="position:fixed; top:20px; left:50%; transform:translateX(-50%); 
+                    background:var(--bg-card); backdrop-filter:blur(40px); 
+                    padding:20px 30px; border-radius:20px; border:2px solid var(--gold);
+                    box-shadow:0 20px 60px rgba(0,0,0,0.5); z-index:10000;
+                    display:flex; align-items:center; gap:16px;
+                    animation:slideDown 0.5s ease-out;">
+            <span style="font-size:2.5rem;">${ach.icon}</span>
+            <div>
+                <div style="font-weight:700; font-size:1.1rem;">🏅 ${ach.name}</div>
+                <div style="color:var(--text-secondary); font-size:0.9rem;">${ach.desc}</div>
+            </div>
+            <button onclick="this.parentElement.parentElement.remove()" 
+                    style="background:transparent; border:none; color:var(--text-muted); cursor:pointer; font-size:1.2rem;">✕</button>
+        </div>
+        <style>
+            @keyframes slideDown {
+                from { opacity:0; transform:translateX(-50%) translateY(-30px) scale(0.9); }
+                to { opacity:1; transform:translateX(-50%) translateY(0) scale(1); }
+            }
+        </style>
+    `;
+    document.body.appendChild(div);
+    setTimeout(() => { if (div.parentElement) div.remove(); }, 5000);
+}
+
+// ========================================================
+// НАВИГАЦИЯ
+// ========================================================
+function setupNavigation() {
+    document.querySelectorAll('#mainNav button').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const sectionId = this.dataset.section;
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active-section'));
+            const target = document.getElementById(sectionId);
+            if (target) target.classList.add('active-section');
+            document.querySelectorAll('#mainNav button').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+}
+
+// ========================================================
+// РЕНДЕРИНГ КАРТОЧЕК
+// ========================================================
+function renderSpeechCards() {
+    const colors = ['blue', 'red', 'green', 'yellow'];
+    const colorMap = { blue: 'card-blue', red: 'card-red', green: 'card-green', yellow: 'card-yellow' };
+    const labelMap = { blue: 'blueCount', red: 'redCount', green: 'greenCount', yellow: 'yellowCount' };
+    
+    for (const color of colors) {
+        const container = document.getElementById(`${color}Cards`);
+        if (!container) continue;
+        const cards = CARDS_DATA[color] || [];
+        let html = '', count = 0;
+        
+        for (let i = 0; i < cards.length; i++) {
+            const card = cards[i];
+            if (AppState.showOnlyConfirmed && !card.confirmed) continue;
+            count++;
+            const badgeClass = card.confirmed ? 'badge-confirmed' : 'badge-developed';
+            const badgeText = card.confirmed ? '✓ Подтверждено' : '✎ В разработке';
+            const taskId = `${color}_${i}`;
+            const isCompleted = AppState.completedTaskIds.includes(taskId);
+            
+            html += `
+                <div class="task-card ${colorMap[color]}" data-task-id="${taskId}">
+                    <div class="card-title">
+                        ${isCompleted ? '✅ ' : ''}${card.title}
+                        <span class="card-badge ${badgeClass}">${badgeText}</span>
+                    </div>
+                    <div class="card-desc">${card.desc}</div>
+                    <button class="btn btn-sm btn-success" onclick="window.completeTask('${taskId}')" style="margin-top:12px; padding:6px 16px; font-size:0.8rem; border-radius:30px;">
+                        ✅ Выполнено
+                    </button>
+                </div>
+            `;
+        }
+        if (!html) html = '<div style="padding:30px; text-align:center; color:var(--text-muted);">Нет заданий в этой категории</div>';
+        container.innerHTML = html;
+        const countEl = document.getElementById(labelMap[color]);
+        if (countEl) countEl.textContent = count;
+    }
+    init3DCards();
+}
+
+function renderMotorCards() {
+    const container = document.getElementById('orangeCards');
+    if (!container) return;
+    let cards = [];
+    if (AppState.currentMotorFilter === 'all') {
+        cards = [...MOTOR_CARDS.fine, ...MOTOR_CARDS.gross];
+    } else if (AppState.currentMotorFilter === 'fine') {
+        cards = MOTOR_CARDS.fine;
+    } else if (AppState.currentMotorFilter === 'gross') {
+        cards = MOTOR_CARDS.gross;
+    }
+    let html = '';
+    for (let i = 0; i < cards.length; i++) {
+        const card = cards[i];
+        const isFine = MOTOR_CARDS.fine.includes(card);
+        const badgeText = isFine ? '✋ Мелкая моторика' : '🏃 Крупная моторика';
+        const badgeClass = isFine ? 'badge-confirmed' : 'badge-developed';
+        const taskId = `motor_${i}`;
+        const isCompleted = AppState.completedTaskIds.includes(taskId);
+        html += `
+            <div class="task-card card-orange" data-task-id="${taskId}">
+                <div class="card-title">
+                    ${isCompleted ? '✅ ' : ''}${card.title}
+                    <span class="card-badge ${badgeClass}">${badgeText}</span>
+                </div>
+                <div class="card-desc">${card.desc}</div>
+                <button class="btn btn-sm btn-success" onclick="window.completeTask('${taskId}')" style="margin-top:12px; padding:6px 16px; font-size:0.8rem; border-radius:30px;">
+                    ✅ Выполнено
+                </button>
+            </div>
+        `;
+    }
+    if (!html) html = '<div style="padding:30px; text-align:center; color:var(--text-muted);">Нет карточек в этой категории</div>';
+    container.innerHTML = html;
+    document.getElementById('orangeCount').textContent = cards.length;
+    init3DCards();
+}
+
+function renderCardsStats() {
+    const total = Object.values(CARDS_DATA).reduce((acc, arr) => acc + arr.length, 0) + 
+                  MOTOR_CARDS.fine.length + MOTOR_CARDS.gross.length;
+    const completed = AppState.completedTaskIds.length;
+    const progress = total > 0 ? Math.round((completed / total) * 100) : 0;
+    const statCards = document.getElementById('statCards');
+    const statProgress = document.getElementById('statProgress');
+    if (statCards) statCards.textContent = total;
+    if (statProgress) statProgress.textContent = `${progress}%`;
+}
+
+window.completeTask = function(taskId) {
+    if (markTaskCompleted(taskId)) {
+        renderSpeechCards();
+        renderMotorCards();
+        renderCardsStats();
+        const btn = document.querySelector(`[data-task-id="${taskId}"] .btn`);
+        if (btn) {
+            btn.textContent = '✅ Готово!';
+            btn.style.background = 'var(--green)';
+            setTimeout(() => { btn.textContent = '✅ Выполнено'; }, 1500);
+        }
+    }
+};
+
+// ========================================================
+// 3D-ЭФФЕКТ
+// ========================================================
+function init3DCards() {
+    const theme = document.documentElement.getAttribute('data-theme') || 'game';
+    if (theme === 'official' || theme === 'elderly') return;
+    document.querySelectorAll('.task-card').forEach(card => {
+        card.removeEventListener('mousemove', card._mouseMove);
+        card.removeEventListener('mouseleave', card._mouseLeave);
+        const mouseMove = function(e) {
+            const rect = this.getBoundingClientRect();
+            const x = e.clientX - rect.left, y = e.clientY - rect.top;
+            const rotateX = (y - rect.height/2) / 12;
+            const rotateY = (rect.width/2 - x) / 12;
+            this.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.03, 1.03, 1.03)`;
+        };
+        const mouseLeave = function() {
+            this.style.transform = 'perspective(800px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+        };
+        card._mouseMove = mouseMove;
+        card._mouseLeave = mouseLeave;
+        card.addEventListener('mousemove', mouseMove);
+        card.addEventListener('mouseleave', mouseLeave);
+    });
+}
+
+// ========================================================
+// ФИЛЬТРЫ
+// ========================================================
+function toggleCardFilter() {
+    AppState.showOnlyConfirmed = !AppState.showOnlyConfirmed;
+    const toggle = document.getElementById('toggleCards');
+    if (toggle) toggle.classList.toggle('active', AppState.showOnlyConfirmed);
+    renderSpeechCards();
+    saveState();
+}
+
+function setMotorFilter(filter, btn) {
+    AppState.currentMotorFilter = filter;
+    document.querySelectorAll('.motor-filter-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    renderMotorCards();
+    saveState();
+}
+
+// ========================================================
+// НАСТРОЙКИ (темы, язык)
+// ========================================================
+function toggleSettings() {
+    const panel = document.getElementById('settingsPanel');
+    const gear = document.getElementById('settingsGear');
+    if (panel) panel.classList.toggle('open');
+    if (gear) gear.classList.toggle('open');
+}
+
+function changeTheme(theme) {
+    AppState.theme = theme;
+    document.documentElement.setAttribute('data-theme', theme);
+    const select = document.getElementById('themeSelect');
+    if (select) select.value = theme;
+    saveState();
+    const canvas = document.getElementById('particles-canvas');
+    if (canvas) {
+        canvas.style.display = (theme === 'official' || theme === 'elderly') ? 'none' : 'block';
+    }
+    init3DCards();
+}
+
+function changeLanguage(lang) {
+    AppState.lang = lang;
+    const select = document.getElementById('langSelect');
+    if (select) select.value = lang;
+    saveState();
+    applyTranslations();
+}
+
+function applyTranslations() {
+    const t = TRANSLATIONS[AppState.lang] || TRANSLATIONS.ru;
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.dataset.i18n;
+        const keys = key.split('.');
+        let value = t;
+        for (const k of keys) {
+            if (value && value[k] !== undefined) value = value[k];
+            else { value = null; break; }
+        }
+        if (value !== null && value !== undefined) {
+            el.innerHTML = value;
+        }
+    });
+    renderRules();
+}
+
+function renderRules() {
+    const container = document.getElementById('rulesContent');
+    if (!container) return;
+    const isRu = AppState.lang === 'ru';
+    container.innerHTML = `
+        <h3>${isRu ? '1. Общая информация' : '1. General Information'}</h3>
+        <p><strong>${isRu ? 'Название игры:' : 'Game name:'}</strong> ${isRu ? '«Говорю правильно: Путешествие к вулкану речи»' : '"Speak Correctly: Journey to the Volcano of Speech"'}<br>
+        <strong>${isRu ? 'Тип:' : 'Type:'}</strong> ${isRu ? 'Настольная логопедическая игра' : 'Board speech therapy game'}<br>
+        <strong>${isRu ? 'Количество игроков:' : 'Number of players:'}</strong> ${isRu ? '1–4 ребёнка + 1 взрослый (ведущий, «Хранитель речи»)' : '1–4 children + 1 adult (host, "Guardian of Speech")'}<br>
+        <strong>${isRu ? 'Возраст:' : 'Age:'}</strong> 5–7 ${isRu ? 'лет' : 'years'}<br>
+        <strong>${isRu ? 'Цель игры:' : 'Goal:'}</strong> ${isRu ? 'Первым добраться до финиша (жерло вулкана), правильно выполняя задания.' : 'Be the first to reach the finish (volcano crater) by completing tasks correctly.'}</p>
+
+        <h3>${isRu ? '2. Комплектация' : '2. Contents'}</h3>
+        <ul>
+            <li><strong>${isRu ? 'Игровое поле' : 'Game board'}</strong> — ${isRu ? 'карта-змейка с маршрутом из 89 клеток.' : 'snake map with 89 cells.'}</li>
+            <li><strong>${isRu ? '4 фигурки игроков' : '4 player pieces'}</strong></li>
+            <li><strong>${isRu ? 'Игральный кубик' : 'Dice'}</strong> (1-6)</li>
+            <li><strong>${isRu ? '5 колод карточек' : '5 decks of cards'}</strong> ${isRu ? 'в цифровом формате: синие, красные, зелёные, жёлтые, оранжевые (моторные).' : 'in digital format: blue, red, green, yellow, orange (motor).'}</li>
+            <li><strong>${isRu ? 'Зеркало' : 'Mirror'}</strong> — ${isRu ? 'для контроля артикуляции.' : 'for articulation control.'}</li>
+            <li><strong>${isRu ? 'Индивидуальная карта игрока' : 'Player card'}</strong> — ${isRu ? 'создаётся для отслеживания прогресса.' : 'created to track progress.'}</li>
+        </ul>
+
+        <h3>${isRu ? '3. Подготовка к игре' : '3. Preparation'}</h3>
+        <ol>
+            <li>${isRu ? 'Взрослый вместе с ребёнком готовит индивидуальную карту.' : 'Adult and child prepare a player card.'}</li>
+            <li>${isRu ? 'Карточки открываются на цифровом устройстве.' : 'Cards are opened on a digital device.'}</li>
+            <li>${isRu ? 'Зеркало кладётся рядом с полем.' : 'Mirror is placed next to the board.'}</li>
+            <li>${isRu ? 'Каждый ребёнок выбирает фигурку и ставит её на СТАРТ.' : 'Each child chooses a piece and places it on START.'}</li>
+            <li>${isRu ? 'Взрослый объясняет правила.' : 'Adult explains the rules.'}</li>
+        </ol>
+
+        <h3>${isRu ? '4. Ход игры' : '4. Gameplay'}</h3>
+        <p><strong>${isRu ? '4.1. Бросок кубика' : '4.1. Dice roll'}</strong><br>${isRu ? 'Игрок бросает кубик и передвигает фигурку вперёд на выпавшее количество клеток.' : 'Player rolls the dice and moves forward the number of cells shown.'}</p>
+        <p><strong>${isRu ? '4.2. Что делать на клетке' : '4.2. What to do on a cell'}</strong></p>
+        <table>
+            <tr><th>${isRu ? 'Что на клетке' : 'On the cell'}</th><th>${isRu ? 'Что происходит' : 'What happens'}</th></tr>
+            <tr><td>${isRu ? 'Обычная клетка (нет знаков)' : 'Regular cell (no symbols)'}</td><td>${isRu ? 'Ничего. Ход переходит к следующему игроку.' : 'Nothing. Turn passes to the next player.'}</td></tr>
+            <tr><td>${isRu ? 'Знак «?»' : 'Symbol "?"'}</td><td>${isRu ? 'Взрослый берёт карточку (цвет по зоне). Ребёнок выполняет задание. Если правильно — остаётся на клетке. Если с ошибкой — возвращается на 2 клетки назад.' : 'Adult takes a card (color by zone). Child completes the task. If correct — stays on the cell. If wrong — moves 2 cells back.'}</td></tr>
+            <tr><td>${isRu ? 'Крест' : 'Cross'}</td><td>${isRu ? 'Ведущий проверяет: выполнял ли игрок задание. Если не выполнял — игрок отправляется на СТАРТ.' : 'Host checks: did player complete a task. If not — player goes to START.'}</td></tr>
+            <tr><td>${isRu ? 'Костёр' : 'Campfire'}</td><td>${isRu ? 'Лагерь отдыха. Игрок получает дополнительный ход.' : 'Rest camp. Player gets an extra turn.'}</td></tr>
+            <tr><td>${isRu ? 'Волшебники' : 'Wizards'}</td><td>${isRu ? 'Игрок может выбрать карточку полегче или пропустить ход.' : 'Player can choose an easier card or skip the turn.'}</td></tr>
+            <tr><td>${isRu ? 'Водопад' : 'Waterfall'}</td><td>${isRu ? 'Игрок перемещается на клетку дорога у водопада.' : 'Player moves to the waterfall road cell.'}</td></tr>
+            <tr><td>${isRu ? 'Верёвочная переправа' : 'Rope crossing'}</td><td>${isRu ? 'Игрок перемещается на клетку ниже по карте.' : 'Player moves to a lower cell on the map.'}</td></tr>
+            <tr><td>${isRu ? 'Живот гиганта (клетка 18)' : 'Giant\'s belly (cell 18)'}</td><td>${isRu ? 'Игрок перемещается на клетку 22 (пляж).' : 'Player moves to cell 22 (beach).'}</td></tr>
+            <tr><td>${isRu ? 'Жерло вулкана' : 'Volcano crater'}</td><td><strong>${isRu ? 'ФИНИШ! Победа.' : 'FINISH! Victory.'}</strong></td></tr>
+        </table>
+        <p><em>${isRu ? 'Если ребёнок ошибся — взрослый показывает правильную артикуляцию в зеркале.' : 'If child makes a mistake — adult shows correct articulation in the mirror.'}</em></p>
+    `;
+}
+
+// ========================================================
+// КАРТА
+// ========================================================
+function renderMapMarkers() {
+    const overlay = document.getElementById('mapOverlay');
+    if (!overlay) return;
+    overlay.innerHTML = '';
+    const specialCells = {
+        1: { emoji: '🌿', name: 'Старт — Цветочный луг' },
+        18: { emoji: '🦛', name: 'Живот гиганта → клетка 22' },
+        22: { emoji: '🏖️', name: 'Пляж' },
+        89: { emoji: '🏁', name: '🏆 Жерло вулкана — ПОБЕДА!' },
+        17: { emoji: '🌊', name: 'Водопад — вниз по течению' },
+        16: { emoji: '🧗', name: 'Верёвочная переправа — скатывание' }
+    };
+    for (const cell of MAP_COORDINATES.cells) {
+        const div = document.createElement('div');
+        div.className = 'map-marker';
+        div.style.top = cell.top;
+        div.style.left = cell.left;
+        div.title = `Клетка ${cell.number}`;
+        let color = 'var(--purple)', emoji = '';
+        if (specialCells[cell.number]) {
+            emoji = specialCells[cell.number].emoji;
+            color = 'var(--gold)';
+        }
+        div.innerHTML = `
+            <div class="marker-dot" style="background:${color};">${emoji || cell.number}</div>
+            <span class="marker-label">Клетка ${cell.number}</span>
+        `;
+        if (specialCells[cell.number]) {
+            div.addEventListener('click', function() {
+                showZoneInfo(specialCells[cell.number].name || `Клетка ${cell.number}`, `Особая клетка #${cell.number} на карте путешествия.`);
+            });
+        }
+        overlay.appendChild(div);
+    }
+}
+
+// ========================================================
+// РЕДАКТОР КАРТЫ
+// ========================================================
+let editorMarkers = [];
+let editorCounter = 0;
+
+function toggleMapEditor() {
+    AppState.isEditorMode = !AppState.isEditorMode;
+    const btn = document.getElementById('toggleEditorBtn');
+    const exportBtn = document.getElementById('exportCoordsBtn');
+    const clearBtn = document.getElementById('clearMarkersBtn');
+    const status = document.getElementById('editorStatus');
+    const mapImage = document.getElementById('mapImage');
+    const canvas = document.getElementById('particles-canvas');
+    
+    if (AppState.isEditorMode) {
+        if (btn) btn.innerHTML = '<i class="fas fa-eye"></i> Выйти из разметки';
+        if (exportBtn) exportBtn.style.display = 'inline-flex';
+        if (clearBtn) clearBtn.style.display = 'inline-flex';
+        if (status) status.innerHTML = '📌 <strong>Режим разметки</strong> — кликайте на карту, чтобы добавить новые клетки';
+        if (mapImage) mapImage.style.cursor = 'crosshair';
+        if (canvas) canvas.style.display = 'none';
+        if (mapImage) mapImage.addEventListener('click', onMapClick);
+    } else {
+        if (btn) btn.innerHTML = '<i class="fas fa-pen"></i> Режим разметки';
+        if (exportBtn) exportBtn.style.display = 'none';
+        if (clearBtn) clearBtn.style.display = 'none';
+        if (status) status.innerHTML = '📌 <strong>Все 89 клеток</strong> уже отмечены на карте!';
+        if (mapImage) mapImage.style.cursor = 'default';
+        const theme = document.documentElement.getAttribute('data-theme') || 'game';
+        if (canvas) canvas.style.display = (theme === 'official' || theme === 'elderly') ? 'none' : 'block';
+        if (mapImage) mapImage.removeEventListener('click', onMapClick);
+    }
+}
+
+function onMapClick(e) {
+    if (!AppState.isEditorMode) return;
+    const rect = e.target.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width * 100);
+    const y = ((e.clientY - rect.top) / rect.height * 100);
+    editorCounter++;
+    const newMarker = { number: editorCounter, top: y + '%', left: x + '%' };
+    editorMarkers.push(newMarker);
+    const overlay = document.getElementById('mapOverlay');
+    if (overlay) {
+        const div = document.createElement('div');
+        div.className = 'map-marker editing';
+        div.style.top = newMarker.top;
+        div.style.left = newMarker.left;
+        div.innerHTML = `
+            <div class="marker-dot" style="background:var(--gold);">${newMarker.number}</div>
+            <span class="marker-label">Клетка ${newMarker.number}</span>
+        `;
+        overlay.appendChild(div);
+    }
+    const status = document.getElementById('editorStatus');
+    if (status) status.innerHTML = `📌 <strong>Отмечено:</strong> ${editorCounter} клеток (последняя: ${editorCounter})`;
+}
+
+function clearMarkers() {
+    if (!confirm('Очистить все добавленные клетки?')) return;
+    editorMarkers = [];
+    editorCounter = 0;
+    renderMapMarkers();
+    const status = document.getElementById('editorStatus');
+    if (status) status.innerHTML = '📌 <strong>Все клетки очищены</strong>';
+}
+
+function exportCoordinates() {
+    if (editorMarkers.length === 0) {
+        alert('Сначала отметьте новые клетки на карте!');
+        return;
+    }
+    const data = { total: editorMarkers.length, cells: editorMarkers.map((m, i) => ({ number: i + 1, top: m.top, left: m.left })) };
+    const json = JSON.stringify(data, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'map_coordinates.json';
+    link.click();
+    URL.revokeObjectURL(link.href);
+    const status = document.getElementById('editorStatus');
+    if (status) status.innerHTML = `✅ <strong>Экспортировано!</strong> ${editorMarkers.length} новых клеток.`;
+}
+
+// ========================================================
+// МОДАЛКА
+// ========================================================
+function showZoneInfo(title, description) {
+    const titleEl = document.getElementById('zoneTitle');
+    const descEl = document.getElementById('zoneDescription');
+    const modal = document.getElementById('zoneModal');
+    if (titleEl) titleEl.textContent = title;
+    if (descEl) descEl.textContent = description;
+    if (modal) modal.classList.add('active');
+}
+
+function closeZoneInfo() {
+    const modal = document.getElementById('zoneModal');
+    if (modal) modal.classList.remove('active');
+}
+
+// ========================================================
+// ГАЛЕРЕЯ КАРТОЧЕК
+// ========================================================
+function openCardsGallery() {
+    const galleryWindow = window.open('', '_blank');
+    if (!galleryWindow) {
+        alert('Пожалуйста, разрешите всплывающие окна для этой страницы');
+        return;
+    }
+    const cards = [
+        { num: 1, title: "Окошко (Бегемот) • Чистим зубки • Месим тесто" },
+        { num: 2, title: "Чашечка • Дудочка • Заборчик" },
+        { num: 3, title: "Слоник пьёт • Индюки болтают • Орешки" },
+        { num: 4, title: "Маляр • Грибочек • Киска" },
+        { num: 5, title: "Вкусное варенье • Шарик • Гармошка" },
+        { num: 6, title: "Барабанщик • Парашютик • Загнать мяч в ворота" },
+        { num: 7, title: "Качели • Масики • Блинчик" },
+        { num: 8, title: "Поймали мышку • Лошадка • Пароход гудит" }
+    ];
+    galleryWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+    <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Карточки заданий</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Inter',sans-serif; background:#0a0e27; color:#f1f5f9; padding:20px; min-height:100vh; }
+        h1 { text-align:center; font-family:'Playfair Display',serif; font-size:clamp(1.8rem,4vw,2.5rem); margin-bottom:30px; background:linear-gradient(135deg,#fff,#a78bfa); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:25px; max-width:1200px; margin:0 auto; }
+        .img-card { background:rgba(30,41,59,0.6); backdrop-filter:blur(20px); border-radius:20px; padding:15px; border:1px solid rgba(255,255,255,0.08); transition:0.3s; text-align:center; }
+        .img-card:hover { transform:translateY(-6px); border-color:rgba(124,58,237,0.3); box-shadow:0 8px 30px rgba(124,58,237,0.15); }
+        .img-card img { width:100%; border-radius:12px; cursor:pointer; transition:0.3s; aspect-ratio:1/1; object-fit:cover; background:#1a1a2e; }
+        .img-card img:hover { transform:scale(1.03); }
+        .img-card .card-label { margin-top:10px; color:#cbd5e1; font-size:0.85rem; line-height:1.4; }
+        .img-card .card-label strong { color:#f1f5f9; }
+        .download-btn { margin-top:10px; padding:6px 18px; border:none; border-radius:30px; background:linear-gradient(135deg,#7c3aed,#5b21b6); color:white; cursor:pointer; font-size:0.85rem; transition:0.3s; font-family:'Inter',sans-serif; }
+        .download-btn:hover { transform:scale(1.05); box-shadow:0 4px 15px rgba(124,58,237,0.3); }
+        .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.92); backdrop-filter:blur(20px); justify-content:center; align-items:center; z-index:999; padding:20px; cursor:pointer; }
+        .modal img { max-width:90%; max-height:90%; border-radius:16px; box-shadow:0 20px 60px rgba(0,0,0,0.8); object-fit:contain; }
+        .close-gallery { position:fixed; top:20px; right:30px; font-size:2rem; color:#fff; cursor:pointer; z-index:1000; transition:0.3s; }
+        .close-gallery:hover { transform:rotate(90deg); color:#a78bfa; }
+        .gallery-info { text-align:center; color:#94a3b8; margin-bottom:20px; font-size:0.95rem; }
+        @media (max-width:600px) { body { padding:10px; } .grid { gap:15px; } .img-card { padding:10px; } }
+    </style>
+    </head>
+    <body>
+        <span class="close-gallery" onclick="window.close()">✕</span>
+        <h1>📸 Артикуляционная гимнастика</h1>
+        <p class="gallery-info">Кликните на карточку, чтобы увеличить • Нажмите "Скачать" для сохранения</p>
+        <div class="grid">
+            ${cards.map(c => `
+                <div class="img-card">
+                    <img src="images/card${c.num}.jpg" loading="lazy" onclick="openImage(this.src)" alt="Карточка ${c.num}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22300%22%3E%3Crect fill=%22%231e293b%22 width=%22300%22 height=%22300%22/%3E%3Ctext x=%2250%%22 y=%2250%%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%2364748b%22 font-size=%2220%22 font-family=%22Inter%22%3EКарточка ${c.num}%3C/text%3E%3C/svg%3E'">
+                    <div class="card-label"><strong>Карточка #${c.num}</strong><br>${c.title}</div>
+                    <a href="images/card${c.num}.jpg" download="card${c.num}.jpg"><button class="download-btn">⬇ Скачать</button></a>
+                </div>
+            `).join('')}
+        </div>
+        <div class="modal" id="galleryModal" onclick="this.style.display='none'"><img id="galleryModalImg" src=""></div>
+        <script>
+            function openImage(src) { document.getElementById('galleryModalImg').src = src; document.getElementById('galleryModal').style.display = 'flex'; }
+            document.addEventListener('keydown', function(e) { if (e.key === 'Escape') document.getElementById('galleryModal').style.display = 'none'; });
+        <\/script>
+    </body>
+    </html>
+    `);
+    galleryWindow.document.close();
+}
+
+// ========================================================
+// СКАЧИВАНИЕ WORD-КАРТЫ
+// ========================================================
+function downloadWordCard() {
+    const isRu = AppState.lang === 'ru';
+    const content = `<!DOCTYPE html>
+    <html>
+    <head><meta charset="UTF-8"><title>${isRu ? 'Индивидуальная карта игрока' : 'Player Card'}</title>
+    <style>
+        body{font-family:'Segoe UI',serif;margin:2cm;background:#fff;color:#1a1a2e;}
+        h1{color:#7c3aed;border-bottom:2px solid #7c3aed;padding-bottom:10px;}
+        h2{color:#5b21b6;margin-top:25px;}
+        table{border-collapse:collapse;width:100%;margin:15px 0;}
+        td,th{border:1px solid #ccc;padding:8px;}
+        th{background:#f3f0ff;}
+        .progress-bar { background: #e5e7eb; border-radius: 10px; height: 20px; margin: 10px 0; }
+        .progress-fill { background: #7c3aed; border-radius: 10px; height: 100%; width: ${Math.min(100, AppState.completedTaskIds.length * 2)}%; }
+    </style>
+    </head>
+    <body>
+        <h1>🗺️ ${isRu ? 'Индивидуальная карта игрока' : 'Player Card'}</h1>
+        <p><strong>${isRu ? 'Игра:' : 'Game:'}</strong> ${isRu ? '«Говорю правильно: Путешествие к вулкану речи»' : '"Speak Correctly: Journey to the Volcano of Speech"'}</p>
+        <p><strong>${isRu ? 'Имя:' : 'Name:'}</strong> _________________ <strong>${isRu ? 'Возраст:' : 'Age:'}</strong> _____ <strong>${isRu ? 'Дата:' : 'Date:'}</strong> _________</p>
+        <h2>📊 ${isRu ? 'Прогресс' : 'Progress'}</h2>
+        <p>${isRu ? 'Выполнено заданий:' : 'Completed tasks:'} ${AppState.completedTaskIds.length}</p>
+        <div class="progress-bar"><div class="progress-fill"></div></div>
+        <p>${isRu ? 'Правильных ответов:' : 'Correct answers:'} ${AppState.stats.totalCorrect} | ${isRu ? 'Неправильных:' : 'Incorrect:'} ${AppState.stats.totalIncorrect}</p>
+        <h2>🔊 ${isRu ? 'Нарушенные звуки' : 'Problem Sounds'}</h2>
+        <p>□ ${isRu ? 'Свистящие' : 'Sibilants'} □ ${isRu ? 'Шипящие' : 'Hushing'} □ ${isRu ? 'Сонорные' : 'Sonorants'} □ ${isRu ? 'Другие:' : 'Other:'} ___________</p>
+        <h2>📈 ${isRu ? 'Этап коррекции' : 'Correction Stage'}</h2>
+        <p>□ ${isRu ? 'Постановка' : 'Production'} □ ${isRu ? 'Автоматизация в слогах' : 'Automation in syllables'} □ ${isRu ? 'В словах' : 'In words'} □ ${isRu ? 'Во фразах' : 'In phrases'}</p>
+        <h2>📋 ${isRu ? 'Выполненные задания' : 'Completed Tasks'}</h2>
+        <p>${AppState.completedTaskIds.join(', ') || (isRu ? 'Пока нет' : 'None yet')}</p>
+        <h2>📝 ${isRu ? 'Рекомендации' : 'Recommendations'}</h2>
+        <p>_________________________________________________</p>
+        <h2>🤲 ${isRu ? 'Моторное развитие' : 'Motor Development'}</h2>
+        <p>_________________________________________________</p>
+        <p style="margin-top:40px; color:#64748b; font-size:0.85rem; text-align:center;">${isRu ? 'Карта создана для игры «Говорю правильно» • Москва 2026' : 'Card created for the game "Speak Correctly" • Moscow 2026'}</p>
+    </body>
+    </html>`;
+    const blob = new Blob([content], { type: 'application/msword' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = isRu ? 'Individualnaya_karta.doc' : 'Player_Card.doc';
+    link.click();
+    URL.revokeObjectURL(link.href);
+}
+
+// ========================================================
+// ЧАСТИЦЫ
+// ========================================================
+let particleCanvas, particleCtx, particleWidth, particleHeight;
+let particleArray = [];
+let particleAnimId = null;
+
+function initParticles() {
+    particleCanvas = document.getElementById('particles-canvas');
+    if (!particleCanvas) return;
+    particleCtx = particleCanvas.getContext('2d');
+    resizeParticles();
+    createParticles();
+    drawParticles();
+    window.addEventListener('resize', () => { resizeParticles(); createParticles(); });
+}
+
+function resizeParticles() {
+    particleWidth = particleCanvas.width = window.innerWidth;
+    particleHeight = particleCanvas.height = window.innerHeight;
+}
+
+function createParticles() {
+    particleArray = [];
+    for (let i = 0; i < 50; i++) {
+        particleArray.push({
+            x: Math.random() * particleWidth,
+            y: Math.random() * particleHeight,
+            size: Math.random() * 1.5 + 0.5,
+            speedX: (Math.random() - 0.5) * 0.15,
+            speedY: (Math.random() - 0.5) * 0.15,
+            opacity: Math.random() * 0.4 + 0.15
+        });
+    }
+}
+
+function drawParticles() {
+    const theme = document.documentElement.getAttribute('data-theme') || 'game';
+    if (theme === 'official' || theme === 'elderly') {
+        if (particleAnimId) cancelAnimationFrame(particleAnimId);
+        return;
+    }
+    particleCtx.clearRect(0, 0, particleWidth, particleHeight);
+    for (const p of particleArray) {
+        particleCtx.beginPath();
+        particleCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        particleCtx.fillStyle = `rgba(255, 255, 255, ${p.opacity})`;
+        particleCtx.fill();
+        p.x += p.speedX;
+        p.y += p.speedY;
+        if (p.x < 0) p.x = particleWidth;
+        if (p.x > particleWidth) p.x = 0;
+        if (p.y < 0) p.y = particleHeight;
+        if (p.y > particleHeight) p.y = 0;
+    }
+    for (let i = 0; i < particleArray.length; i += 2) {
+        for (let j = i + 1; j < particleArray.length; j += 2) {
+            const dx = particleArray[i].x - particleArray[j].x;
+            const dy = particleArray[i].y - particleArray[j].y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 120) {
+                particleCtx.beginPath();
+                particleCtx.moveTo(particleArray[i].x, particleArray[i].y);
+                particleCtx.lineTo(particleArray[j].x, particleArray[j].y);
+                particleCtx.strokeStyle = `rgba(124, 58, 237, ${0.04 * (1 - dist / 120)})`;
+                particleCtx.lineWidth = 0.5;
+                particleCtx.stroke();
+            }
+        }
+    }
+    particleAnimId = requestAnimationFrame(drawParticles);
+}
+
+// ========================================================
+// ЗАПУСК
+// ========================================================
+document.addEventListener('DOMContentLoaded', function() {
+    // Загружаем сохранения
+    loadState();
+    
+    // Применяем тему и язык
+    changeTheme(AppState.theme);
+    changeLanguage(AppState.lang);
+    
+    // Навигация
+    setupNavigation();
+    
+    // Рендерим карточки
+    renderSpeechCards();
+    renderMotorCards();
+    renderCardsStats();
+    
+    // Карта
+    renderMapMarkers();
+    
+    // Частицы
+    initParticles();
+    
+    // Модалка - закрытие по клику вне
+    document.getElementById('zoneModal').addEventListener('click', function(e) {
+        if (e.target === this) closeZoneInfo();
+    });
+    
+    console.log('🎮 Говорю правильно — игра загружена!');
+    console.log(`📚 Карточек: ${Object.values(CARDS_DATA).reduce((a,b) => a + b.length, 0) + MOTOR_CARDS.fine.length + MOTOR_CARDS.gross.length}`);
+    console.log(`🗺️ Клеток: ${MAP_COORDINATES.total}`);
+    console.log(`🌍 Тема: ${AppState.theme} | Язык: ${AppState.lang}`);
+    console.log(`📊 Прогресс: ${AppState.completedTaskIds.length} заданий выполнено`);
+});
+</script>
+</body>
+</html>
