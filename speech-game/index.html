@@ -2266,4 +2266,16 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 </body>
+    <script>
+// ПРИНУДИТЕЛЬНЫЙ ПОКАЗ ГЛАВНОГО МЕНЮ
+(function() {
+    const menu = document.getElementById('mainMenu');
+    if (menu) {
+        menu.classList.remove('hidden');
+        menu.style.display = 'flex';
+        menu.style.opacity = '1';
+        menu.style.pointerEvents = 'auto';
+    }
+})();
+</script>
 </html>
