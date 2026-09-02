@@ -1,0 +1,103 @@
+{
+  "title": "Speak Correctly",
+  "subtitle": "Journey to the <span class=\"highlight\">volcano of speech</span>",
+  "authors": "Project participants:",
+  "school": "School №7",
+  "year": "Moscow 2026",
+  "close": "Close",
+  "footer": "🧠 Game created for speech correction in children 5-7 years old • Moscow 2026",
+  "settings": {
+    "title": "Settings",
+    "theme": "Theme",
+    "themeGame": "Game",
+    "themeOfficial": "Official",
+    "themeElderly": "Elderly",
+    "language": "Language",
+    "langRu": "Russian",
+    "langEn": "English",
+    "close": "Close"
+  },
+  "nav": {
+    "about": "About",
+    "rules": "Rules",
+    "cards": "Cards",
+    "map": "Map",
+    "parent": "For Parents"
+  },
+  "about": {
+    "title": "About the Project",
+    "desc": "Children with dyslalia lose interest in routine speech therapy sessions. Our game turns articulation exercises, sound production, and automation into an exciting adventure.",
+    "figures": "🎲 3D-printed figures",
+    "mirror": "🪞 Mirror for articulation control",
+    "cells": "Cells on the map",
+    "cards": "Task cards",
+    "types": "Task types",
+    "progress": "Progress"
+  },
+  "cards": {
+    "title": "Task Cards",
+    "gallery": "View actual cards",
+    "filter": "Mode:",
+    "all": "All",
+    "confirmed": "Only confirmed",
+    "blue": "Articulation exercises",
+    "red": "Say the sound",
+    "green": "Find the word",
+    "yellow": "Tongue twisters",
+    "orange": "Motor skills",
+    "motorFilter": "Motor filter:",
+    "fine": "Fine",
+    "gross": "Gross"
+  },
+  "map": {
+    "title": "Journey Map",
+    "editor": {
+      "status": "📌 <strong>All 89 cells</strong> are already marked on the map!",
+      "start": "Edit mode",
+      "export": "Export JSON",
+      "clear": "Clear"
+    },
+    "cells": {
+      "cross": "Cross",
+      "crossDesc": "Task check",
+      "fire": "Campfire",
+      "fireDesc": "Extra turn",
+      "wizards": "Wizards",
+      "wizardsDesc": "Choose task",
+      "waterfall": "Waterfall",
+      "waterfallDesc": "Downstream",
+      "rope": "Rope crossing",
+      "ropeDesc": "Slide down",
+      "finish": "Volcano",
+      "finishDesc": "VICTORY!"
+    },
+    "download": {
+      "title": "Player Card",
+      "desc": "Download and print to track your child's progress.",
+      "btn": "Download Word Card"
+    }
+  },
+  "parent": {
+    "title": "Recommendations for Parents",
+    "tip1": {
+      "title": "Don't ignore mistakes",
+      "desc": "If a sound is pronounced incorrectly — the task doesn't count. Only correct pronunciation leads to victory!"
+    },
+    "tip2": {
+      "title": "Use the mirror",
+      "desc": "Show the correct articulation and ask the child to watch themselves. Visual control is the key to success."
+    },
+    "tip3": {
+      "title": "Regularity",
+      "desc": "Play 2-3 times a week for 15-20 minutes. Short but regular sessions give the best results."
+    },
+    "effects": {
+      "title": "Expected Effects",
+      "1": "Increased motivation for speech therapy sessions",
+      "2": "More correct articulation patterns",
+      "3": "Faster automation of sounds in a game environment",
+      "4": "Development of fine and gross motor skills stimulating speech",
+      "5": "Parental involvement in the correction process"
+    }
+  }
+}
