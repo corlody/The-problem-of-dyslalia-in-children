@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* ========================================================
-           ВСЕ СТИЛИ (полная версия с glassmorphism)
+           ВСЕ СТИЛИ (glassmorphism + анимации)
            ======================================================== */
         :root {
             --bg-primary: #0a0e27;
@@ -108,7 +108,7 @@
         }
         
         /* ========================================================
-           ШЕСТЕРЁНКА НАСТРОЕК
+           ШЕСТЕРЁНКА НАСТРОЕК (упрощена)
            ======================================================== */
         .settings-gear {
             position: fixed;
@@ -202,6 +202,7 @@
         }
         .settings-panel .close-settings:hover { transform: scale(1.02); box-shadow: var(--shadow-glow); }
         
+        /* Переключатели (тумблеры) */
         .toggle-switch {
             position: relative;
             width: 44px;
@@ -439,9 +440,13 @@
         .section-title i { -webkit-text-fill-color: initial; color: var(--gold); font-size: 1.8rem; }
         [data-theme="official"] .section-title i { color: var(--purple); }
         
+        /* ========================================================
+           СТЕКЛЯННЫЕ КАРТОЧКИ
+           ======================================================== */
         .glass-card {
             background: var(--bg-card);
             backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
             border-radius: var(--radius);
             border: 1px solid var(--glass-border);
             padding: 25px 30px;
@@ -467,6 +472,7 @@
         .card {
             background: var(--bg-card);
             backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
             border-radius: var(--radius);
             padding: 22px 24px;
             border-left: 4px solid var(--purple);
@@ -475,8 +481,10 @@
             position: relative;
             overflow: hidden;
             box-shadow: var(--shadow-card);
+            transform: perspective(800px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1);
+            will-change: transform;
         }
-        .card:hover { border-color: rgba(124, 58, 237, 0.3); box-shadow: var(--shadow-glow), var(--shadow-card); transform: scale(1.02); }
+        .card:hover { border-color: rgba(124, 58, 237, 0.3); box-shadow: var(--shadow-glow), var(--shadow-card); transform: perspective(800px) rotateX(0deg) rotateY(0deg) scale3d(1.03, 1.03, 1.03); }
         [data-theme="official"] .card { border-left-width: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
         [data-theme="official"] .card:hover { border-color: var(--purple); box-shadow: 0 4px 16px rgba(30, 64, 175, 0.06); transform: translateY(-2px); }
         [data-theme="elderly"] .card { padding: 28px 30px; border-left-width: 6px; transform: none !important; }
@@ -527,6 +535,9 @@
             font-weight: 500;
         }
         
+        /* ========================================================
+           ФИЛЬТРЫ
+           ======================================================== */
         .filter-switch {
             display: flex;
             flex-wrap: wrap;
@@ -612,6 +623,9 @@
         }
         .motor-switch-btn:hover:not(.active) { background: rgba(249, 115, 22, 0.2); }
         
+        /* ========================================================
+           ПРАВИЛА
+           ======================================================== */
         .rules-text {
             background: var(--bg-card);
             backdrop-filter: blur(20px);
@@ -656,7 +670,12 @@
         [data-theme="official"] .rules-text th { background: rgba(30, 64, 175, 0.06); }
         [data-theme="elderly"] .rules-text th { background: rgba(30, 64, 175, 0.08); font-size: 1.2rem; }
         .rules-text td { color: var(--text-secondary); }
+        .rules-text tr:nth-child(even) td { background: rgba(255, 255, 255, 0.02); }
+        [data-theme="official"] .rules-text tr:nth-child(even) td { background: rgba(0, 0, 0, 0.01); }
         
+        /* ========================================================
+           КАРТА И ЗОНЫ
+           ======================================================== */
         .map-zones {
             background: var(--bg-card);
             backdrop-filter: blur(20px);
@@ -665,7 +684,11 @@
             border: 1px solid var(--glass-border);
             margin: 20px 0;
         }
+        .map-zones h3 { color: var(--purple-light); margin-bottom: 15px; }
         
+        /* ========================================================
+           ФОТО
+           ======================================================== */
         .photo-section {
             text-align: center;
             margin: 30px 0;
@@ -684,6 +707,9 @@
             color: var(--text-secondary);
         }
         
+        /* ========================================================
+           КНОПКИ
+           ======================================================== */
         .btn {
             padding: var(--btn-padding);
             border: none;
@@ -723,6 +749,9 @@
         }
         .download-btn:hover { transform: scale(1.02); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); }
         
+        /* ========================================================
+           ФУТЕР
+           ======================================================== */
         footer {
             margin-top: 60px;
             padding: 30px 20px;
@@ -735,7 +764,7 @@
         [data-theme="official"] footer { border-top-color: #d1d5db; }
         
         /* ========================================================
-           ОТКЛЮЧЕНИЕ ЭФФЕКТОВ
+           ОТКЛЮЧЕНИЕ 3D ДЛЯ СЛАБЫХ ПК
            ======================================================== */
         .no-3d .card {
             transform: none !important;
@@ -744,7 +773,11 @@
         .no-3d .card:hover { transform: none !important; }
         .no-animations header h1 { animation: none !important; }
         .no-animations header { animation: none !important; }
+        .no-pulse .map-marker .marker-dot::after { animation: none !important; display: none !important; }
         
+        /* ========================================================
+           АДАПТАЦИЯ
+           ======================================================== */
         @media (max-width: 768px) {
             .app { padding: 0 10px 10px; }
             .settings-gear { bottom: 16px; right: 16px; width: 44px; height: 44px; }
@@ -863,6 +896,7 @@
    ======================================================== -->
 <div class="app">
 
+    <!-- HEADER -->
     <header id="mainHeader">
         <h1 id="mainTitle"><i class="fas fa-dice-d6"></i> Говорю правильно</h1>
         <p class="subtitle">
@@ -877,6 +911,7 @@
             <span>Москва 2026</span>
         </div>
         
+        <!-- КНОПКА ЗАПУСКА ИГРЫ -->
         <div style="margin-top:15px;">
             <a href="game.html" target="_blank" class="btn-start-game">
                 <i class="fas fa-play"></i> Начать игру 🚀
@@ -885,6 +920,7 @@
         </div>
     </header>
 
+    <!-- НАВИГАЦИЯ -->
     <nav id="mainNav">
         <button data-section="about" class="active">
             <i class="fas fa-rocket"></i>
@@ -919,11 +955,13 @@
             Дети с дислалией теряют интерес к рутинным логопедическим занятиям. Наша игра превращает артикуляционную гимнастику, постановку звуков и автоматизацию в увлекательное приключение.
         </p>
         
+        <!-- Фото фигурок -->
         <div class="photo-section">
             <img src="images/figures.jpg" alt="3D-печатные фигурки для игры" style="max-width:600px; width:100%; border-radius:20px; box-shadow:0 10px 30px rgba(0,0,0,0.4);">
             <p class="photo-caption">🎲 Фигурки, напечатанные на 3D-принтере</p>
         </div>
         
+        <!-- Фото зеркала -->
         <div class="photo-section">
             <img src="images/mirror.jpg" alt="Зеркало для контроля артикуляции" style="max-width:400px; width:100%; border-radius:20px;">
             <p class="photo-caption">🪞 Зеркало для контроля артикуляции</p>
@@ -949,7 +987,7 @@
     </section>
 
     <!-- ========================================================
-           СЕКЦИЯ: ПРАВИЛА (полная версия)
+           СЕКЦИЯ: ПРАВИЛА
            ======================================================== -->
     <section id="rules" class="section">
         <h2 class="section-title">
@@ -1092,9 +1130,93 @@
 </div>
 
 <!-- ========================================================
-   JAVASCRIPT (исправлен)
+   JAVASCRIPT (УПРОЩЁННАЯ ВЕРСИЯ — БЕЗ ОШИБОК)
    ======================================================== -->
 <script>
+// ========================================================
+// ДАННЫЕ КАРТОЧЕК
+// ========================================================
+const motorCards = {
+    fine: [
+        { title: "Пальчики здороваются", desc: "Соедини большой палец с указательным — «здравствуй», затем со средним, безымянным и мизинцем. Повтори 2 раза." },
+        { title: "Колечки", desc: "Сделай колечко из большого и указательного пальцев, затем из большого и среднего, большого и безымянного, большого и мизинца." },
+        { title: "Щепотка", desc: "Собери пальцы в щепотку (большой, указательный и средний вместе), затем разожми. Повтори 3 раза." },
+        { title: "Сорока-ворона", desc: "Сделай круговые движения указательным пальцем по ладони другой руки — «сорока кашу варила»." },
+        { title: "Кулак-ладонь", desc: "Сожми руку в кулак, затем раскрой ладонь. Повтори 3 раза каждой рукой." },
+        { title: "Ножницы", desc: "Разведи указательный и средний пальцы в стороны — «ножницы», затем соедини обратно. Повтори 3 раза." },
+        { title: "Замок", desc: "Сцепи пальцы в замок, затем разомкни. Повтори 2 раза." },
+        { title: "Карандаш-каталка", desc: "Покатай карандаш между ладонями (или вообрази движение)." }
+    ],
+    gross: [
+        { title: "Хлопки над головой", desc: "Подними руки вверх и хлопни в ладоши 3 раза." },
+        { title: "Наклоны", desc: "Сделай наклон влево, затем вправо. Повтори 2 раза." },
+        { title: "Прыжки на месте", desc: "Попрыгай на месте 3 раза." },
+        { title: "Приседания", desc: "Присядь 2 раза, держа спину прямо." },
+        { title: "Повороты головы", desc: "Поверни голову влево, затем вправо. Повтори 2 раза." },
+        { title: "Потягушки", desc: "Подними руки вверх и потянись, как после сна." },
+        { title: "Цапля", desc: "Постой на одной ноге 3 секунды, затем на другой." },
+        { title: "Мельница", desc: "Вытяни руки в стороны и вращай ими, как мельница." }
+    ]
+};
+
+const cardsData = {
+    blue: [
+        { title: "Заборчик", desc: "Улыбнуться, обнажив сомкнутые зубы.", confirmed: true },
+        { title: "Слоник пьёт", desc: "Вытянуть губы трубочкой, набирать воздух с причмокиванием.", confirmed: true },
+        { title: "Лошадка", desc: "Поцокать узким языком.", confirmed: true },
+        { title: "Чашечка", desc: "Широкий язык поднять к верхней губе, загнув края.", confirmed: true },
+        { title: "Дудочка", desc: "Вытянуть губы вперёд, зубы сомкнуты.", confirmed: true },
+        { title: "Барабанщик", desc: "дэ-дэ-дэ кончиком языка за верхними зубами.", confirmed: true },
+        { title: "Месим тесто", desc: "Покусать язык, пошлёпать губами.", confirmed: true },
+        { title: "Маляр", desc: "Погладить нёбо кончиком языка.", confirmed: true },
+        { title: "Качели", desc: "Язык вверх-вниз за зубами.", confirmed: true },
+        { title: "Вкусное варенье", desc: "Облизать верхнюю губу широким языком.", confirmed: true },
+        { title: "Гармошка", desc: "Присосать язык к нёбу, открывать-закрывать рот.", confirmed: true },
+        { title: "Блинчик", desc: "Широкий язык на нижней губе.", confirmed: true },
+        { title: "Окошко (Бегемот)", desc: "Широко открыть рот — «жарко», закрыть рот — «холодно».", confirmed: true },
+        { title: "Поймали мышку", desc: "Губы в улыбке, приоткрыть рот, произнести «а-а» и прикусить широкий кончик языка.", confirmed: true },
+        { title: "Масики", desc: "Улыбнуться, открыть рот, кончиком языка переводить из одного уголка рта в другой.", confirmed: true },
+        { title: "Грибочек", desc: "Присосать язык к нёбу.", confirmed: true }
+    ],
+    red: [
+        { title: "Пароход гудит", desc: "ы-ы-ы-ы губы в улыбке.", confirmed: true },
+        { title: "Загнать мяч в ворота", desc: "Дуть с широким языком между зубами.", confirmed: true },
+        { title: "Киска", desc: "Выгнуть язык горкой, кончик у нижних зубов.", confirmed: true },
+        { title: "Парашютик", desc: "Сдуть ватку с носа чашечкой языка.", confirmed: true },
+        { title: "Чистим зубки", desc: "Почистить зубы изнутри языком.", confirmed: true },
+        { title: "Орешки", desc: "Языком упираться в щёки изнутри.", confirmed: true },
+        { title: "Индюки болтают", desc: "бл-бл-бл по верхней губе.", confirmed: true },
+        { title: "Шарик", desc: "Надуть щёку, потом сдуть щёку.", confirmed: true }
+    ],
+    green: [
+        { title: "Слова на С", desc: "Назови 3 слова со звуком С в начале (сом, сок, сон).", confirmed: false },
+        { title: "Слова на З", desc: "Назови 3 слова со звуком З в начале (замок, зуб, зонт).", confirmed: false },
+        { title: "Слова на Ш", desc: "Назови 3 слова со звуком Ш в начале (шапка, шар, шум).", confirmed: false },
+        { title: "Слова на Ж в середине", desc: "Назови слова с Ж в середине (лужа, ножи, пижама).", confirmed: false },
+        { title: "Слова на Р в середине", desc: "Корова, ворона, дерево.", confirmed: false },
+        { title: "Слова на Р в конце", desc: "Топор, забор, помидор.", confirmed: false },
+        { title: "Слова на Л в начале", desc: "Луна, лук, лапа.", confirmed: false },
+        { title: "Слова на Л в середине", desc: "Полка, пила, молоко.", confirmed: false },
+        { title: "Слова на Ч в конце", desc: "Мяч, ключ, врач.", confirmed: false },
+        { title: "Слова с С и Ш", desc: "Суши, шасси, смешно.", confirmed: false }
+    ],
+    yellow: [
+        { title: "Сашина сушка", desc: "Шла Саша по шоссе и сосала сушку.", confirmed: false },
+        { title: "Карл и Клара", desc: "Карл у Клары украл кораллы.", confirmed: false },
+        { title: "Грека", desc: "Ехал Грека через реку, видит Грека — в реке рак.", confirmed: false },
+        { title: "Бараны", desc: "Белые бараны били в барабаны.", confirmed: false },
+        { title: "Мышата", desc: "Шесть мышат в камышах шуршат.", confirmed: false },
+        { title: "Ёлки-иголки", desc: "У ёлки иголки колки.", confirmed: false },
+        { title: "Пироги", desc: "Съел молодец тридцать три пирога с пирогом, да всё с творогом.", confirmed: false },
+        { title: "Жужелица", desc: "Жужжит жужелица, кружится, жужжит.", confirmed: false },
+        { title: "Лара и рояль", desc: "Лара играла на рояле, у Лары были алые лалы.", confirmed: false },
+        { title: "Трава-дрова", desc: "На дворе трава, на траве дрова.", confirmed: false }
+    ]
+};
+
+let currentMotorFilter = 'all';
+let currentLang = 'ru';
+
 // ========================================================
 // ПЕРЕВОДЫ
 // ========================================================
@@ -1165,20 +1287,13 @@ const TRANSLATIONS = {
             title: 'Карта путешествия',
             caption: '🗺️ Игровое поле (цифровая версия)',
             specialCells: 'Особые клетки',
-            cross: 'Крест',
-            crossDesc: 'проверка выполнения заданий',
-            fire: 'Костёр',
-            fireDesc: 'доп. ход',
-            wizards: 'Волшебники',
-            wizardsDesc: 'выбор задания',
-            waterfall: 'Водопад',
-            waterfallDesc: 'вниз по течению',
-            rope: 'Верёвочная переправа',
-            ropeDesc: 'скатывание',
-            giant: 'Живот гиганта (18)',
-            giantTarget: 'пляж (22)',
-            finish: 'Жерло вулкана',
-            finishDesc: 'ПОБЕДА!',
+            cross: 'Крест', crossDesc: 'проверка выполнения заданий',
+            fire: 'Костёр', fireDesc: 'доп. ход',
+            wizards: 'Волшебники', wizardsDesc: 'выбор задания',
+            waterfall: 'Водопад', waterfallDesc: 'вниз по течению',
+            rope: 'Верёвочная переправа', ropeDesc: 'скатывание',
+            giant: 'Живот гиганта (18)', giantTarget: 'пляж (22)',
+            finish: 'Жерло вулкана', finishDesc: 'ПОБЕДА!',
             download: {
                 title: 'Индивидуальная карта игрока',
                 desc: 'Скачайте и распечатайте для отслеживания прогресса ребёнка.',
@@ -1297,91 +1412,7 @@ const TRANSLATIONS = {
 };
 
 // ========================================================
-// ДАННЫЕ КАРТОЧЕК
-// ========================================================
-const motorCards = {
-    fine: [
-        { title: "Пальчики здороваются", desc: "Соедини большой палец с указательным — «здравствуй», затем со средним, безымянным и мизинцем. Повтори 2 раза." },
-        { title: "Колечки", desc: "Сделай колечко из большого и указательного пальцев, затем из большого и среднего, большого и безымянного, большого и мизинца." },
-        { title: "Щепотка", desc: "Собери пальцы в щепотку (большой, указательный и средний вместе), затем разожми. Повтори 3 раза." },
-        { title: "Сорока-ворона", desc: "Сделай круговые движения указательным пальцем по ладони другой руки — «сорока кашу варила»." },
-        { title: "Кулак-ладонь", desc: "Сожми руку в кулак, затем раскрой ладонь. Повтори 3 раза каждой рукой." },
-        { title: "Ножницы", desc: "Разведи указательный и средний пальцы в стороны — «ножницы», затем соедини обратно. Повтори 3 раза." },
-        { title: "Замок", desc: "Сцепи пальцы в замок, затем разомкни. Повтори 2 раза." },
-        { title: "Карандаш-каталка", desc: "Покатай карандаш между ладонями (или вообрази движение)." }
-    ],
-    gross: [
-        { title: "Хлопки над головой", desc: "Подними руки вверх и хлопни в ладоши 3 раза." },
-        { title: "Наклоны", desc: "Сделай наклон влево, затем вправо. Повтори 2 раза." },
-        { title: "Прыжки на месте", desc: "Попрыгай на месте 3 раза." },
-        { title: "Приседания", desc: "Присядь 2 раза, держа спину прямо." },
-        { title: "Повороты головы", desc: "Поверни голову влево, затем вправо. Повтори 2 раза." },
-        { title: "Потягушки", desc: "Подними руки вверх и потянись, как после сна." },
-        { title: "Цапля", desc: "Постой на одной ноге 3 секунды, затем на другой." },
-        { title: "Мельница", desc: "Вытяни руки в стороны и вращай ими, как мельница." }
-    ]
-};
-
-const cardsData = {
-    blue: [
-        { title: "Заборчик", desc: "Улыбнуться, обнажив сомкнутые зубы.", confirmed: true },
-        { title: "Слоник пьёт", desc: "Вытянуть губы трубочкой, набирать воздух с причмокиванием.", confirmed: true },
-        { title: "Лошадка", desc: "Поцокать узким языком.", confirmed: true },
-        { title: "Чашечка", desc: "Широкий язык поднять к верхней губе, загнув края.", confirmed: true },
-        { title: "Дудочка", desc: "Вытянуть губы вперёд, зубы сомкнуты.", confirmed: true },
-        { title: "Барабанщик", desc: "дэ-дэ-дэ кончиком языка за верхними зубами.", confirmed: true },
-        { title: "Месим тесто", desc: "Покусать язык, пошлёпать губами.", confirmed: true },
-        { title: "Маляр", desc: "Погладить нёбо кончиком языка.", confirmed: true },
-        { title: "Качели", desc: "Язык вверх-вниз за зубами.", confirmed: true },
-        { title: "Вкусное варенье", desc: "Облизать верхнюю губу широким языком.", confirmed: true },
-        { title: "Гармошка", desc: "Присосать язык к нёбу, открывать-закрывать рот.", confirmed: true },
-        { title: "Блинчик", desc: "Широкий язык на нижней губе.", confirmed: true },
-        { title: "Окошко (Бегемот)", desc: "Широко открыть рот — «жарко», закрыть рот — «холодно».", confirmed: true },
-        { title: "Поймали мышку", desc: "Губы в улыбке, приоткрыть рот, произнести «а-а» и прикусить широкий кончик языка.", confirmed: true },
-        { title: "Масики", desc: "Улыбнуться, открыть рот, кончиком языка переводить из одного уголка рта в другой.", confirmed: true },
-        { title: "Грибочек", desc: "Присосать язык к нёбу.", confirmed: true }
-    ],
-    red: [
-        { title: "Пароход гудит", desc: "ы-ы-ы-ы губы в улыбке.", confirmed: true },
-        { title: "Загнать мяч в ворота", desc: "Дуть с широким языком между зубами.", confirmed: true },
-        { title: "Киска", desc: "Выгнуть язык горкой, кончик у нижних зубов.", confirmed: true },
-        { title: "Парашютик", desc: "Сдуть ватку с носа чашечкой языка.", confirmed: true },
-        { title: "Чистим зубки", desc: "Почистить зубы изнутри языком.", confirmed: true },
-        { title: "Орешки", desc: "Языком упираться в щёки изнутри.", confirmed: true },
-        { title: "Индюки болтают", desc: "бл-бл-бл по верхней губе.", confirmed: true },
-        { title: "Шарик", desc: "Надуть щёку, потом сдуть щёку.", confirmed: true }
-    ],
-    green: [
-        { title: "Слова на С", desc: "Назови 3 слова со звуком С в начале (сом, сок, сон).", confirmed: false },
-        { title: "Слова на З", desc: "Назови 3 слова со звуком З в начале (замок, зуб, зонт).", confirmed: false },
-        { title: "Слова на Ш", desc: "Назови 3 слова со звуком Ш в начале (шапка, шар, шум).", confirmed: false },
-        { title: "Слова на Ж в середине", desc: "Назови слова с Ж в середине (лужа, ножи, пижама).", confirmed: false },
-        { title: "Слова на Р в середине", desc: "Корова, ворона, дерево.", confirmed: false },
-        { title: "Слова на Р в конце", desc: "Топор, забор, помидор.", confirmed: false },
-        { title: "Слова на Л в начале", desc: "Луна, лук, лапа.", confirmed: false },
-        { title: "Слова на Л в середине", desc: "Полка, пила, молоко.", confirmed: false },
-        { title: "Слова на Ч в конце", desc: "Мяч, ключ, врач.", confirmed: false },
-        { title: "Слова с С и Ш", desc: "Суши, шасси, смешно.", confirmed: false }
-    ],
-    yellow: [
-        { title: "Сашина сушка", desc: "Шла Саша по шоссе и сосала сушку.", confirmed: false },
-        { title: "Карл и Клара", desc: "Карл у Клары украл кораллы.", confirmed: false },
-        { title: "Грека", desc: "Ехал Грека через реку, видит Грека — в реке рак.", confirmed: false },
-        { title: "Бараны", desc: "Белые бараны били в барабаны.", confirmed: false },
-        { title: "Мышата", desc: "Шесть мышат в камышах шуршат.", confirmed: false },
-        { title: "Ёлки-иголки", desc: "У ёлки иголки колки.", confirmed: false },
-        { title: "Пироги", desc: "Съел молодец тридцать три пирога с пирогом, да всё с творогом.", confirmed: false },
-        { title: "Жужелица", desc: "Жужжит жужелица, кружится, жужжит.", confirmed: false },
-        { title: "Лара и рояль", desc: "Лара играла на рояле, у Лары были алые лалы.", confirmed: false },
-        { title: "Трава-дрова", desc: "На дворе трава, на траве дрова.", confirmed: false }
-    ]
-};
-
-let currentMotorFilter = 'all';
-let currentLang = 'ru';
-
-// ========================================================
-// СОСТОЯНИЕ ПРОИЗВОДИТЕЛЬНОСТИ
+// НАСТРОЙКИ
 // ========================================================
 const PERF_SETTINGS = {
     perfMode: false,
@@ -1391,29 +1422,18 @@ const PERF_SETTINGS = {
 };
 
 // ========================================================
-// applyPerfMode — ФУНКЦИЯ ДОБАВЛЕНА!
+// ПРИМЕНЕНИЕ НАСТРОЕК ПРОИЗВОДИТЕЛЬНОСТИ
 // ========================================================
 function applyPerfMode() {
-    // Применяем настройки производительности
     document.documentElement.classList.toggle('no-3d', !PERF_SETTINGS.effects3d);
     document.documentElement.classList.toggle('no-animations', !PERF_SETTINGS.headerAnimation);
     
     const canvas = document.getElementById('particles-canvas');
     if (canvas) {
         canvas.style.display = PERF_SETTINGS.particles ? 'block' : 'none';
-        if (!PERF_SETTINGS.particles && window._particleAnimId) {
-            cancelAnimationFrame(window._particleAnimId);
-            window._particleAnimId = null;
-        }
-        if (PERF_SETTINGS.particles && !window._particleAnimId) {
-            initParticles();
-        }
     }
 }
 
-// ========================================================
-// loadPerfSettings — ИСПРАВЛЕНА!
-// ========================================================
 function loadPerfSettings() {
     try {
         const saved = localStorage.getItem('perf_settings');
@@ -1421,9 +1441,7 @@ function loadPerfSettings() {
             const data = JSON.parse(saved);
             Object.assign(PERF_SETTINGS, data);
         }
-    } catch(e) { /* игнорируем ошибки */ }
-    
-    // Применяем настройки (applyPerfMode теперь существует!)
+    } catch(e) {}
     applyPerfMode();
 }
 
@@ -1534,7 +1552,7 @@ function renderRules() {
             <li><strong>${isRu ? 'Игровое поле' : 'Game board'}</strong> — ${isRu ? 'карта-змейка с маршрутом из 89 клеток.' : 'snake map with 89 cells.'}</li>
             <li><strong>${isRu ? '4 фигурки игроков' : '4 player pieces'}</strong></li>
             <li><strong>${isRu ? 'Игральный кубик' : 'Dice'}</strong> (1-6)</li>
-            <li><strong>${isRu ? '5 колод карточек' : '5 decks of cards'}</strong> ${isRu ? 'в цифровом формате: синие, красные, зелёные, жёлтые, оранжевые.' : 'in digital format: blue, red, green, yellow, orange.'}</li>
+            <li><strong>${isRu ? '5 колод карточек' : '5 decks of cards'}</strong> ${isRu ? 'в цифровом формате.' : 'in digital format.'}</li>
             <li><strong>${isRu ? 'Зеркало' : 'Mirror'}</strong> — ${isRu ? 'для контроля артикуляции.' : 'for articulation control.'}</li>
         </ul>
         <h3>${isRu ? '3. Ход игры' : '3. Gameplay'}</h3>
@@ -1544,9 +1562,8 @@ function renderRules() {
             <tr><th>${isRu ? 'Что на клетке' : 'On the cell'}</th><th>${isRu ? 'Что происходит' : 'What happens'}</th></tr>
             <tr><td>${isRu ? 'Обычная клетка' : 'Regular cell'}</td><td>${isRu ? 'Ничего. Ход переходит к следующему игроку.' : 'Nothing. Turn passes to the next player.'}</td></tr>
             <tr><td>${isRu ? 'Знак «?»' : 'Symbol "?"'}</td><td>${isRu ? 'Взрослый берёт карточку. Ребёнок выполняет задание. Если правильно — остаётся на клетке. Если с ошибкой — возвращается на 2 клетки назад.' : 'Adult takes a card. Child completes the task. If correct — stays on the cell. If wrong — moves 2 cells back.'}</td></tr>
-            <tr><td>${isRu ? 'Крест' : 'Cross'}</td><td>${isRu ? 'Проверка выполнения заданий. Если не выполнял — на СТАРТ.' : 'Task check. If not completed — goes to START.'}</td></tr>
+            <tr><td>${isRu ? 'Крест' : 'Cross'}</td><td>${isRu ? 'Проверка выполнения заданий.' : 'Task check.'}</td></tr>
             <tr><td>${isRu ? 'Костёр' : 'Campfire'}</td><td>${isRu ? 'Дополнительный ход.' : 'Extra turn.'}</td></tr>
-            <tr><td>${isRu ? 'Волшебники' : 'Wizards'}</td><td>${isRu ? 'Выбор задания или пропуск хода.' : 'Choose task or skip turn.'}</td></tr>
             <tr><td>${isRu ? 'Живот гиганта (18)' : 'Giant\'s belly (18)'}</td><td>${isRu ? 'Перемещение на клетку 22 (пляж).' : 'Move to cell 22 (beach).'}</td></tr>
             <tr><td>${isRu ? 'Жерло вулкана' : 'Volcano crater'}</td><td><strong>${isRu ? 'ФИНИШ! Победа.' : 'FINISH! Victory.'}</strong></td></tr>
         </table>
@@ -1606,7 +1623,7 @@ function renderMotorCards() {
 }
 
 // ========================================================
-// НАВИГАЦИЯ — ИСПРАВЛЕНА!
+// НАВИГАЦИЯ — ГАРАНТИРОВАННО РАБОТАЕТ
 // ========================================================
 function setupNavigation() {
     const navButtons = document.querySelectorAll('#mainNav button');
@@ -1715,7 +1732,7 @@ th{background:#f3f0ff;}
 }
 
 // ========================================================
-// ЧАСТИЦЫ
+// ЧАСТИЦЫ (упрощённые)
 // ========================================================
 function initParticles() {
     const canvas = document.getElementById('particles-canvas');
@@ -1816,7 +1833,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     document.getElementById('toggleCards')?.addEventListener('change', renderSpeechCards);
     
-    // Глобальные функции
     window.toggleSettings = toggleSettings;
     window.changeTheme = changeTheme;
     window.changeLanguage = changeLanguage;
