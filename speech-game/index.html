@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* ========================================================
-           CSS ПЕРЕМЕННЫЕ
+           ВСЕ СТИЛИ (полная версия с glassmorphism)
            ======================================================== */
         :root {
             --bg-primary: #0a0e27;
@@ -20,8 +20,6 @@
             --purple-dark: #5b21b6;
             --gold: #f59e0b;
             --gold-light: #fbbf24;
-            --pink: #ec4899;
-            --cyan: #06b6d4;
             --green: #10b981;
             --red: #ef4444;
             --text-primary: #f1f5f9;
@@ -36,9 +34,6 @@
             --btn-padding: 12px 28px;
         }
         
-        /* ========================================================
-           ТЕМЫ
-           ======================================================== */
         [data-theme="official"] {
             --bg-primary: #f1f5f9;
             --bg-secondary: #e2e8f0;
@@ -77,9 +72,6 @@
             --radius-sm: 16px;
         }
         
-        /* ========================================================
-           БАЗОВЫЕ СТИЛИ
-           ======================================================== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
         
@@ -105,9 +97,7 @@
         }
         
         [data-theme="official"] #particles-canvas,
-        [data-theme="elderly"] #particles-canvas {
-            display: none;
-        }
+        [data-theme="elderly"] #particles-canvas { display: none; }
         
         .app {
             position: relative;
@@ -150,7 +140,6 @@
             max-width: calc(100vw - 40px);
             background: var(--bg-card);
             backdrop-filter: blur(40px);
-            -webkit-backdrop-filter: blur(40px);
             border: 1px solid var(--glass-border);
             border-radius: var(--radius);
             padding: 28px 30px;
@@ -213,7 +202,6 @@
         }
         .settings-panel .close-settings:hover { transform: scale(1.02); box-shadow: var(--shadow-glow); }
         
-        /* Переключатели (тумблеры) */
         .toggle-switch {
             position: relative;
             width: 44px;
@@ -341,16 +329,12 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             font-size: clamp(0.75rem, 1vw, 0.95rem);
             color: var(--text-secondary);
-            transition: var(--transition);
             flex-wrap: wrap;
             justify-content: center;
         }
         [data-theme="official"] .authors-badge { background: #fff; border-color: #d1d5db; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
         [data-theme="elderly"] .authors-badge { background: rgba(0, 0, 0, 0.04); border-color: rgba(0, 0, 0, 0.15); padding: 16px 36px; font-size: 1.2rem; border-width: 2px; }
         
-        /* ========================================================
-           КНОПКА ЗАПУСКА ИГРЫ
-           ======================================================== */
         .btn-start-game {
             display: inline-flex;
             align-items: center;
@@ -455,13 +439,9 @@
         .section-title i { -webkit-text-fill-color: initial; color: var(--gold); font-size: 1.8rem; }
         [data-theme="official"] .section-title i { color: var(--purple); }
         
-        /* ========================================================
-           СТЕКЛЯННЫЕ КАРТОЧКИ
-           ======================================================== */
         .glass-card {
             background: var(--bg-card);
             backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
             border-radius: var(--radius);
             border: 1px solid var(--glass-border);
             padding: 25px 30px;
@@ -487,7 +467,6 @@
         .card {
             background: var(--bg-card);
             backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
             border-radius: var(--radius);
             padding: 22px 24px;
             border-left: 4px solid var(--purple);
@@ -496,10 +475,8 @@
             position: relative;
             overflow: hidden;
             box-shadow: var(--shadow-card);
-            transform: perspective(800px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1);
-            will-change: transform;
         }
-        .card:hover { border-color: rgba(124, 58, 237, 0.3); box-shadow: var(--shadow-glow), var(--shadow-card); transform: perspective(800px) rotateX(0deg) rotateY(0deg) scale3d(1.03, 1.03, 1.03); }
+        .card:hover { border-color: rgba(124, 58, 237, 0.3); box-shadow: var(--shadow-glow), var(--shadow-card); transform: scale(1.02); }
         [data-theme="official"] .card { border-left-width: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
         [data-theme="official"] .card:hover { border-color: var(--purple); box-shadow: 0 4px 16px rgba(30, 64, 175, 0.06); transform: translateY(-2px); }
         [data-theme="elderly"] .card { padding: 28px 30px; border-left-width: 6px; transform: none !important; }
@@ -550,9 +527,6 @@
             font-weight: 500;
         }
         
-        /* ========================================================
-           ФИЛЬТРЫ
-           ======================================================== */
         .filter-switch {
             display: flex;
             flex-wrap: wrap;
@@ -638,9 +612,6 @@
         }
         .motor-switch-btn:hover:not(.active) { background: rgba(249, 115, 22, 0.2); }
         
-        /* ========================================================
-           ПРАВИЛА
-           ======================================================== */
         .rules-text {
             background: var(--bg-card);
             backdrop-filter: blur(20px);
@@ -685,12 +656,7 @@
         [data-theme="official"] .rules-text th { background: rgba(30, 64, 175, 0.06); }
         [data-theme="elderly"] .rules-text th { background: rgba(30, 64, 175, 0.08); font-size: 1.2rem; }
         .rules-text td { color: var(--text-secondary); }
-        .rules-text tr:nth-child(even) td { background: rgba(255, 255, 255, 0.02); }
-        [data-theme="official"] .rules-text tr:nth-child(even) td { background: rgba(0, 0, 0, 0.01); }
         
-        /* ========================================================
-           КАРТА И ЗОНЫ
-           ======================================================== */
         .map-zones {
             background: var(--bg-card);
             backdrop-filter: blur(20px);
@@ -699,11 +665,7 @@
             border: 1px solid var(--glass-border);
             margin: 20px 0;
         }
-        .map-zones h3 { color: var(--purple-light); margin-bottom: 15px; }
         
-        /* ========================================================
-           ФОТО
-           ======================================================== */
         .photo-section {
             text-align: center;
             margin: 30px 0;
@@ -722,9 +684,6 @@
             color: var(--text-secondary);
         }
         
-        /* ========================================================
-           КНОПКИ
-           ======================================================== */
         .btn {
             padding: var(--btn-padding);
             border: none;
@@ -764,9 +723,6 @@
         }
         .download-btn:hover { transform: scale(1.02); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); }
         
-        /* ========================================================
-           ФУТЕР
-           ======================================================== */
         footer {
             margin-top: 60px;
             padding: 30px 20px;
@@ -779,7 +735,7 @@
         [data-theme="official"] footer { border-top-color: #d1d5db; }
         
         /* ========================================================
-           ОТКЛЮЧЕНИЕ 3D ДЛЯ СЛАБЫХ ПК
+           ОТКЛЮЧЕНИЕ ЭФФЕКТОВ
            ======================================================== */
         .no-3d .card {
             transform: none !important;
@@ -788,11 +744,7 @@
         .no-3d .card:hover { transform: none !important; }
         .no-animations header h1 { animation: none !important; }
         .no-animations header { animation: none !important; }
-        .no-pulse .map-marker .marker-dot::after { animation: none !important; display: none !important; }
         
-        /* ========================================================
-           АДАПТАЦИЯ
-           ======================================================== */
         @media (max-width: 768px) {
             .app { padding: 0 10px 10px; }
             .settings-gear { bottom: 16px; right: 16px; width: 44px; height: 44px; }
@@ -827,22 +779,22 @@
 </div>
 
 <div class="settings-panel" id="settingsPanel">
-    <h4><i class="fas fa-sliders-h"></i> <span data-i18n="settings.title">Настройки</span></h4>
+    <h4><i class="fas fa-sliders-h"></i> Настройки</h4>
     
     <div class="setting-group">
-        <label><i class="fas fa-palette"></i> <span data-i18n="settings.theme">Тема</span></label>
+        <label><i class="fas fa-palette"></i> Тема</label>
         <select id="themeSelect" onchange="changeTheme(this.value)">
-            <option value="game">🎮 <span data-i18n="settings.themeGame">Игровая</span></option>
-            <option value="official">📄 <span data-i18n="settings.themeOfficial">Официальная</span></option>
-            <option value="elderly">👴 <span data-i18n="settings.themeElderly">Для пожилых</span></option>
+            <option value="game">🎮 Игровая</option>
+            <option value="official">📄 Официальная</option>
+            <option value="elderly">👴 Для пожилых</option>
         </select>
     </div>
     
     <div class="setting-group">
-        <label><i class="fas fa-language"></i> <span data-i18n="settings.language">Язык</span></label>
+        <label><i class="fas fa-language"></i> Язык</label>
         <select id="langSelect" onchange="changeLanguage(this.value)">
-            <option value="ru">🇷🇺 <span data-i18n="settings.langRu">Русский</span></option>
-            <option value="en">🇬🇧 <span data-i18n="settings.langEn">English</span></option>
+            <option value="ru">🇷🇺 Русский</option>
+            <option value="en">🇬🇧 English</option>
         </select>
     </div>
     
@@ -853,8 +805,8 @@
             <span class="toggle-label">
                 <i class="fas fa-rocket"></i>
                 <span>
-                    <span class="perf-label"><span data-i18n="settings.perfMode">Режим производительности</span></span>
-                    <div class="perf-desc"><span data-i18n="settings.perfDesc">Включите для слабых компьютеров</span></div>
+                    <span class="perf-label">Режим производительности</span>
+                    <div class="perf-desc">Включите для слабых компьютеров</div>
                 </span>
             </span>
             <div class="toggle-switch" id="toggle-perfMode" onclick="togglePerfMode()">
@@ -867,37 +819,37 @@
     
     <div style="margin-bottom:12px;">
         <label style="font-size:0.8rem; color:var(--text-muted); display:flex; align-items:center; gap:8px;">
-            <i class="fas fa-sliders-h"></i> <span data-i18n="settings.fineTune">Тонкая настройка</span>
+            <i class="fas fa-sliders-h"></i> Тонкая настройка
         </label>
     </div>
     
     <div class="setting-group">
         <label onclick="togglePerformance('effects3d')">
-            <span class="toggle-label"><i class="fas fa-cube"></i> <span data-i18n="settings.effects3d">3D-эффект</span></span>
+            <span class="toggle-label"><i class="fas fa-cube"></i> 3D-эффект</span>
             <div class="toggle-switch" id="toggle-effects3d"><div class="toggle-slider"></div></div>
         </label>
     </div>
     
     <div class="setting-group">
         <label onclick="togglePerformance('particles')">
-            <span class="toggle-label"><i class="fas fa-star"></i> <span data-i18n="settings.particles">Частицы</span></span>
+            <span class="toggle-label"><i class="fas fa-star"></i> Частицы</span>
             <div class="toggle-switch" id="toggle-particles"><div class="toggle-slider"></div></div>
         </label>
     </div>
     
     <div class="setting-group">
         <label onclick="togglePerformance('headerAnimation')">
-            <span class="toggle-label"><i class="fas fa-magic"></i> <span data-i18n="settings.animations">Анимация</span></span>
+            <span class="toggle-label"><i class="fas fa-magic"></i> Анимация</span>
             <div class="toggle-switch" id="toggle-headerAnimation"><div class="toggle-slider"></div></div>
         </label>
     </div>
     
     <button class="btn-reset" onclick="resetPerformance()">
-        <i class="fas fa-undo"></i> <span data-i18n="settings.reset">Сбросить</span>
+        <i class="fas fa-undo"></i> Сбросить
     </button>
     
     <button class="close-settings" onclick="toggleSettings()">
-        <i class="fas fa-check"></i> <span data-i18n="settings.close">Закрыть</span>
+        <i class="fas fa-check"></i> Закрыть
     </button>
 </div>
 
@@ -911,51 +863,48 @@
    ======================================================== -->
 <div class="app">
 
-    <!-- HEADER -->
     <header id="mainHeader">
-        <h1 id="mainTitle"><i class="fas fa-dice-d6"></i> <span data-i18n="title">Говорю правильно</span></h1>
+        <h1 id="mainTitle"><i class="fas fa-dice-d6"></i> Говорю правильно</h1>
         <p class="subtitle">
-            <span data-i18n="subtitle">Путешествие к <span class="highlight">вулкану речи</span></span>
+            Путешествие к <span class="highlight">вулкану речи</span>
         </p>
         <div class="authors-badge">
             <span class="icon"><i class="fas fa-users"></i></span>
-            <span><strong data-i18n="authors">Участники проекта:</strong> Гусев Алексей, Толстова Софья</span>
+            <span><strong>Участники проекта:</strong> Гусев Алексей, Толстова Софья</span>
             <span>•</span>
-            <span data-i18n="school">Школа №7</span>
+            <span>Школа №7</span>
             <span>•</span>
-            <span data-i18n="year">Москва 2026</span>
+            <span>Москва 2026</span>
         </div>
         
-        <!-- КНОПКА ЗАПУСКА ИГРЫ -->
         <div style="margin-top:15px;">
             <a href="game.html" target="_blank" class="btn-start-game">
-                <i class="fas fa-play"></i> <span data-i18n="startGame">Начать игру 🚀</span>
+                <i class="fas fa-play"></i> Начать игру 🚀
             </a>
-            <p style="font-size:0.8rem; opacity:0.6; margin-top:6px;" data-i18n="startGameHint">Откроется в новой вкладке</p>
+            <p style="font-size:0.8rem; opacity:0.6; margin-top:6px;">Откроется в новой вкладке</p>
         </div>
     </header>
 
-    <!-- НАВИГАЦИЯ -->
     <nav id="mainNav">
         <button data-section="about" class="active">
             <i class="fas fa-rocket"></i>
-            <span class="nav-label" data-i18n="nav.about">О проекте</span>
+            <span class="nav-label">О проекте</span>
         </button>
         <button data-section="rules">
             <i class="fas fa-book-open"></i>
-            <span class="nav-label" data-i18n="nav.rules">Правила</span>
+            <span class="nav-label">Правила</span>
         </button>
         <button data-section="cards">
             <i class="fas fa-layer-group"></i>
-            <span class="nav-label" data-i18n="nav.cards">Карточки</span>
+            <span class="nav-label">Карточки</span>
         </button>
         <button data-section="map">
             <i class="fas fa-map"></i>
-            <span class="nav-label" data-i18n="nav.map">Карта</span>
+            <span class="nav-label">Карта</span>
         </button>
         <button data-section="parent">
             <i class="fas fa-heart"></i>
-            <span class="nav-label" data-i18n="nav.parent">Родителям</span>
+            <span class="nav-label">Родителям</span>
         </button>
     </nav>
 
@@ -964,49 +913,47 @@
            ======================================================== -->
     <section id="about" class="section active-section">
         <h2 class="section-title">
-            <i class="fas fa-bullseye"></i> <span data-i18n="about.title">О проекте</span>
+            <i class="fas fa-bullseye"></i> О проекте
         </h2>
-        <p style="font-size: 1.1em; line-height: 1.6; color: var(--text-secondary);" data-i18n="about.desc">
+        <p style="font-size: 1.1em; line-height: 1.6; color: var(--text-secondary);">
             Дети с дислалией теряют интерес к рутинным логопедическим занятиям. Наша игра превращает артикуляционную гимнастику, постановку звуков и автоматизацию в увлекательное приключение.
         </p>
         
-        <!-- Фото фигурок -->
         <div class="photo-section">
             <img src="images/figures.jpg" alt="3D-печатные фигурки для игры" style="max-width:600px; width:100%; border-radius:20px; box-shadow:0 10px 30px rgba(0,0,0,0.4);">
-            <p class="photo-caption" data-i18n="about.figures">🎲 Фигурки, напечатанные на 3D-принтере</p>
+            <p class="photo-caption">🎲 Фигурки, напечатанные на 3D-принтере</p>
         </div>
         
-        <!-- Фото зеркала -->
         <div class="photo-section">
             <img src="images/mirror.jpg" alt="Зеркало для контроля артикуляции" style="max-width:400px; width:100%; border-radius:20px;">
-            <p class="photo-caption" data-i18n="about.mirror">🪞 Зеркало для контроля артикуляции</p>
+            <p class="photo-caption">🪞 Зеркало для контроля артикуляции</p>
         </div>
 
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 40px 0;">
             <div class="glass-card" style="text-align:center;">
                 <i class="fas fa-puzzle-piece" style="font-size: 2.5rem; color: var(--gold);"></i>
-                <h3 style="margin-top: 10px; color: var(--text-primary);" data-i18n="about.cellsTitle">89 клеток</h3>
-                <p style="color: var(--text-secondary);" data-i18n="about.cellsDesc">Уникальный маршрут от цветочного луга до жерла вулкана</p>
+                <h3 style="margin-top: 10px; color: var(--text-primary);">89 клеток</h3>
+                <p style="color: var(--text-secondary);">Уникальный маршрут от цветочного луга до жерла вулкана</p>
             </div>
             <div class="glass-card" style="text-align:center;">
                 <i class="fas fa-layer-group" style="font-size: 2.5rem; color: var(--gold);"></i>
-                <h3 style="margin-top: 10px; color: var(--text-primary);" data-i18n="about.cardsTitle">60+ карточек</h3>
-                <p style="color: var(--text-secondary);" data-i18n="about.cardsDesc">5 типов заданий: речевые + моторные</p>
+                <h3 style="margin-top: 10px; color: var(--text-primary);">60+ карточек</h3>
+                <p style="color: var(--text-secondary);">5 типов заданий: речевые + моторные</p>
             </div>
             <div class="glass-card" style="text-align:center;">
                 <i class="fas fa-chart-line" style="font-size: 2.5rem; color: var(--gold);"></i>
-                <h3 style="margin-top: 10px; color: var(--text-primary);" data-i18n="about.approachTitle">Индивидуальный подход</h3>
-                <p style="color: var(--text-secondary);" data-i18n="about.approachDesc">Карта нарушений и адаптация под каждого ребёнка</p>
+                <h3 style="margin-top: 10px; color: var(--text-primary);">Индивидуальный подход</h3>
+                <p style="color: var(--text-secondary);">Карта нарушений и адаптация под каждого ребёнка</p>
             </div>
         </div>
     </section>
 
     <!-- ========================================================
-           СЕКЦИЯ: ПРАВИЛА
+           СЕКЦИЯ: ПРАВИЛА (полная версия)
            ======================================================== -->
     <section id="rules" class="section">
         <h2 class="section-title">
-            <i class="fas fa-dice"></i> <span data-i18n="rules.title">Правила игры</span>
+            <i class="fas fa-dice"></i> Правила игры
         </h2>
         <div class="rules-text" id="rulesContent">
             <!-- Контент правил будет вставлен через JS -->
@@ -1018,40 +965,40 @@
            ======================================================== -->
     <section id="cards" class="section">
         <h2 class="section-title">
-            <i class="fas fa-id-card"></i> <span data-i18n="cards.title">Карточки заданий</span>
+            <i class="fas fa-id-card"></i> Карточки заданий
         </h2>
         
         <button class="btn btn-primary" onclick="openCardsGallery()">
-            <i class="fas fa-image"></i> <span data-i18n="cards.gallery">Посмотреть реальные карточки</span>
+            <i class="fas fa-image"></i> Посмотреть реальные карточки
         </button>
         
         <div class="filter-switch">
-            <span><i class="fas fa-sliders-h"></i> <span data-i18n="cards.filterMode">Режим отображения речевых карточек:</span></span>
+            <span><i class="fas fa-sliders-h"></i> Режим отображения речевых карточек:</span>
             <label>
                 <input type="checkbox" id="toggleCards">
-                <span><i class="fas fa-check-circle"></i> <span data-i18n="cards.showConfirmed">Показывать только подтверждённые логопедом</span></span>
+                <span><i class="fas fa-check-circle"></i> Показывать только подтверждённые логопедом</span>
             </label>
         </div>
         
-        <h3><i class="fas fa-smile"></i> <span data-i18n="cards.blue">Артикуляционная гимнастика</span> <span class="card-count" id="blueCount">0</span></h3>
+        <h3><i class="fas fa-smile"></i> Артикуляционная гимнастика <span class="card-count" id="blueCount">0</span></h3>
         <div id="blueCards" class="card-grid"></div>
 
-        <h3><i class="fas fa-microphone-alt"></i> <span data-i18n="cards.red">Произнеси звук</span> <span class="card-count" id="redCount">0</span></h3>
+        <h3><i class="fas fa-microphone-alt"></i> Произнеси звук <span class="card-count" id="redCount">0</span></h3>
         <div id="redCards" class="card-grid"></div>
 
-        <h3><i class="fas fa-search"></i> <span data-i18n="cards.green">Найди слово</span> <span class="card-count" id="greenCount">0</span></h3>
+        <h3><i class="fas fa-search"></i> Найди слово <span class="card-count" id="greenCount">0</span></h3>
         <div id="greenCards" class="card-grid"></div>
 
-        <h3><i class="fas fa-comment-dots"></i> <span data-i18n="cards.yellow">Скороговорки</span> <span class="card-count" id="yellowCount">0</span></h3>
+        <h3><i class="fas fa-comment-dots"></i> Скороговорки <span class="card-count" id="yellowCount">0</span></h3>
         <div id="yellowCards" class="card-grid"></div>
 
-        <h3><i class="fas fa-hand-peace"></i> <span data-i18n="cards.orange">Развитие моторики</span> <span class="card-count" id="orangeCount">0</span></h3>
+        <h3><i class="fas fa-hand-peace"></i> Развитие моторики <span class="card-count" id="orangeCount">0</span></h3>
         <div class="motor-switch">
-            <span><i class="fas fa-filter"></i> <span data-i18n="cards.motorFilter">Фильтр моторных карточек:</span></span>
+            <span><i class="fas fa-filter"></i> Фильтр моторных карточек:</span>
             <div class="motor-switch-buttons">
-                <button class="motor-switch-btn active" data-motor-filter="all"><span data-i18n="cards.all">🧩 Все</span></button>
-                <button class="motor-switch-btn" data-motor-filter="fine"><span data-i18n="cards.fine">✋ Мелкая моторика</span></button>
-                <button class="motor-switch-btn" data-motor-filter="gross"><span data-i18n="cards.gross">🏃 Крупная моторика</span></button>
+                <button class="motor-switch-btn active" data-motor-filter="all">🧩 Все</button>
+                <button class="motor-switch-btn" data-motor-filter="fine">✋ Мелкая моторика</button>
+                <button class="motor-switch-btn" data-motor-filter="gross">🏃 Крупная моторика</button>
             </div>
         </div>
         <div id="orangeCards" class="card-grid"></div>
@@ -1062,31 +1009,31 @@
            ======================================================== -->
     <section id="map" class="section">
         <h2 class="section-title">
-            <i class="fas fa-map-marked-alt"></i> <span data-i18n="map.title">Карта путешествия</span>
+            <i class="fas fa-map-marked-alt"></i> Карта путешествия
         </h2>
         
         <div class="photo-section">
             <img src="images/map.png" alt="Игровое поле" style="max-width:700px; width:100%; border-radius:20px;">
-            <p class="photo-caption" data-i18n="map.caption">🗺️ Игровое поле (цифровая версия)</p>
+            <p class="photo-caption">🗺️ Игровое поле (цифровая версия)</p>
         </div>
         
         <div class="map-zones">
-            <h3><i class="fas fa-exclamation-triangle"></i> <span data-i18n="map.specialCells">Особые клетки</span></h3>
+            <h3><i class="fas fa-exclamation-triangle"></i> Особые клетки</h3>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; color: var(--text-secondary);">
-                <div>❌ <strong data-i18n="map.cross">Крест</strong> — <span data-i18n="map.crossDesc">проверка выполнения заданий</span></div>
-                <div>🔥 <strong data-i18n="map.fire">Костёр</strong> — <span data-i18n="map.fireDesc">доп. ход</span></div>
-                <div>🧙 <strong data-i18n="map.wizards">Волшебники</strong> — <span data-i18n="map.wizardsDesc">выбор задания</span></div>
-                <div>🌊 <strong data-i18n="map.waterfall">Водопад</strong> — <span data-i18n="map.waterfallDesc">вниз по течению</span></div>
-                <div>🧗 <strong data-i18n="map.rope">Верёвочная переправа</strong> — <span data-i18n="map.ropeDesc">скатывание</span></div>
-                <div>🦛 <strong data-i18n="map.giant">Живот гиганта (18)</strong> → <span data-i18n="map.giantTarget">пляж (22)</span></div>
-                <div>🏁 <strong data-i18n="map.finish">Жерло вулкана</strong> — <span data-i18n="map.finishDesc">ПОБЕДА!</span></div>
+                <div>❌ <strong>Крест</strong> — проверка выполнения заданий</div>
+                <div>🔥 <strong>Костёр</strong> — доп. ход</div>
+                <div>🧙 <strong>Волшебники</strong> — выбор задания</div>
+                <div>🌊 <strong>Водопад</strong> — вниз по течению</div>
+                <div>🧗 <strong>Верёвочная переправа</strong> — скатывание</div>
+                <div>🦛 <strong>Живот гиганта (18)</strong> → пляж (22)</div>
+                <div>🏁 <strong>Жерло вулкана</strong> — ПОБЕДА!</div>
             </div>
         </div>
 
         <div class="map-zones" style="background: rgba(167, 139, 250, 0.15); border-color: rgba(167, 139, 250, 0.2);">
-            <h3><i class="fas fa-download"></i> <span data-i18n="map.download.title">Индивидуальная карта игрока</span></h3>
-            <p style="color: var(--text-secondary);" data-i18n="map.download.desc">Скачайте и распечатайте для отслеживания прогресса ребёнка.</p>
-            <button class="btn btn-primary" id="downloadWordBtn"><i class="fas fa-file-word"></i> <span data-i18n="map.download.btn">Скачать Word-карту</span></button>
+            <h3><i class="fas fa-download"></i> Индивидуальная карта игрока</h3>
+            <p style="color: var(--text-secondary);">Скачайте и распечатайте для отслеживания прогресса ребёнка.</p>
+            <button class="btn btn-primary" id="downloadWordBtn"><i class="fas fa-file-word"></i> Скачать Word-карту</button>
         </div>
     </section>
 
@@ -1095,61 +1042,61 @@
            ======================================================== -->
     <section id="parent" class="section">
         <h2 class="section-title">
-            <i class="fas fa-chalkboard-user"></i> <span data-i18n="parent.title">Рекомендации родителям</span>
+            <i class="fas fa-chalkboard-user"></i> Рекомендации родителям
         </h2>
 
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
             <div class="map-zones">
                 <i class="fas fa-eye" style="font-size: 1.8em; color: var(--gold);"></i>
-                <h3 style="color: var(--text-primary);" data-i18n="parent.tip1.title">Не пропускайте ошибки</h3>
-                <p style="color: var(--text-secondary);" data-i18n="parent.tip1.desc">Если звук произнесён неверно — задание не засчитывается.</p>
+                <h3 style="color: var(--text-primary);">Не пропускайте ошибки</h3>
+                <p style="color: var(--text-secondary);">Если звук произнесён неверно — задание не засчитывается.</p>
             </div>
             <div class="map-zones">
                 <i class="fas fa-mirror" style="font-size: 1.8em; color: var(--gold);"></i>
-                <h3 style="color: var(--text-primary);" data-i18n="parent.tip2.title">Используйте зеркало</h3>
-                <p style="color: var(--text-secondary);" data-i18n="parent.tip2.desc">Показывайте правильную артикуляцию и просите ребёнка смотреть на себя.</p>
+                <h3 style="color: var(--text-primary);">Используйте зеркало</h3>
+                <p style="color: var(--text-secondary);">Показывайте правильную артикуляцию и просите ребёнка смотреть на себя.</p>
             </div>
             <div class="map-zones">
                 <i class="fas fa-calendar-week" style="font-size: 1.8em; color: var(--gold);"></i>
-                <h3 style="color: var(--text-primary);" data-i18n="parent.tip3.title">Регулярность</h3>
-                <p style="color: var(--text-secondary);" data-i18n="parent.tip3.desc">Играйте 2-3 раза в неделю по 15-20 минут.</p>
+                <h3 style="color: var(--text-primary);">Регулярность</h3>
+                <p style="color: var(--text-secondary);">Играйте 2-3 раза в неделю по 15-20 минут.</p>
             </div>
         </div>
         
         <div class="map-zones" style="margin-top: 20px;">
-            <h3><i class="fas fa-chart-simple"></i> <span data-i18n="parent.effects.title">Ожидаемые эффекты</span></h3>
+            <h3><i class="fas fa-chart-simple"></i> Ожидаемые эффекты</h3>
             <ul style="list-style: none; padding: 0; margin-top: 15px;">
                 <li style="padding: 8px 0; color: var(--text-secondary); display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--glass-border);">
-                    <span style="color: var(--green); font-weight: 700;">✓</span> <span data-i18n="parent.effects.1">Повышение мотивации к логопедическим занятиям</span>
+                    <span style="color: var(--green); font-weight: 700;">✓</span> Повышение мотивации к логопедическим занятиям
                 </li>
                 <li style="padding: 8px 0; color: var(--text-secondary); display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--glass-border);">
-                    <span style="color: var(--green); font-weight: 700;">✓</span> <span data-i18n="parent.effects.2">Увеличение количества правильных артикуляционных укладов</span>
+                    <span style="color: var(--green); font-weight: 700;">✓</span> Увеличение количества правильных артикуляционных укладов
                 </li>
                 <li style="padding: 8px 0; color: var(--text-secondary); display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--glass-border);">
-                    <span style="color: var(--green); font-weight: 700;">✓</span> <span data-i18n="parent.effects.3">Ускорение автоматизации звуков в игровой среде</span>
+                    <span style="color: var(--green); font-weight: 700;">✓</span> Ускорение автоматизации звуков в игровой среде
                 </li>
                 <li style="padding: 8px 0; color: var(--text-secondary); display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--glass-border);">
-                    <span style="color: var(--green); font-weight: 700;">✓</span> <span data-i18n="parent.effects.4">Развитие мелкой и крупной моторики, стимулирующей речь</span>
+                    <span style="color: var(--green); font-weight: 700;">✓</span> Развитие мелкой и крупной моторики, стимулирующей речь
                 </li>
                 <li style="padding: 8px 0; color: var(--text-secondary); display: flex; align-items: center; gap: 12px;">
-                    <span style="color: var(--green); font-weight: 700;">✓</span> <span data-i18n="parent.effects.5">Вовлечение родителей в коррекционный процесс</span>
+                    <span style="color: var(--green); font-weight: 700;">✓</span> Вовлечение родителей в коррекционный процесс
                 </li>
             </ul>
         </div>
     </section>
 
     <footer>
-        <span data-i18n="footer">🧠 Игра создана для коррекции дислалии у детей 5-7 лет • Москва 2026</span>
+        🧠 Игра создана для коррекции дислалии у детей 5-7 лет • Москва 2026
     </footer>
 
 </div>
 
 <!-- ========================================================
-   JAVASCRIPT
+   JAVASCRIPT (исправлен)
    ======================================================== -->
 <script>
 // ========================================================
-// ПЕРЕВОДЫ (полная версия)
+// ПЕРЕВОДЫ
 // ========================================================
 const TRANSLATIONS = {
     ru: {
@@ -1198,9 +1145,7 @@ const TRANSLATIONS = {
             approachTitle: 'Индивидуальный подход',
             approachDesc: 'Карта нарушений и адаптация под каждого ребёнка'
         },
-        rules: {
-            title: 'Правила игры'
-        },
+        rules: { title: 'Правила игры' },
         cards: {
             title: 'Карточки заданий',
             gallery: 'Посмотреть реальные карточки',
@@ -1242,18 +1187,9 @@ const TRANSLATIONS = {
         },
         parent: {
             title: 'Рекомендации родителям',
-            tip1: {
-                title: 'Не пропускайте ошибки',
-                desc: 'Если звук произнесён неверно — задание не засчитывается.'
-            },
-            tip2: {
-                title: 'Используйте зеркало',
-                desc: 'Показывайте правильную артикуляцию и просите ребёнка смотреть на себя.'
-            },
-            tip3: {
-                title: 'Регулярность',
-                desc: 'Играйте 2-3 раза в неделю по 15-20 минут.'
-            },
+            tip1: { title: 'Не пропускайте ошибки', desc: 'Если звук произнесён неверно — задание не засчитывается.' },
+            tip2: { title: 'Используйте зеркало', desc: 'Показывайте правильную артикуляцию и просите ребёнка смотреть на себя.' },
+            tip3: { title: 'Регулярность', desc: 'Играйте 2-3 раза в неделю по 15-20 минут.' },
             effects: {
                 title: 'Ожидаемые эффекты',
                 1: 'Повышение мотивации к логопедическим занятиям',
@@ -1310,9 +1246,7 @@ const TRANSLATIONS = {
             approachTitle: 'Individual approach',
             approachDesc: 'Disorder map and adaptation for each child'
         },
-        rules: {
-            title: 'Game Rules'
-        },
+        rules: { title: 'Game Rules' },
         cards: {
             title: 'Task Cards',
             gallery: 'View actual cards',
@@ -1332,20 +1266,13 @@ const TRANSLATIONS = {
             title: 'Journey Map',
             caption: '🗺️ Game board (digital version)',
             specialCells: 'Special cells',
-            cross: 'Cross',
-            crossDesc: 'task check',
-            fire: 'Campfire',
-            fireDesc: 'extra turn',
-            wizards: 'Wizards',
-            wizardsDesc: 'choose task',
-            waterfall: 'Waterfall',
-            waterfallDesc: 'downstream',
-            rope: 'Rope crossing',
-            ropeDesc: 'slide down',
-            giant: 'Giant\'s belly (18)',
-            giantTarget: 'beach (22)',
-            finish: 'Volcano crater',
-            finishDesc: 'VICTORY!',
+            cross: 'Cross', crossDesc: 'task check',
+            fire: 'Campfire', fireDesc: 'extra turn',
+            wizards: 'Wizards', wizardsDesc: 'choose task',
+            waterfall: 'Waterfall', waterfallDesc: 'downstream',
+            rope: 'Rope crossing', ropeDesc: 'slide down',
+            giant: 'Giant\'s belly (18)', giantTarget: 'beach (22)',
+            finish: 'Volcano crater', finishDesc: 'VICTORY!',
             download: {
                 title: 'Player Card',
                 desc: 'Download and print to track your child\'s progress.',
@@ -1354,18 +1281,9 @@ const TRANSLATIONS = {
         },
         parent: {
             title: 'Recommendations for Parents',
-            tip1: {
-                title: 'Don\'t ignore mistakes',
-                desc: 'If a sound is pronounced incorrectly — the task doesn\'t count.'
-            },
-            tip2: {
-                title: 'Use the mirror',
-                desc: 'Show the correct articulation and ask the child to watch themselves.'
-            },
-            tip3: {
-                title: 'Regularity',
-                desc: 'Play 2-3 times a week for 15-20 minutes.'
-            },
+            tip1: { title: 'Don\'t ignore mistakes', desc: 'If a sound is pronounced incorrectly — the task doesn\'t count.' },
+            tip2: { title: 'Use the mirror', desc: 'Show the correct articulation and ask the child to watch themselves.' },
+            tip3: { title: 'Regularity', desc: 'Play 2-3 times a week for 15-20 minutes.' },
             effects: {
                 title: 'Expected Effects',
                 1: 'Increased motivation for speech therapy sessions',
@@ -1377,18 +1295,6 @@ const TRANSLATIONS = {
         }
     }
 };
-
-// ========================================================
-// СОСТОЯНИЕ
-// ========================================================
-const PERF_SETTINGS = {
-    perfMode: false,
-    effects3d: true,
-    particles: true,
-    headerAnimation: true
-};
-
-let currentLang = 'ru';
 
 // ========================================================
 // ДАННЫЕ КАРТОЧЕК
@@ -1472,10 +1378,119 @@ const cardsData = {
 };
 
 let currentMotorFilter = 'all';
+let currentLang = 'ru';
 
 // ========================================================
-// ПЕРЕВОДЫ И ЯЗЫК
+// СОСТОЯНИЕ ПРОИЗВОДИТЕЛЬНОСТИ
 // ========================================================
+const PERF_SETTINGS = {
+    perfMode: false,
+    effects3d: true,
+    particles: true,
+    headerAnimation: true
+};
+
+// ========================================================
+// applyPerfMode — ФУНКЦИЯ ДОБАВЛЕНА!
+// ========================================================
+function applyPerfMode() {
+    // Применяем настройки производительности
+    document.documentElement.classList.toggle('no-3d', !PERF_SETTINGS.effects3d);
+    document.documentElement.classList.toggle('no-animations', !PERF_SETTINGS.headerAnimation);
+    
+    const canvas = document.getElementById('particles-canvas');
+    if (canvas) {
+        canvas.style.display = PERF_SETTINGS.particles ? 'block' : 'none';
+        if (!PERF_SETTINGS.particles && window._particleAnimId) {
+            cancelAnimationFrame(window._particleAnimId);
+            window._particleAnimId = null;
+        }
+        if (PERF_SETTINGS.particles && !window._particleAnimId) {
+            initParticles();
+        }
+    }
+}
+
+// ========================================================
+// loadPerfSettings — ИСПРАВЛЕНА!
+// ========================================================
+function loadPerfSettings() {
+    try {
+        const saved = localStorage.getItem('perf_settings');
+        if (saved) {
+            const data = JSON.parse(saved);
+            Object.assign(PERF_SETTINGS, data);
+        }
+    } catch(e) { /* игнорируем ошибки */ }
+    
+    // Применяем настройки (applyPerfMode теперь существует!)
+    applyPerfMode();
+}
+
+function savePerfSettings() {
+    try {
+        localStorage.setItem('perf_settings', JSON.stringify(PERF_SETTINGS));
+    } catch(e) {}
+}
+
+function togglePerfMode() {
+    PERF_SETTINGS.perfMode = !PERF_SETTINGS.perfMode;
+    savePerfSettings();
+    if (PERF_SETTINGS.perfMode) {
+        PERF_SETTINGS.effects3d = false;
+        PERF_SETTINGS.particles = false;
+        PERF_SETTINGS.headerAnimation = false;
+    } else {
+        PERF_SETTINGS.effects3d = true;
+        PERF_SETTINGS.particles = true;
+        PERF_SETTINGS.headerAnimation = true;
+    }
+    applyPerfMode();
+    updateAllToggles();
+}
+
+function togglePerformance(key) {
+    if (PERF_SETTINGS.perfMode) PERF_SETTINGS.perfMode = false;
+    PERF_SETTINGS[key] = !PERF_SETTINGS[key];
+    savePerfSettings();
+    applyPerfMode();
+    updateAllToggles();
+}
+
+function updateAllToggles() {
+    const perfToggle = document.getElementById('toggle-perfMode');
+    if (perfToggle) perfToggle.classList.toggle('off', PERF_SETTINGS.perfMode);
+    ['effects3d', 'particles', 'headerAnimation'].forEach(key => {
+        const el = document.getElementById(`toggle-${key}`);
+        if (el) el.classList.toggle('off', !PERF_SETTINGS[key]);
+    });
+}
+
+function resetPerformance() {
+    PERF_SETTINGS.perfMode = false;
+    PERF_SETTINGS.effects3d = true;
+    PERF_SETTINGS.particles = true;
+    PERF_SETTINGS.headerAnimation = true;
+    savePerfSettings();
+    applyPerfMode();
+    updateAllToggles();
+}
+
+// ========================================================
+// НАСТРОЙКИ (темы, язык)
+// ========================================================
+function toggleSettings() {
+    document.getElementById('settingsPanel').classList.toggle('open');
+    document.getElementById('settingsGear').classList.toggle('open');
+}
+
+function changeTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+    document.getElementById('themeSelect').value = theme;
+    applyPerfMode();
+}
+
 function changeLanguage(lang) {
     currentLang = lang;
     localStorage.setItem('lang', lang);
@@ -1483,6 +1498,9 @@ function changeLanguage(lang) {
     applyTranslations();
 }
 
+// ========================================================
+// ПЕРЕВОДЫ
+// ========================================================
 function applyTranslations() {
     const t = TRANSLATIONS[currentLang] || TRANSLATIONS.ru;
     document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -1500,189 +1518,44 @@ function applyTranslations() {
     renderRules();
 }
 
-// ========================================================
-// ПРАВИЛА (полная версия)
-// ========================================================
 function renderRules() {
     const container = document.getElementById('rulesContent');
     if (!container) return;
     const isRu = currentLang === 'ru';
-    
     container.innerHTML = `
         <h3>${isRu ? '1. Общая информация' : '1. General Information'}</h3>
         <p><strong>${isRu ? 'Название игры:' : 'Game name:'}</strong> ${isRu ? '«Говорю правильно: Путешествие к вулкану речи»' : '"Speak Correctly: Journey to the Volcano of Speech"'}<br>
         <strong>${isRu ? 'Тип:' : 'Type:'}</strong> ${isRu ? 'Настольная логопедическая игра' : 'Board speech therapy game'}<br>
-        <strong>${isRu ? 'Количество игроков:' : 'Number of players:'}</strong> ${isRu ? '1–4 ребёнка + 1 взрослый (ведущий, «Хранитель речи»)' : '1–4 children + 1 adult (host, "Guardian of Speech")'}<br>
+        <strong>${isRu ? 'Количество игроков:' : 'Number of players:'}</strong> ${isRu ? '1–4 ребёнка + 1 взрослый' : '1–4 children + 1 adult'}<br>
         <strong>${isRu ? 'Возраст:' : 'Age:'}</strong> 5–7 ${isRu ? 'лет' : 'years'}<br>
         <strong>${isRu ? 'Цель игры:' : 'Goal:'}</strong> ${isRu ? 'Первым добраться до финиша (жерло вулкана), правильно выполняя задания.' : 'Be the first to reach the finish (volcano crater) by completing tasks correctly.'}</p>
-
         <h3>${isRu ? '2. Комплектация' : '2. Contents'}</h3>
         <ul>
             <li><strong>${isRu ? 'Игровое поле' : 'Game board'}</strong> — ${isRu ? 'карта-змейка с маршрутом из 89 клеток.' : 'snake map with 89 cells.'}</li>
             <li><strong>${isRu ? '4 фигурки игроков' : '4 player pieces'}</strong></li>
             <li><strong>${isRu ? 'Игральный кубик' : 'Dice'}</strong> (1-6)</li>
-            <li><strong>${isRu ? '5 колод карточек' : '5 decks of cards'}</strong> ${isRu ? 'в цифровом формате: синие, красные, зелёные, жёлтые, оранжевые (моторные).' : 'in digital format: blue, red, green, yellow, orange (motor).'}</li>
+            <li><strong>${isRu ? '5 колод карточек' : '5 decks of cards'}</strong> ${isRu ? 'в цифровом формате: синие, красные, зелёные, жёлтые, оранжевые.' : 'in digital format: blue, red, green, yellow, orange.'}</li>
             <li><strong>${isRu ? 'Зеркало' : 'Mirror'}</strong> — ${isRu ? 'для контроля артикуляции.' : 'for articulation control.'}</li>
-            <li><strong>${isRu ? 'Индивидуальная карта игрока' : 'Player card'}</strong> — ${isRu ? 'создаётся для отслеживания прогресса.' : 'created to track progress.'}</li>
         </ul>
-
-        <h3>${isRu ? '3. Подготовка к игре' : '3. Preparation'}</h3>
-        <ol>
-            <li>${isRu ? 'Взрослый вместе с ребёнком готовит индивидуальную карту.' : 'Adult and child prepare a player card.'}</li>
-            <li>${isRu ? 'Карточки открываются на цифровом устройстве.' : 'Cards are opened on a digital device.'}</li>
-            <li>${isRu ? 'Зеркало кладётся рядом с полем.' : 'Mirror is placed next to the board.'}</li>
-            <li>${isRu ? 'Каждый ребёнок выбирает фигурку и ставит её на СТАРТ.' : 'Each child chooses a piece and places it on START.'}</li>
-            <li>${isRu ? 'Взрослый объясняет правила.' : 'Adult explains the rules.'}</li>
-        </ol>
-
-        <h3>${isRu ? '4. Ход игры' : '4. Gameplay'}</h3>
-        <p><strong>${isRu ? '4.1. Бросок кубика' : '4.1. Dice roll'}</strong><br>${isRu ? 'Игрок бросает кубик и передвигает фигурку вперёд на выпавшее количество клеток.' : 'Player rolls the dice and moves forward the number of cells shown.'}</p>
-        <p><strong>${isRu ? '4.2. Что делать на клетке' : '4.2. What to do on a cell'}</strong></p>
+        <h3>${isRu ? '3. Ход игры' : '3. Gameplay'}</h3>
+        <p><strong>${isRu ? 'Бросок кубика' : 'Dice roll'}</strong><br>${isRu ? 'Игрок бросает кубик и передвигает фигурку вперёд на выпавшее количество клеток.' : 'Player rolls the dice and moves forward the number of cells shown.'}</p>
+        <p><strong>${isRu ? 'Что делать на клетке' : 'What to do on a cell'}</strong></p>
         <table>
             <tr><th>${isRu ? 'Что на клетке' : 'On the cell'}</th><th>${isRu ? 'Что происходит' : 'What happens'}</th></tr>
-            <tr><td>${isRu ? 'Обычная клетка (нет знаков)' : 'Regular cell (no symbols)'}</td><td>${isRu ? 'Ничего. Ход переходит к следующему игроку.' : 'Nothing. Turn passes to the next player.'}</td></tr>
-            <tr><td>${isRu ? 'Знак «?»' : 'Symbol "?"'}</td><td>${isRu ? 'Взрослый берёт карточку (цвет по зоне). Ребёнок выполняет задание. Если правильно — остаётся на клетке. Если с ошибкой — возвращается на 2 клетки назад.' : 'Adult takes a card (color by zone). Child completes the task. If correct — stays on the cell. If wrong — moves 2 cells back.'}</td></tr>
-            <tr><td>${isRu ? 'Крест' : 'Cross'}</td><td>${isRu ? 'Ведущий проверяет: выполнял ли игрок задание. Если не выполнял — игрок отправляется на СТАРТ.' : 'Host checks: did player complete a task. If not — player goes to START.'}</td></tr>
-            <tr><td>${isRu ? 'Костёр' : 'Campfire'}</td><td>${isRu ? 'Лагерь отдыха. Игрок получает дополнительный ход.' : 'Rest camp. Player gets an extra turn.'}</td></tr>
-            <tr><td>${isRu ? 'Волшебники' : 'Wizards'}</td><td>${isRu ? 'Игрок может выбрать карточку полегче или пропустить ход.' : 'Player can choose an easier card or skip the turn.'}</td></tr>
-            <tr><td>${isRu ? 'Водопад' : 'Waterfall'}</td><td>${isRu ? 'Игрок перемещается на клетку дорога у водопада.' : 'Player moves to the waterfall road cell.'}</td></tr>
-            <tr><td>${isRu ? 'Верёвочная переправа' : 'Rope crossing'}</td><td>${isRu ? 'Игрок перемещается на клетку ниже по карте.' : 'Player moves to a lower cell on the map.'}</td></tr>
-            <tr><td>${isRu ? 'Живот гиганта (клетка 18)' : 'Giant\'s belly (cell 18)'}</td><td>${isRu ? 'Игрок перемещается на клетку 22 (пляж).' : 'Player moves to cell 22 (beach).'}</td></tr>
+            <tr><td>${isRu ? 'Обычная клетка' : 'Regular cell'}</td><td>${isRu ? 'Ничего. Ход переходит к следующему игроку.' : 'Nothing. Turn passes to the next player.'}</td></tr>
+            <tr><td>${isRu ? 'Знак «?»' : 'Symbol "?"'}</td><td>${isRu ? 'Взрослый берёт карточку. Ребёнок выполняет задание. Если правильно — остаётся на клетке. Если с ошибкой — возвращается на 2 клетки назад.' : 'Adult takes a card. Child completes the task. If correct — stays on the cell. If wrong — moves 2 cells back.'}</td></tr>
+            <tr><td>${isRu ? 'Крест' : 'Cross'}</td><td>${isRu ? 'Проверка выполнения заданий. Если не выполнял — на СТАРТ.' : 'Task check. If not completed — goes to START.'}</td></tr>
+            <tr><td>${isRu ? 'Костёр' : 'Campfire'}</td><td>${isRu ? 'Дополнительный ход.' : 'Extra turn.'}</td></tr>
+            <tr><td>${isRu ? 'Волшебники' : 'Wizards'}</td><td>${isRu ? 'Выбор задания или пропуск хода.' : 'Choose task or skip turn.'}</td></tr>
+            <tr><td>${isRu ? 'Живот гиганта (18)' : 'Giant\'s belly (18)'}</td><td>${isRu ? 'Перемещение на клетку 22 (пляж).' : 'Move to cell 22 (beach).'}</td></tr>
             <tr><td>${isRu ? 'Жерло вулкана' : 'Volcano crater'}</td><td><strong>${isRu ? 'ФИНИШ! Победа.' : 'FINISH! Victory.'}</strong></td></tr>
         </table>
-        <p><em>${isRu ? 'Если ребёнок ошибся — взрослый показывает правильную артикуляцию в зеркале.' : 'If child makes a mistake — adult shows correct articulation in the mirror.'}</em></p>
     `;
 }
 
 // ========================================================
-// НАСТРОЙКИ ПРОИЗВОДИТЕЛЬНОСТИ
+// КАРТОЧКИ (рендеринг)
 // ========================================================
-function loadPerfSettings() {
-    try {
-        const saved = localStorage.getItem('perf_settings');
-        if (saved) {
-            const data = JSON.parse(saved);
-            Object.assign(PERF_SETTINGS, data);
-        }
-    } catch(e) {}
-    if (PERF_SETTINGS.perfMode) applyPerfMode();
-}
-
-function savePerfSettings() {
-    try {
-        localStorage.setItem('perf_settings', JSON.stringify(PERF_SETTINGS));
-    } catch(e) {}
-}
-
-function togglePerfMode() {
-    PERF_SETTINGS.perfMode = !PERF_SETTINGS.perfMode;
-    savePerfSettings();
-    if (PERF_SETTINGS.perfMode) {
-        PERF_SETTINGS.effects3d = false;
-        PERF_SETTINGS.particles = false;
-        PERF_SETTINGS.headerAnimation = false;
-        applyPerformanceSettings();
-    } else {
-        PERF_SETTINGS.effects3d = true;
-        PERF_SETTINGS.particles = true;
-        PERF_SETTINGS.headerAnimation = true;
-        applyPerformanceSettings();
-    }
-    updateAllToggles();
-}
-
-function togglePerformance(key) {
-    if (PERF_SETTINGS.perfMode) PERF_SETTINGS.perfMode = false;
-    PERF_SETTINGS[key] = !PERF_SETTINGS[key];
-    savePerfSettings();
-    applyPerformanceSettings();
-    updateAllToggles();
-}
-
-function updateAllToggles() {
-    const perfToggle = document.getElementById('toggle-perfMode');
-    if (perfToggle) perfToggle.classList.toggle('off', PERF_SETTINGS.perfMode);
-    ['effects3d', 'particles', 'headerAnimation'].forEach(key => {
-        const el = document.getElementById(`toggle-${key}`);
-        if (el) el.classList.toggle('off', !PERF_SETTINGS[key]);
-    });
-}
-
-function applyPerformanceSettings() {
-    document.documentElement.classList.toggle('no-3d', !PERF_SETTINGS.effects3d);
-    const canvas = document.getElementById('particles-canvas');
-    if (canvas) {
-        canvas.style.display = PERF_SETTINGS.particles ? 'block' : 'none';
-        if (!PERF_SETTINGS.particles && window._particleAnimId) {
-            cancelAnimationFrame(window._particleAnimId);
-            window._particleAnimId = null;
-        }
-        if (PERF_SETTINGS.particles && !window._particleAnimId) initParticles();
-    }
-    const header = document.getElementById('mainHeader');
-    const title = document.getElementById('mainTitle');
-    if (header) header.style.animation = PERF_SETTINGS.headerAnimation ? 'gradientShift 10s ease-in-out infinite' : 'none';
-    if (title) title.style.animation = PERF_SETTINGS.headerAnimation ? 'shimmerText 6s ease-in-out infinite' : 'none';
-}
-
-function resetPerformance() {
-    PERF_SETTINGS.perfMode = false;
-    PERF_SETTINGS.effects3d = true;
-    PERF_SETTINGS.particles = true;
-    PERF_SETTINGS.headerAnimation = true;
-    savePerfSettings();
-    applyPerformanceSettings();
-    updateAllToggles();
-}
-
-// ========================================================
-// НАСТРОЙКИ (темы)
-// ========================================================
-function toggleSettings() {
-    document.getElementById('settingsPanel').classList.toggle('open');
-    document.getElementById('settingsGear').classList.toggle('open');
-}
-
-function changeTheme(theme) {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
-    document.getElementById('themeSelect').value = theme;
-    applyPerformanceSettings();
-}
-
-// ========================================================
-// РЕНДЕРИНГ КАРТОЧЕК
-// ========================================================
-function renderMotorCards() {
-    const container = document.getElementById('orangeCards');
-    if (!container) return;
-    
-    let cards = [];
-    if (currentMotorFilter === 'all') {
-        cards = [...motorCards.fine, ...motorCards.gross];
-    } else if (currentMotorFilter === 'fine') {
-        cards = motorCards.fine;
-    } else if (currentMotorFilter === 'gross') {
-        cards = motorCards.gross;
-    }
-    
-    let html = '';
-    for (let card of cards) {
-        let motorType = motorCards.fine.includes(card) ? 'fine' : 'gross';
-        let badgeText = motorType === 'fine' ? '✋ Мелкая моторика' : '🏃 Крупная моторика';
-        let badgeClass = 'badge-motor-fine';
-        html += `
-            <div class="card card-orange">
-                <div class="card-title">${card.title} <span class="card-badge ${badgeClass}">${badgeText}</span></div>
-                <div class="card-desc">${card.desc}</div>
-            </div>
-        `;
-    }
-    if (html === '') html = '<div style="padding:20px; text-align:center; color: var(--text-muted);">Нет карточек в этой категории</div>';
-    container.innerHTML = html;
-    document.getElementById('orangeCount').textContent = cards.length;
-}
-
 function renderSpeechCards() {
     const showOnlyConfirmed = document.getElementById('toggleCards').checked;
     for (let color of ['blue', 'red', 'green', 'yellow']) {
@@ -1704,23 +1577,69 @@ function renderSpeechCards() {
     }
 }
 
+function renderMotorCards() {
+    const container = document.getElementById('orangeCards');
+    if (!container) return;
+    let cards = [];
+    if (currentMotorFilter === 'all') {
+        cards = [...motorCards.fine, ...motorCards.gross];
+    } else if (currentMotorFilter === 'fine') {
+        cards = motorCards.fine;
+    } else if (currentMotorFilter === 'gross') {
+        cards = motorCards.gross;
+    }
+    let html = '';
+    for (let card of cards) {
+        let motorType = motorCards.fine.includes(card) ? 'fine' : 'gross';
+        let badgeText = motorType === 'fine' ? '✋ Мелкая моторика' : '🏃 Крупная моторика';
+        let badgeClass = 'badge-motor-fine';
+        html += `
+            <div class="card card-orange">
+                <div class="card-title">${card.title} <span class="card-badge ${badgeClass}">${badgeText}</span></div>
+                <div class="card-desc">${card.desc}</div>
+            </div>
+        `;
+    }
+    if (html === '') html = '<div style="padding:20px; text-align:center; color: var(--text-muted);">Нет карточек в этой категории</div>';
+    container.innerHTML = html;
+    document.getElementById('orangeCount').textContent = cards.length;
+}
+
 // ========================================================
-// НАВИГАЦИЯ
+// НАВИГАЦИЯ — ИСПРАВЛЕНА!
 // ========================================================
 function setupNavigation() {
-    document.querySelectorAll('#mainNav button').forEach(btn => {
+    const navButtons = document.querySelectorAll('#mainNav button');
+    const sections = {
+        about: document.getElementById('about'),
+        rules: document.getElementById('rules'),
+        cards: document.getElementById('cards'),
+        map: document.getElementById('map'),
+        parent: document.getElementById('parent')
+    };
+    
+    navButtons.forEach(btn => {
         btn.addEventListener('click', function() {
-            const sectionId = this.dataset.section;
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active-section'));
-            document.getElementById(sectionId).classList.add('active-section');
-            document.querySelectorAll('#mainNav button').forEach(b => b.classList.remove('active'));
+            // Убираем активный класс у всех кнопок
+            navButtons.forEach(b => b.classList.remove('active'));
             this.classList.add('active');
+            
+            // Скрываем все секции
+            Object.values(sections).forEach(s => {
+                if (s) s.classList.remove('active-section');
+            });
+            
+            // Показываем нужную секцию
+            const targetId = this.dataset.section;
+            if (sections[targetId]) {
+                sections[targetId].classList.add('active-section');
+            }
         });
     });
 }
 
 // ========================================================
-// ГАЛЕРЕЯ КАРТОЧЕК
+// ГАЛЕРЕЯ
 // ========================================================
 function openCardsGallery() {
     const galleryWindow = window.open("", "_blank");
@@ -1729,87 +1648,30 @@ function openCardsGallery() {
         return;
     }
     galleryWindow.document.write(`
-    <html>
-    <head>
-        <title>Карточки заданий</title>
-        <style>
-            body {
-                margin: 0;
-                font-family: 'Inter', sans-serif;
-                background: linear-gradient(135deg, #0f172a, #1e293b);
-                color: white;
-                padding: 30px;
-                min-height: 100vh;
-            }
-            h1 {
-                text-align: center;
-                margin-bottom: 30px;
-                font-size: 2.5rem;
-            }
-            .grid {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-                gap: 20px;
-                max-width: 1200px;
-                margin: 0 auto;
-            }
-            .img-card {
-                background: rgba(30, 41, 59, 0.6);
-                padding: 15px;
-                border-radius: 20px;
-                backdrop-filter: blur(10px);
-                transition: 0.3s;
-                border: 1px solid rgba(255,255,255,0.1);
-            }
-            .img-card:hover {
-                transform: scale(1.03);
-                border-color: rgba(102,126,234,0.5);
-            }
-            .img-card img {
-                width: 100%;
-                border-radius: 15px;
-            }
-            .img-card .label {
-                margin-top: 10px;
-                font-size: 0.9rem;
-                color: #cbd5e1;
-                text-align: center;
-            }
-            .close-btn {
-                position: fixed;
-                top: 20px;
-                right: 30px;
-                font-size: 2rem;
-                color: white;
-                cursor: pointer;
-                transition: 0.3s;
-                z-index: 10;
-            }
-            .close-btn:hover {
-                transform: rotate(90deg);
-                color: #a78bfa;
-            }
-            @media (max-width: 600px) {
-                body { padding: 15px; }
-                .grid { grid-template-columns: 1fr 1fr; }
-            }
-        </style>
-    </head>
-    <body>
-        <span class="close-btn" onclick="window.close()">✕</span>
-        <h1>📸 Реальные карточки заданий</h1>
-        <div class="grid">
-            <div class="img-card"><img src="images/card1.jpg" alt="Карточка 1"><div class="label">Карточка #1</div></div>
-            <div class="img-card"><img src="images/card2.jpg" alt="Карточка 2"><div class="label">Карточка #2</div></div>
-            <div class="img-card"><img src="images/card3.jpg" alt="Карточка 3"><div class="label">Карточка #3</div></div>
-            <div class="img-card"><img src="images/card4.jpg" alt="Карточка 4"><div class="label">Карточка #4</div></div>
-            <div class="img-card"><img src="images/card5.jpg" alt="Карточка 5"><div class="label">Карточка #5</div></div>
-            <div class="img-card"><img src="images/card6.jpg" alt="Карточка 6"><div class="label">Карточка #6</div></div>
-            <div class="img-card"><img src="images/card7.jpg" alt="Карточка 7"><div class="label">Карточка #7</div></div>
-            <div class="img-card"><img src="images/card8.jpg" alt="Карточка 8"><div class="label">Карточка #8</div></div>
-        </div>
-    </body>
-    </html>
+    <html><head><title>Карточки заданий</title>
+    <style>
+        body { margin:0; font-family:'Inter',sans-serif; background:linear-gradient(135deg,#0f172a,#1e293b); color:white; padding:30px; min-height:100vh; }
+        h1 { text-align:center; margin-bottom:30px; font-size:2.5rem; }
+        .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:20px; max-width:1200px; margin:0 auto; }
+        .img-card { background:rgba(30,41,59,0.6); padding:15px; border-radius:20px; backdrop-filter:blur(10px); transition:0.3s; border:1px solid rgba(255,255,255,0.1); }
+        .img-card:hover { transform:scale(1.03); border-color:rgba(102,126,234,0.5); }
+        .img-card img { width:100%; border-radius:15px; }
+        .img-card .label { margin-top:10px; font-size:0.9rem; color:#cbd5e1; text-align:center; }
+        .close-btn { position:fixed; top:20px; right:30px; font-size:2rem; color:white; cursor:pointer; transition:0.3s; z-index:10; }
+        .close-btn:hover { transform:rotate(90deg); color:#a78bfa; }
+    </style>
+    </head><body>
+    <span class="close-btn" onclick="window.close()">✕</span>
+    <h1>📸 Реальные карточки заданий</h1>
+    <div class="grid">
+        ${[1,2,3,4,5,6,7,8].map(i => `
+            <div class="img-card">
+                <img src="images/card${i}.jpg" alt="Карточка ${i}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22300%22%3E%3Crect fill=%22%231e293b%22 width=%22300%22 height=%22300%22/%3E%3Ctext x=%2250%%22 y=%2250%%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%2364748b%22 font-size=%2220%22 font-family=%22Inter%22%3EКарточка ${i}%3C/text%3E%3C/svg%3E'">
+                <div class="label">Карточка #${i}</div>
+            </div>
+        `).join('')}
+    </div>
+    </body></html>
     `);
     galleryWindow.document.close();
 }
@@ -1822,8 +1684,7 @@ function downloadWordCard() {
     const content = `<!DOCTYPE html>
 <html>
 <head><meta charset="UTF-8"><title>${isRu ? 'Индивидуальная карта игрока' : 'Player Card'}</title>
-<style>
-body{font-family:'Segoe UI',serif;margin:2cm;background:#fff;color:#1a1a2e;}
+<style>body{font-family:'Segoe UI',serif;margin:2cm;background:#fff;color:#1a1a2e;}
 h1{color:#7c3aed;border-bottom:2px solid #7c3aed;padding-bottom:10px;}
 h2{color:#5b21b6;margin-top:25px;}
 table{border-collapse:collapse;width:100%;margin:15px 0;}
@@ -1935,7 +1796,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('langSelect').value = savedLang;
     
     updateAllToggles();
-    applyPerformanceSettings();
+    applyPerfMode();
     
     renderSpeechCards();
     renderMotorCards();
@@ -1965,7 +1826,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.openCardsGallery = openCardsGallery;
     window.downloadWordCard = downloadWordCard;
     
-    console.log('🎮 Говорю правильно — полная версия загружена!');
+    console.log('🎮 Говорю правильно — загружено!');
 });
 </script>
 </body>
