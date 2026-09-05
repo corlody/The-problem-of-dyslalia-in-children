@@ -2,23 +2,23 @@
   "title": "正确说话",
   "subtitle": "通往<span class=\"highlight\">语音火山</span>的旅程",
   "authors": "项目参与者：",
-  "school": "第7学校",
+  "school": "第七学校",
   "year": "莫斯科 2026",
   "startGame": "开始游戏 🚀",
   "startGameHint": "在新标签页中打开",
-  "footer": "🧠 游戏专为5-7岁儿童的构音障碍矫正而设计 • 莫斯科 2026",
+  "footer": "🧠 专为5-7岁儿童构音障碍矫正设计的游戏 • 莫斯科 2026",
   "settings": {
     "title": "设置",
     "theme": "主题",
     "themeGame": "游戏",
-    "themeOfficial": "正式",
-    "themeElderly": "老年",
+    "themeOfficial": "官方",
+    "themeElderly": "老年人",
     "language": "语言",
     "langRu": "俄语",
     "langEn": "英语",
     "langZh": "中文",
     "perfMode": "性能模式",
-    "perfDesc": "为弱电脑启用",
+    "perfDesc": "弱电脑请开启",
     "fineTune": "微调",
     "effects3d": "3D效果",
     "particles": "粒子",
@@ -31,19 +31,19 @@
     "rules": "规则",
     "cards": "卡片",
     "map": "地图",
-    "parent": "给家长"
+    "parent": "家长指南"
   },
   "about": {
     "title": "关于项目",
-    "desc": "患有构音障碍的儿童对常规言语治疗课程失去兴趣。我们的游戏将发音练习、发音训练和自动化变成一场激动人心的冒险。",
-    "figures": "🎲 3D打印的小人",
+    "desc": "构音障碍儿童对常规言语治疗失去兴趣。我们的游戏将发音练习、音素定位和自动化训练变成一场激动人心的冒险。",
+    "figures": "🎲 3D打印小雕像",
     "mirror": "🪞 用于控制发音的镜子",
     "cellsTitle": "89个格子",
     "cellsDesc": "从花田到火山口的独特路线",
     "cardsTitle": "60+张卡片",
-    "cardsDesc": "5种任务类型：言语 + 运动",
+    "cardsDesc": "5类任务：言语 + 运动",
     "approachTitle": "个性化方法",
-    "approachDesc": "针对每个孩子的障碍地图和调整"
+    "approachDesc": "障碍图谱和针对每个孩子的适应"
   },
   "rules": {
     "title": "游戏规则"
@@ -53,22 +53,22 @@
     "gallery": "查看真实卡片",
     "filterMode": "言语卡片显示模式：",
     "showConfirmed": "仅显示经言语治疗师确认的",
-    "blue": "发音练习",
-    "red": "发出声音",
-    "green": "找出单词",
+    "blue": "发音体操",
+    "red": "说出声音",
+    "green": "找词",
     "yellow": "绕口令",
-    "orange": "运动技能",
+    "orange": "运动技能发展",
     "motorFilter": "运动卡片筛选：",
-    "all": "🧩 所有",
+    "all": "🧩 全部",
     "fine": "✋ 精细运动",
-    "gross": "🏃 大运动"
+    "gross": "🏃 粗大运动"
   },
   "map": {
-    "title": "旅行地图",
-    "caption": "🗺️ 游戏板（数字版）",
+    "title": "旅程地图",
+    "caption": "🗺️ 游戏棋盘（数字版）",
     "specialCells": "特殊格子",
     "cross": "十字",
-    "crossDesc": "任务检查",
+    "crossDesc": "任务完成检查",
     "fire": "篝火",
     "fireDesc": "额外回合",
     "wizards": "巫师",
@@ -76,14 +76,14 @@
     "waterfall": "瀑布",
     "waterfallDesc": "顺流而下",
     "rope": "绳索渡口",
-    "ropeDesc": "滑下",
-    "giant": "巨人肚子（18）",
-    "giantTarget": "海滩（22）",
+    "ropeDesc": "滑回",
+    "giant": "巨人腹部 (18)",
+    "giantTarget": "沙滩 (22)",
     "finish": "火山口",
     "finishDesc": "胜利！",
     "download": {
-      "title": "玩家卡片",
-      "desc": "下载并打印以跟踪孩子的进度。",
+      "title": "个人玩家卡片",
+      "desc": "下载并打印以追踪孩子的进度。",
       "btn": "下载Word卡片"
     }
   },
@@ -91,22 +91,22 @@
     "title": "给家长的建议",
     "tip1": {
       "title": "不要忽略错误",
-      "desc": "如果发音不正确——该任务不算数。"
+      "desc": "如果发音不正确，则该任务不计分。"
     },
     "tip2": {
       "title": "使用镜子",
-      "desc": "展示正确的发音，并让孩子看着自己。视觉控制是成功的关键。"
+      "desc": "展示正确的发音方式，并让孩子看着自己。"
     },
     "tip3": {
       "title": "规律性",
-      "desc": "每周玩2-3次，每次15-20分钟。短而规律的课程效果最好。"
+      "desc": "每周玩2-3次，每次15-20分钟。"
     },
     "effects": {
       "title": "预期效果",
-      "1": "提高言语治疗的积极性",
-      "2": "更多正确的发音模式",
-      "3": "在游戏环境中更快地自动化发音",
-      "4": "发展精细和大动作技能，刺激言语发展",
+      "1": "提高言语治疗课的积极性",
+      "2": "增加正确发音姿势的数量",
+      "3": "在游戏环境中加速声音的自动化",
+      "4": "发展精细和粗大运动技能，刺激语言发展",
       "5": "家长参与矫正过程"
     }
   },
@@ -116,30 +116,31 @@
     "selectPlayers": "选择玩家人数：",
     "startGame": "🚀 开始游戏",
     "continueTitle": "📂 继续游戏？",
-    "continueBtn": "✅ 继续",
+    "continueBtn": "✅ 继续游戏",
     "newGame": "新游戏",
     "exit": "退出",
-    "currentTurn": "当前回合",
+    "currentTurn": "当前轮到",
     "cell": "格子",
     "rollDice": "掷骰子",
     "diceResult": "掷出",
     "task": "任务",
     "completed": "已完成",
+    "partial": "部分完成",
     "failed": "未完成",
     "logWelcome": "🎮 游戏开始！掷骰子。",
     "winner": "胜利！",
     "bonusTurn": "额外回合！",
     "campfire": "篝火！",
-    "giantCell": "巨人肚子",
+    "giantCell": "巨人腹部",
     "ropeCell": "绳索渡口",
     "moveTo": "移动到格子",
-    "returnBack": "移动到格子",
-    "rollHint": "进行移动以获取任务。",
+    "returnBack": "移到格子",
+    "rollHint": "进行移动以获得练习。",
     "diceRoll": "掷出",
     "firstTask": "第一个任务",
     "tenTasks": "十个任务",
-    "twentyTasks": "20个任务"
-    "partial": "部分地",
-    "logExport": "原木出口"
+    "twentyTasks": "20个任务",
+    "logExport": "导出日志",
+    "loaded": "📂 游戏已加载。"
   }
 }
