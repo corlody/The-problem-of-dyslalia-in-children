@@ -139,5 +139,7 @@
     "firstTask": "第一个任务",
     "tenTasks": "十个任务",
     "twentyTasks": "20个任务"
+    "partial": "部分地",
+    "logExport": "原木出口"
   }
 }
