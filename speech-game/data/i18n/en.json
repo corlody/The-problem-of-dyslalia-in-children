@@ -1,12 +1,12 @@
 {
-  "title": "Speak Correctly",
-  "subtitle": "Journey to the <span class=\"highlight\">volcano of speech</span>",
+  "title": "I Speak Correctly",
+  "subtitle": "Journey to the <span class=\"highlight\">Volcano of Speech</span>",
   "authors": "Project participants:",
-  "school": "School №7",
+  "school": "School No. 7",
   "year": "Moscow 2026",
   "startGame": "Start Game 🚀",
   "startGameHint": "Opens in a new tab",
-  "footer": "🧠 Game created for speech correction in children 5-7 years old • Moscow 2026",
+  "footer": "🧠 Game created for correction of dyslalia in children 5–7 years old • Moscow 2026",
   "settings": {
     "title": "Settings",
     "theme": "Theme",
@@ -16,10 +16,10 @@
     "language": "Language",
     "langRu": "Russian",
     "langEn": "English",
-    "langZh": "中文",
+    "langZh": "中文 (Chinese)",
     "perfMode": "Performance mode",
     "perfDesc": "Enable for weak computers",
-    "fineTune": "Fine tuning",
+    "fineTune": "Fine-tuning",
     "effects3d": "3D effect",
     "particles": "Particles",
     "animations": "Animation",
@@ -36,28 +36,28 @@
   "about": {
     "title": "About the Project",
     "desc": "Children with dyslalia lose interest in routine speech therapy sessions. Our game turns articulation exercises, sound production, and automation into an exciting adventure.",
-    "figures": "🎲 3D-printed figures",
+    "figures": "🎲 3D‑printed figures",
     "mirror": "🪞 Mirror for articulation control",
     "cellsTitle": "89 cells",
-    "cellsDesc": "Unique route from flower meadow to volcano crater",
+    "cellsDesc": "Unique route from flower meadow to the volcano crater",
     "cardsTitle": "60+ cards",
     "cardsDesc": "5 types of tasks: speech + motor",
     "approachTitle": "Individual approach",
-    "approachDesc": "Disorder map and adaptation for each child"
+    "approachDesc": "Disorder map and adaptation to each child"
   },
   "rules": {
     "title": "Game Rules"
   },
   "cards": {
     "title": "Task Cards",
-    "gallery": "View actual cards",
-    "filterMode": "Speech cards display mode:",
-    "showConfirmed": "Show only confirmed by speech therapist",
-    "blue": "Articulation exercises",
+    "gallery": "View real cards",
+    "filterMode": "Display mode for speech cards:",
+    "showConfirmed": "Show only speech therapist‑approved",
+    "blue": "Articulation gymnastics",
     "red": "Say the sound",
     "green": "Find the word",
     "yellow": "Tongue twisters",
-    "orange": "Motor skills",
+    "orange": "Motor skills development",
     "motorFilter": "Motor cards filter:",
     "all": "🧩 All",
     "fine": "✋ Fine motor",
@@ -68,56 +68,56 @@
     "caption": "🗺️ Game board (digital version)",
     "specialCells": "Special cells",
     "cross": "Cross",
-    "crossDesc": "task check",
+    "crossDesc": "task completion check",
     "fire": "Campfire",
-    "fireDesc": "extra turn",
+    "fireDesc": "bonus turn",
     "wizards": "Wizards",
-    "wizardsDesc": "choose task",
+    "wizardsDesc": "choose a task",
     "waterfall": "Waterfall",
     "waterfallDesc": "downstream",
     "rope": "Rope crossing",
-    "ropeDesc": "slide down",
+    "ropeDesc": "slide back",
     "giant": "Giant's belly (18)",
     "giantTarget": "beach (22)",
     "finish": "Volcano crater",
     "finishDesc": "VICTORY!",
     "download": {
-      "title": "Player Card",
-      "desc": "Download and print to track your child's progress.",
-      "btn": "Download Word Card"
+      "title": "Individual player card",
+      "desc": "Download and print to track the child's progress.",
+      "btn": "Download Word card"
     }
   },
   "parent": {
     "title": "Recommendations for Parents",
     "tip1": {
       "title": "Don't ignore mistakes",
-      "desc": "If a sound is pronounced incorrectly — the task doesn't count."
+      "desc": "If a sound is pronounced incorrectly – the task is not counted."
     },
     "tip2": {
-      "title": "Use the mirror",
-      "desc": "Show the correct articulation and ask the child to watch themselves."
+      "title": "Use a mirror",
+      "desc": "Show correct articulation and ask the child to look at themselves."
     },
     "tip3": {
       "title": "Regularity",
-      "desc": "Play 2-3 times a week for 15-20 minutes."
+      "desc": "Play 2–3 times a week for 15–20 minutes."
     },
     "effects": {
-      "title": "Expected Effects",
+      "title": "Expected effects",
       "1": "Increased motivation for speech therapy sessions",
-      "2": "More correct articulation patterns",
-      "3": "Faster automation of sounds in a game environment",
-      "4": "Development of fine and gross motor skills stimulating speech",
+      "2": "Increase in correct articulatory postures",
+      "3": "Accelerated automation of sounds in a game environment",
+      "4": "Development of fine and gross motor skills that stimulate speech",
       "5": "Parental involvement in the correction process"
     }
   },
   "game": {
     "title": "Game",
-    "setupTitle": "🎲 Game Setup",
+    "setupTitle": "🎲 Game setup",
     "selectPlayers": "Select number of players:",
-    "startGame": "🚀 Start Game",
-    "continueTitle": "📂 Continue Game?",
-    "continueBtn": "✅ Continue",
-    "newGame": "New Game",
+    "startGame": "🚀 Start game",
+    "continueTitle": "📂 Continue game?",
+    "continueBtn": "✅ Continue game",
+    "newGame": "New game",
     "exit": "Exit",
     "currentTurn": "Current turn",
     "cell": "Cell",
@@ -125,21 +125,22 @@
     "diceResult": "Rolled",
     "task": "Task",
     "completed": "Completed",
+    "partial": "Partial",
     "failed": "Failed",
-    "logWelcome": "🎮 Game starts! Roll the dice.",
+    "logWelcome": "🎮 Game is starting! Roll the dice.",
     "winner": "VICTORY!",
     "bonusTurn": "Bonus turn!",
     "campfire": "Campfire!",
     "giantCell": "Giant's belly",
     "ropeCell": "Rope crossing",
-    "moveTo": "Move to cell",
+    "moveTo": "Moving to cell",
     "returnBack": "moved to cell",
-    "rollHint": "Make a move to get a task.",
+    "rollHint": "Make a move to get an exercise.",
     "diceRoll": "rolled",
     "firstTask": "First task",
     "tenTasks": "Ten tasks",
-    "twentyTasks": "20 tasks"
-    "partial": "Partially",
-    "logExport": "Log export"
+    "twentyTasks": "20 tasks",
+    "logExport": "Export logs",
+    "loaded": "📂 Game loaded."
   }
 }
