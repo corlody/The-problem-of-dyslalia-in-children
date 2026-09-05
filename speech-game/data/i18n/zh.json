@@ -109,5 +109,35 @@
       "4": "发展精细和大动作技能，刺激言语发展",
       "5": "家长参与矫正过程"
     }
+  },
+  "game": {
+    "title": "游戏",
+    "setupTitle": "🎲 游戏设置",
+    "selectPlayers": "选择玩家人数：",
+    "startGame": "🚀 开始游戏",
+    "continueTitle": "📂 继续游戏？",
+    "continueBtn": "✅ 继续",
+    "newGame": "新游戏",
+    "exit": "退出",
+    "currentTurn": "当前回合",
+    "cell": "格子",
+    "rollDice": "掷骰子",
+    "diceResult": "掷出",
+    "task": "任务",
+    "completed": "已完成",
+    "failed": "未完成",
+    "logWelcome": "🎮 游戏开始！掷骰子。",
+    "winner": "胜利！",
+    "bonusTurn": "额外回合！",
+    "campfire": "篝火！",
+    "giantCell": "巨人肚子",
+    "ropeCell": "绳索渡口",
+    "moveTo": "移动到格子",
+    "returnBack": "移动到格子",
+    "rollHint": "进行移动以获取任务。",
+    "diceRoll": "掷出",
+    "firstTask": "第一个任务",
+    "tenTasks": "十个任务",
+    "twentyTasks": "20个任务"
   }
 }
