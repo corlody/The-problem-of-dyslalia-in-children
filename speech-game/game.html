@@ -7,6 +7,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* ========================================================
+           СТИЛИ (обновлены с учётом меню и новых элементов)
+           ======================================================== */
         :root {
             --bg-primary: #0a0e27;
             --bg-card: rgba(26, 30, 60, 0.85);
@@ -24,6 +27,30 @@
             --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        [data-theme="official"] {
+            --bg-primary: #f1f5f9;
+            --bg-card: rgba(255, 255, 255, 0.92);
+            --glass-border: rgba(0, 0, 0, 0.08);
+            --purple: #1e40af;
+            --purple-dark: #1e3a8a;
+            --gold: #d97706;
+            --text-primary: #0f172a;
+            --text-secondary: #334155;
+            --text-muted: #64748b;
+        }
+        [data-theme="elderly"] {
+            --bg-primary: #ffffff;
+            --bg-card: rgba(255, 255, 255, 0.96);
+            --glass-border: rgba(0, 0, 0, 0.2);
+            --purple: #1e40af;
+            --purple-dark: #1e3a8a;
+            --gold: #b45309;
+            --text-primary: #000000;
+            --text-secondary: #1f2937;
+            --text-muted: #4b5563;
+            --font-size-base: 22px;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', sans-serif;
@@ -31,38 +58,223 @@
             color: var(--text-primary);
             min-height: 100vh;
             padding: 20px;
+            transition: background 0.5s ease, color 0.5s ease;
         }
 
         /* ========================================================
-           МОДАЛЬНОЕ ОКНО НАСТРОЙКИ
+           ГЛАВНОЕ МЕНЮ (полноэкранное)
            ======================================================== */
-        .modal-overlay {
+        .main-menu {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(10, 14, 39, 0.95);
-            backdrop-filter: blur(10px);
-            display: flex; align-items: center; justify-content: center;
-            z-index: 100;
+            inset: 0;
+            z-index: 1000;
+            background: var(--bg-primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            padding: 40px;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+        .main-menu.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.95);
+        }
+        .main-menu h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            background: linear-gradient(135deg, var(--gold), var(--purple-light));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-align: center;
+        }
+        .main-menu .sub {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            text-align: center;
+        }
+        .main-menu .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            width: 100%;
+            max-width: 380px;
+        }
+        .main-menu .menu-buttons .btn {
+            padding: 16px 24px;
+            border: none;
+            border-radius: 60px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            width: 100%;
+        }
+        .btn-primary { background: linear-gradient(135deg, var(--purple), var(--purple-dark)); color: #fff; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(124, 58, 237, 0.4); }
+        .btn-success { background: var(--green); color: #fff; }
+        .btn-success:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4); }
+        .btn-danger { background: var(--red); color: #fff; }
+        .btn-danger:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4); }
+        .btn-outline { background: transparent; border: 2px solid var(--glass-border); color: var(--text-primary); }
+        .btn-outline:hover { border-color: var(--purple); background: rgba(124, 58, 237, 0.05); }
+
+        .menu-footer {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 380px;
+            margin-top: 10px;
+            gap: 12px;
+        }
+        .menu-footer .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
-        .setup-card {
-            background: var(--bg-card); border: 1px solid var(--glass-border);
-            border-radius: var(--radius); padding: 30px; width: 100%;
-            max-width: 520px; box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+        /* ========================================================
+           МЕНЮ ПРОДОЛЖЕНИЯ (список сохранённых игр)
+           ======================================================== */
+        .continue-menu {
+            position: fixed;
+            inset: 0;
+            z-index: 1100;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(20px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+        }
+        .continue-menu.active { display: flex; }
+        .continue-menu .modal-box {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
             max-height: 90vh;
             overflow-y: auto;
+            box-shadow: var(--shadow-card);
         }
+        .continue-menu h2 {
+            margin-bottom: 20px;
+            color: var(--gold);
+        }
+        .continue-menu .game-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .continue-menu .game-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.03);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--glass-border);
+            cursor: default;
+        }
+        .continue-menu .game-item .info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .continue-menu .game-item .info .date {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        .continue-menu .game-item .info .players {
+            font-weight: 500;
+        }
+        .continue-menu .game-item .actions {
+            display: flex;
+            gap: 8px;
+        }
+        .continue-menu .game-item .actions button {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+        }
+        .continue-menu .game-item .actions .btn-open { background: var(--purple); color: #fff; }
+        .continue-menu .game-item .actions .btn-open:hover { transform: scale(1.05); }
+        .continue-menu .game-item .actions .btn-delete { background: var(--red); color: #fff; }
+        .continue-menu .game-item .actions .btn-delete:hover { transform: scale(1.05); }
+        .continue-menu .close-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 30px;
+            background: rgba(255,255,255,0.05);
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+            font-family: 'Inter', sans-serif;
+        }
+        .continue-menu .close-btn:hover { background: rgba(255,255,255,0.1); }
 
-        .setup-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 20px; text-align: center; color: var(--gold); }
+        /* ========================================================
+           НАСТРОЙКА ИГРОКОВ (модалка)
+           ======================================================== */
+        .setup-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1200;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(20px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+        }
+        .setup-overlay.active { display: flex; }
+        .setup-overlay .setup-card {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            padding: 30px;
+            max-width: 520px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-card);
+        }
+        .setup-overlay .setup-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 20px; text-align: center; color: var(--gold); }
         .player-count-btns { display: flex; gap: 10px; margin-bottom: 20px; }
-        .btn-count {
+        .player-count-btns button {
             flex: 1; padding: 10px; border-radius: 10px; border: 1px solid var(--glass-border);
             background: rgba(255,255,255,0.05); color: #fff; cursor: pointer; font-weight: 600;
         }
-        .btn-count.active { background: var(--purple); border-color: var(--purple); }
-
+        .player-count-btns button.active { background: var(--purple); border-color: var(--purple); }
         .player-inputs { display: flex; flex-direction: column; gap: 16px; margin-bottom: 25px; }
-
         .player-input-group {
             display: flex;
             align-items: center;
@@ -73,15 +285,8 @@
             border: 1px solid var(--glass-border);
             flex-wrap: wrap;
         }
-
-        .player-input-group .player-color-dot {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-
-        .player-input-group .player-avatar-select {
+        .player-color-dot { width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0; }
+        .player-avatar-select {
             font-size: 1.3rem;
             padding: 4px 10px;
             border: 1px solid var(--glass-border);
@@ -93,15 +298,8 @@
             flex-shrink: 0;
             min-width: 50px;
         }
-
-        .player-input-group .player-avatar-select option {
-            background: #1e293b;
-            color: #fff;
-            font-size: 1.2rem;
-            padding: 4px;
-        }
-
-        .player-input-group .player-input {
+        .player-avatar-select option { background: #1e293b; color: #fff; }
+        .player-input {
             flex: 1;
             padding: 8px 12px;
             border-radius: 8px;
@@ -109,35 +307,136 @@
             background: rgba(0,0,0,0.2);
             color: #fff;
             font-family: inherit;
-            min-width: 100px;
+            min-width: 80px;
         }
-
-        .player-input-group .player-input::placeholder {
-            color: var(--text-muted);
+        .player-age-input {
+            width: 60px;
+            padding: 8px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(0,0,0,0.2);
+            color: #fff;
+            font-family: inherit;
+            text-align: center;
+            flex-shrink: 0;
         }
-
-        .btn-start {
-            width: 100%; padding: 14px; border-radius: 30px; border: none;
-            background: linear-gradient(135deg, var(--purple), var(--purple-dark));
-            color: #fff; font-weight: 700; font-size: 1.1rem; cursor: pointer;
-            transition: var(--transition);
-        }
-        .btn-start:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4); }
+        .player-age-input:focus { outline: 1px solid var(--purple); }
+        .setup-actions { display: flex; gap: 10px; }
+        .setup-actions .btn { flex: 1; padding: 14px; border-radius: 30px; border: none; font-weight: 600; cursor: pointer; font-family: inherit; }
+        .btn-start-game { background: linear-gradient(135deg, var(--purple), var(--purple-dark)); color: #fff; }
+        .btn-start-game:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4); }
+        .btn-cancel { background: rgba(255,255,255,0.05); color: var(--text-secondary); }
+        .btn-cancel:hover { background: rgba(255,255,255,0.1); }
 
         /* ========================================================
-           ИГРОВОЙ СТОЛ
+           ШЕСТЕРЁНКА НАСТРОЕК (в игре)
+           ======================================================== */
+        .settings-gear {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: var(--shadow-card);
+        }
+        .settings-gear:hover { transform: scale(1.08) rotate(90deg); border-color: var(--purple); box-shadow: 0 0 40px rgba(124, 58, 237, 0.15); }
+        .settings-gear i { font-size: 1.6rem; color: var(--text-primary); transition: 0.6s; }
+        .settings-gear.open i { transform: rotate(180deg); }
+
+        .settings-panel {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 360px;
+            max-width: calc(100vw - 40px);
+            background: var(--bg-card);
+            backdrop-filter: blur(40px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            padding: 28px 30px;
+            box-shadow: var(--shadow-card);
+            transform: scale(0);
+            transform-origin: bottom right;
+            opacity: 0;
+            transition: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 9998;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .settings-panel.open { transform: scale(1); opacity: 1; }
+        .settings-panel h4 { font-size: 1.2rem; margin-bottom: 20px; color: var(--text-primary); display: flex; align-items: center; gap: 10px; }
+        .settings-panel .setting-group { margin-bottom: 16px; }
+        .settings-panel .setting-group label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .settings-panel select {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: var(--transition);
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748b' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+        }
+        .settings-panel select option { background: var(--bg-primary); color: var(--text-primary); }
+        [data-theme="official"] .settings-panel select { background: #fff; color: #0f172a; }
+        [data-theme="official"] .settings-panel select option { background: #fff; color: #0f172a; }
+        [data-theme="elderly"] .settings-panel select { background: #f1f5f9; color: #000; padding: 14px 18px; font-size: 1.1rem; border-width: 2px; }
+        [data-theme="elderly"] .settings-panel select option { background: #f1f5f9; color: #000; }
+
+        .settings-panel .close-settings {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--purple), var(--purple-dark));
+            color: #fff;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Inter', sans-serif;
+            margin-top: 12px;
+        }
+        .settings-panel .close-settings:hover { transform: scale(1.02); box-shadow: 0 0 40px rgba(124, 58, 237, 0.15); }
+
+        /* ========================================================
+           ИГРОВОЙ СТОЛ (основной)
            ======================================================== */
         .board-container {
             display: grid; grid-template-columns: 1fr 380px; gap: 20px;
             max-width: 1600px; margin: 0 auto;
+            margin-top: 10px;
         }
-
         .game-map-area {
             position: relative; border-radius: var(--radius); overflow: hidden;
             border: 1px solid var(--glass-border); background: var(--bg-card);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); height: fit-content;
+            box-shadow: var(--shadow-card); height: fit-content;
         }
-
         .map-image { width: 100%; display: block; user-select: none; }
         .map-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
@@ -156,7 +455,6 @@
         .marker-dot.finish { background: rgba(239, 68, 68, 0.6); border-color: var(--red); color: #fff; }
         .marker-dot.fire { background: rgba(239, 68, 68, 0.4); border-color: #f97316; color: #f97316; }
 
-        /* Фишки игроков */
         .player-chip {
             position: absolute;
             width: 34px;
@@ -175,10 +473,7 @@
             background-size: cover;
             background-position: center;
         }
-        .player-chip .chip-avatar {
-            font-size: 1.2rem;
-            line-height: 1;
-        }
+        .player-chip .chip-avatar { font-size: 1.2rem; line-height: 1; }
         .player-chip.active-player {
             border-color: var(--gold);
             box-shadow: 0 0 25px rgba(245, 158, 11, 0.7);
@@ -193,7 +488,7 @@
             background: var(--bg-card); backdrop-filter: blur(30px);
             border-radius: var(--radius); border: 1px solid var(--glass-border);
             padding: 25px; display: flex; flex-direction: column; gap: 16px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); max-height: calc(100vh - 40px);
+            box-shadow: var(--shadow-card); max-height: calc(100vh - 40px);
             overflow-y: auto;
         }
 
@@ -206,7 +501,6 @@
             padding-bottom: 8px;
             border-bottom: 1px solid var(--glass-border);
         }
-
         .panel-top .exit-btn, .panel-top .reset-btn {
             background: transparent;
             border: none;
@@ -243,15 +537,11 @@
         .turn-info .label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; }
         .turn-info .name { font-weight: 600; }
 
-        /* ========================================================
-           КУБИК
-           ======================================================== */
         .dice-area {
             background: rgba(255, 255, 255, 0.03); border-radius: var(--radius-sm);
             padding: 16px 20px; display: flex; align-items: center; justify-content: space-between;
             border: 1px solid var(--glass-border); flex-wrap: wrap; gap: 12px;
         }
-
         .cube-wrapper { width: 60px; height: 60px; perspective: 600px; flex-shrink: 0; }
         .cube {
             width: 100%; height: 100%; position: relative;
@@ -308,45 +598,142 @@
         .btn-roll:disabled { opacity: 0.5; cursor: not-allowed; }
 
         /* ========================================================
-           ЗАДАНИЯ
+           ЗАДАНИЯ (с повторениями)
            ======================================================== */
         .task-area {
             background: rgba(255, 255, 255, 0.03); border-radius: var(--radius-sm);
-            padding: 14px 16px; border: 1px solid var(--glass-border); min-height: 140px;
+            padding: 14px 16px; border: 1px solid var(--glass-border);
+            min-height: 160px;
         }
         .task-label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
         .task-card {
             background: rgba(0, 0, 0, 0.3); border-radius: var(--radius-sm);
-            padding: 12px 14px; border-left: 4px solid var(--purple); margin: 8px 0 12px;
+            padding: 12px 14px; border-left: 4px solid var(--purple);
+            margin: 8px 0 12px;
         }
         .task-name { font-weight: 600; font-size: 1rem; margin-bottom: 4px; }
         .task-desc { color: var(--text-secondary); font-size: 0.85rem; line-height: 1.4; }
+        .task-repetitions {
+            font-size: 0.8rem;
+            color: var(--gold);
+            margin-top: 6px;
+            font-weight: 500;
+        }
 
-        .task-actions { display: flex; gap: 10px; }
-        .btn-action {
-            flex: 1; padding: 10px; border: none; border-radius: 30px;
-            font-weight: 600; cursor: pointer; transition: var(--transition); color: #fff;
+        .task-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .task-actions .btn-action {
+            flex: 1;
+            padding: 10px 12px;
+            border: none;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            color: #fff;
             font-family: inherit;
+            font-size: 0.85rem;
+            min-width: 80px;
         }
         .btn-success { background: var(--green); }
         .btn-success:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); }
+        .btn-partial { background: #f59e0b; color: #0f172a; }
+        .btn-partial:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3); }
         .btn-danger { background: var(--red); }
         .btn-danger:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); }
         .btn-action:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+
+        /* Модалка для частичного выполнения */
+        .partial-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 1300;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+        }
+        .partial-modal.active { display: flex; }
+        .partial-modal .modal-box {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            padding: 30px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: var(--shadow-card);
+        }
+        .partial-modal .modal-box h3 { margin-bottom: 15px; color: var(--gold); }
+        .partial-modal .modal-box input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid var(--glass-border);
+            background: rgba(0,0,0,0.3);
+            color: #fff;
+            font-size: 1.1rem;
+            font-family: inherit;
+            margin-bottom: 15px;
+        }
+        .partial-modal .modal-box input:focus { outline: 1px solid var(--purple); }
+        .partial-modal .modal-box .actions {
+            display: flex;
+            gap: 10px;
+        }
+        .partial-modal .modal-box .actions button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+        .partial-modal .modal-box .actions .btn-confirm { background: var(--purple); color: #fff; }
+        .partial-modal .modal-box .actions .btn-confirm:hover { transform: scale(1.02); }
+        .partial-modal .modal-box .actions .btn-cancel-partial { background: rgba(255,255,255,0.05); color: var(--text-secondary); }
+        .partial-modal .modal-box .actions .btn-cancel-partial:hover { background: rgba(255,255,255,0.1); }
 
         /* ========================================================
            ЛОГ
            ======================================================== */
         .game-log {
             background: rgba(255, 255, 255, 0.02); border-radius: var(--radius-sm);
-            padding: 10px 14px; max-height: 110px; overflow-y: auto; font-size: 0.85rem;
-            color: var(--text-secondary); border: 1px solid var(--glass-border);
+            padding: 10px 14px;
+            max-height: 110px;
+            overflow-y: auto;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border: 1px solid var(--glass-border);
         }
         .game-log .log-entry { padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
         .game-log .log-entry:last-child { border-bottom: none; }
         .game-log .highlight { color: var(--gold); font-weight: 600; }
         .game-log .success { color: var(--green); }
         .game-log .fail { color: var(--red); }
+        .game-log .partial { color: #f59e0b; }
+
+        .log-export-btn {
+            margin-top: 8px;
+            padding: 6px 16px;
+            border: none;
+            border-radius: 30px;
+            background: var(--purple);
+            color: #fff;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            align-self: flex-end;
+        }
+        .log-export-btn:hover { transform: scale(1.05); box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3); }
 
         .achievement-toast {
             position: fixed;
@@ -385,35 +772,110 @@
             .btn-roll { width: 100%; justify-content: center; }
             .task-actions { flex-direction: column; }
             .panel-top { flex-direction: column; align-items: stretch; }
-            .player-input-group { flex-wrap: wrap; }
-            .setup-card { padding: 20px; }
+            .settings-gear { bottom: 16px; right: 16px; width: 44px; height: 44px; }
+            .settings-gear i { font-size: 1.1rem; }
+            .settings-panel { bottom: 70px; right: 16px; width: calc(100vw - 32px); max-width: 320px; padding: 18px 20px; }
+            .menu-footer { flex-direction: column; }
         }
     </style>
 </head>
 <body>
 
 <!-- ========================================================
-   МОДАЛЬНОЕ ОКНО НАСТРОЙКИ
+   ГЛАВНОЕ МЕНЮ
    ======================================================== -->
-<div class="modal-overlay" id="setupModal">
-    <div class="setup-card">
-        <div class="setup-title">🎲 Настройка игры</div>
-        <div style="font-size:0.9rem; color:var(--text-muted); margin-bottom:10px;">Выберите количество игроков:</div>
-        <div class="player-count-btns">
-            <button class="btn-count active" onclick="setPlayerCount(1)">1</button>
-            <button class="btn-count" onclick="setPlayerCount(2)">2</button>
-            <button class="btn-count" onclick="setPlayerCount(3)">3</button>
-            <button class="btn-count" onclick="setPlayerCount(4)">4</button>
-        </div>
-        <div class="player-inputs" id="playerInputs"></div>
-        <button class="btn-start" onclick="startGame()">🚀 Начать игру</button>
+<div class="main-menu" id="mainMenu">
+    <h1>🎲 Говорю правильно</h1>
+    <p class="sub">Путешествие к вулкану речи</p>
+    <div class="menu-buttons">
+        <button class="btn btn-primary" onclick="showSetup()"><i class="fas fa-play"></i> Новая игра</button>
+        <button class="btn btn-success" onclick="showContinueMenu()"><i class="fas fa-folder-open"></i> Продолжить игру</button>
+    </div>
+    <div class="menu-footer">
+        <button class="btn btn-outline" onclick="toggleSettings()"><i class="fas fa-cog"></i> Настройки</button>
+        <button class="btn btn-danger" onclick="exitGame()"><i class="fas fa-sign-out-alt"></i> Выход</button>
     </div>
 </div>
 
 <!-- ========================================================
-   ИГРОВОЙ СТОЛ
+   МЕНЮ ПРОДОЛЖЕНИЯ (список сохранённых игр)
    ======================================================== -->
-<div class="board-container">
+<div class="continue-menu" id="continueMenu">
+    <div class="modal-box">
+        <h2><i class="fas fa-folder-open"></i> Сохранённые игры</h2>
+        <div class="game-list" id="gameList"></div>
+        <button class="close-btn" onclick="closeContinueMenu()">✕ Закрыть</button>
+    </div>
+</div>
+
+<!-- ========================================================
+   НАСТРОЙКА ИГРОКОВ
+   ======================================================== -->
+<div class="setup-overlay" id="setupOverlay">
+    <div class="setup-card">
+        <div class="setup-title">🎲 Настройка игры</div>
+        <div style="font-size:0.9rem; color:var(--text-muted); margin-bottom:10px;">Выберите количество игроков:</div>
+        <div class="player-count-btns">
+            <button class="active" onclick="setPlayerCount(1)">1</button>
+            <button onclick="setPlayerCount(2)">2</button>
+            <button onclick="setPlayerCount(3)">3</button>
+            <button onclick="setPlayerCount(4)">4</button>
+        </div>
+        <div class="player-inputs" id="playerInputs"></div>
+        <div class="setup-actions">
+            <button class="btn btn-start-game" onclick="startNewGame()"><i class="fas fa-play"></i> Начать</button>
+            <button class="btn btn-cancel" onclick="closeSetup()">Отмена</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================================
+   МОДАЛКА ДЛЯ ЧАСТИЧНОГО ВЫПОЛНЕНИЯ
+   ======================================================== -->
+<div class="partial-modal" id="partialModal">
+    <div class="modal-box">
+        <h3><i class="fas fa-pen"></i> Частичное выполнение</h3>
+        <p style="margin-bottom:10px; color:var(--text-secondary);">Сколько раз выполнено?</p>
+        <input type="number" id="partialCount" min="1" max="100" value="1">
+        <div class="actions">
+            <button class="btn-confirm" onclick="confirmPartial()">Подтвердить</button>
+            <button class="btn-cancel-partial" onclick="closePartial()">Отмена</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================================
+   ШЕСТЕРЁНКА НАСТРОЕК
+   ======================================================== -->
+<div class="settings-gear" id="settingsGear" onclick="toggleSettings()">
+    <i class="fas fa-cog"></i>
+</div>
+
+<div class="settings-panel" id="settingsPanel">
+    <h4><i class="fas fa-sliders-h"></i> Настройки</h4>
+    <div class="setting-group">
+        <label><i class="fas fa-palette"></i> Тема</label>
+        <select id="themeSelect" onchange="changeTheme(this.value)">
+            <option value="game">🎮 Игровая</option>
+            <option value="official">📄 Официальная</option>
+            <option value="elderly">👴 Для пожилых</option>
+        </select>
+    </div>
+    <div class="setting-group">
+        <label><i class="fas fa-language"></i> Язык</label>
+        <select id="langSelect" onchange="changeLanguage(this.value)">
+            <option value="ru">🇷🇺 Русский</option>
+            <option value="en">🇬🇧 English</option>
+            <option value="zh">🇨🇳 中文</option>
+        </select>
+    </div>
+    <button class="close-settings" onclick="toggleSettings()"><i class="fas fa-check"></i> Закрыть</button>
+</div>
+
+<!-- ========================================================
+   ИГРОВОЙ СТОЛ (скрыт до начала игры)
+   ======================================================== -->
+<div class="board-container" id="gameBoard" style="display:none;">
     <div class="game-map-area">
         <img src="images/map.png" alt="Карта игры" class="map-image" id="mapImage">
         <div class="map-overlay" id="mapOverlay"></div>
@@ -422,14 +884,14 @@
     <div class="game-panel">
         <div class="panel-top">
             <div style="font-size:0.8rem; color:var(--text-muted);">
-                <i class="fas fa-gamepad"></i> Игра
+                <i class="fas fa-gamepad"></i> <span data-i18n="game.title">Игра</span>
             </div>
             <div style="display:flex; gap:8px;">
-                <button class="reset-btn" onclick="resetGame()" title="Начать новую игру">
-                    <i class="fas fa-redo"></i> Новая игра
+                <button class="reset-btn" onclick="resetGame()" title="Новая игра">
+                    <i class="fas fa-redo"></i> <span data-i18n="game.newGame">Новая игра</span>
                 </button>
-                <button class="exit-btn" onclick="exitGame()" title="Выйти из игры">
-                    <i class="fas fa-sign-out-alt"></i> Выйти
+                <button class="exit-btn" onclick="exitToMenu()" title="Выйти в меню">
+                    <i class="fas fa-sign-out-alt"></i> <span data-i18n="game.exit">Выйти</span>
                 </button>
             </div>
         </div>
@@ -437,11 +899,11 @@
         <div class="turn-indicator">
             <div class="current-avatar" id="currentAvatar">👤</div>
             <div class="turn-info">
-                <div class="label">Сейчас ходит</div>
+                <div class="label" data-i18n="game.currentTurn">Сейчас ходит</div>
                 <div class="name" id="currentPlayerName">Игрок 1</div>
             </div>
             <div style="font-size:0.8rem; color:var(--text-muted);">
-                Клетка: <strong id="currentCellDisplay" style="color:var(--gold);">1</strong>/89
+                <span data-i18n="game.cell">Клетка</span>: <strong id="currentCellDisplay" style="color:var(--gold);">1</strong>/89
             </div>
         </div>
 
@@ -450,78 +912,59 @@
                 <div class="cube-wrapper">
                     <div class="cube" id="cube">
                         <div class="cube-face front">
-                            <div class="pip-grid">
-                                <div></div><div></div><div></div>
-                                <div></div><div class="pip pip-center"></div><div></div>
-                                <div></div><div></div><div></div>
-                            </div>
+                            <div class="pip-grid"><div class="pip" style="grid-area:2/2"></div></div>
                         </div>
                         <div class="cube-face back">
-                            <div class="pip-grid">
-                                <div class="pip pip-top-left"></div><div></div><div></div>
-                                <div></div><div></div><div></div>
-                                <div></div><div></div><div class="pip pip-bottom-right"></div>
-                            </div>
+                            <div class="pip-grid"><div class="pip" style="grid-area:1/1"></div><div class="pip" style="grid-area:3/3"></div><div class="pip" style="grid-area:1/3"></div><div class="pip" style="grid-area:3/1"></div><div class="pip" style="grid-area:2/2"></div><div class="pip" style="grid-area:2/1"></div></div>
                         </div>
                         <div class="cube-face right">
-                            <div class="pip-grid">
-                                <div class="pip pip-top-left"></div><div></div><div></div>
-                                <div></div><div class="pip pip-center"></div><div></div>
-                                <div></div><div></div><div class="pip pip-bottom-right"></div>
-                            </div>
+                            <div class="pip-grid"><div class="pip" style="grid-area:1/1"></div><div class="pip" style="grid-area:3/3"></div><div class="pip" style="grid-area:2/2"></div></div>
                         </div>
                         <div class="cube-face left">
-                            <div class="pip-grid">
-                                <div class="pip pip-top-left"></div><div></div><div class="pip pip-top-right"></div>
-                                <div></div><div></div><div></div>
-                                <div class="pip pip-bottom-left"></div><div></div><div class="pip pip-bottom-right"></div>
-                            </div>
+                            <div class="pip-grid"><div class="pip" style="grid-area:1/3"></div><div class="pip" style="grid-area:3/1"></div></div>
                         </div>
                         <div class="cube-face top">
-                            <div class="pip-grid">
-                                <div class="pip pip-top-left"></div><div></div><div class="pip pip-top-right"></div>
-                                <div></div><div class="pip pip-center"></div><div></div>
-                                <div class="pip pip-bottom-left"></div><div></div><div class="pip pip-bottom-right"></div>
-                            </div>
+                            <div class="pip-grid"><div class="pip" style="grid-area:1/1"></div><div class="pip" style="grid-area:3/3"></div><div class="pip" style="grid-area:1/3"></div><div class="pip" style="grid-area:3/1"></div></div>
                         </div>
                         <div class="cube-face bottom">
-                            <div class="pip-grid">
-                                <div class="pip pip-top-left"></div><div></div><div class="pip pip-top-right"></div>
-                                <div class="pip pip-middle-left"></div><div></div><div class="pip pip-middle-right"></div>
-                                <div class="pip pip-bottom-left"></div><div></div><div class="pip pip-bottom-right"></div>
-                            </div>
+                            <div class="pip-grid"><div class="pip" style="grid-area:1/1"></div><div class="pip" style="grid-area:3/3"></div><div class="pip" style="grid-area:1/3"></div><div class="pip" style="grid-area:3/1"></div><div class="pip" style="grid-area:2/2"></div></div>
                         </div>
                     </div>
                 </div>
                 <div class="dice-result">
-                    <div style="font-size:0.7rem; color:var(--text-muted);">Выпало</div>
+                    <div style="font-size:0.7rem; color:var(--text-muted);" data-i18n="game.diceResult">Выпало</div>
                     <strong id="diceValue">—</strong>
                 </div>
             </div>
             <button class="btn-roll" id="rollBtn" onclick="rollDice()">
-                <i class="fas fa-dice"></i> Бросить
+                <i class="fas fa-dice"></i> <span data-i18n="game.rollDice">Бросить</span>
             </button>
         </div>
 
         <div class="task-area">
-            <div class="task-label"><i class="fas fa-tasks"></i> Текущее задание</div>
+            <div class="task-label"><i class="fas fa-tasks"></i> <span data-i18n="game.task">Задание</span></div>
             <div class="task-card">
                 <div class="task-name" id="taskName">Бросьте кубик</div>
                 <div class="task-desc" id="taskDesc">Сделайте ход, чтобы получить упражнение.</div>
+                <div class="task-repetitions" id="taskReps"></div>
             </div>
             <div class="task-actions">
                 <button class="btn-action btn-success" id="btnWin" onclick="completeTask(true)" disabled>
-                    <i class="fas fa-check"></i> Выполнено
+                    <i class="fas fa-check"></i> <span data-i18n="game.completed">Выполнено</span>
+                </button>
+                <button class="btn-action btn-partial" id="btnPartial" onclick="openPartial()" disabled>
+                    <i class="fas fa-pen"></i> <span data-i18n="game.partial">Частично</span>
                 </button>
                 <button class="btn-action btn-danger" id="btnFail" onclick="completeTask(false)" disabled>
-                    <i class="fas fa-times"></i> Не выполнено
+                    <i class="fas fa-times"></i> <span data-i18n="game.failed">Не выполнено</span>
                 </button>
             </div>
         </div>
 
         <div class="game-log" id="gameLog">
-            <div class="log-entry">🎮 Игра начинается! Бросьте кубик.</div>
+            <div class="log-entry" data-i18n="game.logWelcome">🎮 Игра начинается! Бросьте кубик.</div>
         </div>
+        <button class="log-export-btn" onclick="exportLogs()"><i class="fas fa-download"></i> Экспорт логов</button>
     </div>
 </div>
 
@@ -529,6 +972,311 @@
    JAVASCRIPT
    ======================================================== -->
 <script>
+// ========================================================
+// ЗАГРУЗКА ПЕРЕВОДОВ
+// ========================================================
+let translations = {};
+let currentLang = 'ru';
+
+async function loadTranslations(lang) {
+    try {
+        const response = await fetch(`data/i18n/${lang}.json`);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        translations = await response.json();
+        return translations;
+    } catch (e) {
+        console.warn(`Не удалось загрузить перевод для ${lang}, пробуем русский`);
+        if (lang !== 'ru') return loadTranslations('ru');
+        translations = {};
+        return {};
+    }
+}
+
+function getTranslation(key) {
+    const keys = key.split('.');
+    let value = translations;
+    for (const k of keys) {
+        if (value && value[k] !== undefined) value = value[k];
+        else return key;
+    }
+    return value;
+}
+
+function applyTranslations() {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.dataset.i18n;
+        const value = getTranslation(key);
+        if (value !== key) {
+            if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                el.placeholder = value;
+            } else {
+                el.innerHTML = value;
+            }
+        }
+    });
+    // Обновляем заголовок
+    document.title = getTranslation('game.title') || 'Игра — Говорю правильно';
+    // Обновить лог приветствия
+    updateLogWelcome();
+}
+
+function updateLogWelcome() {
+    const log = document.getElementById('gameLog');
+    if (log && log.children.length > 0) {
+        const first = log.children[0];
+        if (first && first.classList.contains('log-entry')) {
+            first.textContent = getTranslation('game.logWelcome') || '🎮 Игра начинается! Бросьте кубик.';
+        }
+    }
+}
+
+// ========================================================
+// НАСТРОЙКИ (темы, язык)
+// ========================================================
+function toggleSettings() {
+    document.getElementById('settingsPanel').classList.toggle('open');
+    document.getElementById('settingsGear').classList.toggle('open');
+}
+
+function changeTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+    document.getElementById('themeSelect').value = theme;
+}
+
+async function changeLanguage(lang) {
+    currentLang = lang;
+    localStorage.setItem('lang', lang);
+    document.getElementById('langSelect').value = lang;
+    await loadTranslations(lang);
+    applyTranslations();
+}
+
+// ========================================================
+// ГЛАВНОЕ МЕНЮ
+// ========================================================
+function showMainMenu() {
+    document.getElementById('mainMenu').classList.remove('hidden');
+    document.getElementById('gameBoard').style.display = 'none';
+}
+
+function hideMainMenu() {
+    document.getElementById('mainMenu').classList.add('hidden');
+}
+
+function exitGame() {
+    if (confirm('Вы уверены, что хотите выйти?')) {
+        saveGameState();
+        window.close();
+    }
+}
+
+// ========================================================
+// МЕНЮ ПРОДОЛЖЕНИЯ
+// ========================================================
+function showContinueMenu() {
+    const menu = document.getElementById('continueMenu');
+    menu.classList.add('active');
+    renderGameList();
+}
+
+function closeContinueMenu() {
+    document.getElementById('continueMenu').classList.remove('active');
+}
+
+function renderGameList() {
+    const list = document.getElementById('gameList');
+    const sessions = getAllSessions();
+    if (sessions.length === 0) {
+        list.innerHTML = '<div style="padding:20px; text-align:center; color:var(--text-muted);">Нет сохранённых игр</div>';
+        return;
+    }
+    list.innerHTML = '';
+    sessions.forEach((session, index) => {
+        const div = document.createElement('div');
+        div.className = 'game-item';
+        const date = new Date(session.savedAt).toLocaleString();
+        const playersInfo = session.players.map(p => `${p.name} (${p.age} лет)`).join(', ');
+        div.innerHTML = `
+            <div class="info">
+                <div class="date">${date}</div>
+                <div class="players">${playersInfo}</div>
+                <div style="font-size:0.8rem; color:var(--text-muted);">Клетка: ${session.players[0]?.cell || 1} | Заданий: ${session.logs?.length || 0}</div>
+            </div>
+            <div class="actions">
+                <button class="btn-open" onclick="loadSession(${index})"><i class="fas fa-play"></i> Открыть</button>
+                <button class="btn-delete" onclick="deleteSession(${index})"><i class="fas fa-trash"></i></button>
+            </div>
+        `;
+        list.appendChild(div);
+    });
+}
+
+function getAllSessions() {
+    try {
+        const raw = localStorage.getItem('speech_sessions');
+        return raw ? JSON.parse(raw) : [];
+    } catch(e) { return []; }
+}
+
+function saveSessions(sessions) {
+    try {
+        localStorage.setItem('speech_sessions', JSON.stringify(sessions));
+    } catch(e) {}
+}
+
+function loadSession(index) {
+    const sessions = getAllSessions();
+    if (index >= sessions.length) return;
+    const session = sessions[index];
+    // Восстанавливаем состояние игры из сессии
+    players = session.players;
+    activePlayerIndex = session.activePlayerIndex || 0;
+    isGameFinished = session.isGameFinished || false;
+    achievements = session.achievements || [];
+    gameLog = session.logs || [];
+    // Показываем игровой стол
+    document.getElementById('gameBoard').style.display = 'grid';
+    closeContinueMenu();
+    hideMainMenu();
+    renderStaticMap();
+    updateAllChips();
+    updateTurnUI();
+    // Восстанавливаем лог
+    const logContainer = document.getElementById('gameLog');
+    logContainer.innerHTML = '';
+    gameLog.forEach(entry => {
+        const div = document.createElement('div');
+        div.className = 'log-entry';
+        div.innerHTML = entry;
+        logContainer.appendChild(div);
+    });
+    if (gameLog.length === 0) {
+        const div = document.createElement('div');
+        div.className = 'log-entry';
+        div.textContent = getTranslation('game.logWelcome') || '🎮 Игра начинается! Бросьте кубик.';
+        logContainer.appendChild(div);
+    }
+    // Сохраняем ID текущей сессии, чтобы обновлять её
+    currentSessionId = index;
+    addLog('📂 Игра загружена.');
+}
+
+function deleteSession(index) {
+    if (!confirm('Удалить эту игру?')) return;
+    const sessions = getAllSessions();
+    sessions.splice(index, 1);
+    saveSessions(sessions);
+    renderGameList();
+}
+
+// ========================================================
+// НАСТРОЙКА ИГРОКОВ
+// ========================================================
+let players = [];
+let activePlayerIndex = 0;
+let selectedCount = 1;
+let isGameFinished = false;
+let isProcessing = false;
+let isMoving = false;
+let achievements = [];
+let currentTask = null;
+let currentSessionId = null; // индекс сессии для обновления
+let gameLog = [];
+let partialCallback = null;
+let partialTask = null;
+
+function setPlayerCount(count) {
+    selectedCount = count;
+    document.querySelectorAll('.player-count-btns button').forEach((b, i) => {
+        b.classList.toggle('active', i + 1 === count);
+    });
+    renderSetupInputs();
+}
+
+function renderSetupInputs() {
+    const container = document.getElementById('playerInputs');
+    container.innerHTML = '';
+    const AVATARS = ['🧙', '🧝', '🦊', '🐺', '🐉', '🦄', '⚔️', '🛡️', '🌟', '🌈'];
+    const colors = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b'];
+    for (let i = 0; i < selectedCount; i++) {
+        const avatarOptions = AVATARS.map(a => `<option value="${a}">${a}</option>`).join('');
+        container.innerHTML += `
+            <div class="player-input-group">
+                <div class="player-color-dot" style="background:${colors[i]}"></div>
+                <select class="player-avatar-select" id="pAvatar${i}">${avatarOptions}</select>
+                <input type="text" class="player-input" id="pName${i}" value="Игрок ${i+1}" placeholder="Имя">
+                <input type="number" class="player-age-input" id="pAge${i}" value="5" min="5" max="7" placeholder="Лет">
+            </div>
+        `;
+        document.getElementById(`pAvatar${i}`).selectedIndex = i % AVATARS.length;
+    }
+}
+
+function showSetup() {
+    document.getElementById('setupOverlay').classList.add('active');
+    renderSetupInputs();
+}
+
+function closeSetup() {
+    document.getElementById('setupOverlay').classList.remove('active');
+}
+
+function startNewGame() {
+    players = [];
+    for (let i = 0; i < selectedCount; i++) {
+        const name = document.getElementById(`pName${i}`).value || `Игрок ${i+1}`;
+        const avatar = document.getElementById(`pAvatar${i}`).value || '🧙';
+        const age = parseInt(document.getElementById(`pAge${i}`).value) || 5;
+        players.push({ id: i, name, avatar, age, cell: 0, tasksCompleted: 0 });
+    }
+    achievements = [];
+    isGameFinished = false;
+    activePlayerIndex = 0;
+    gameLog = [];
+    currentSessionId = null;
+    closeSetup();
+    hideMainMenu();
+    document.getElementById('gameBoard').style.display = 'grid';
+    renderStaticMap();
+    updateAllChips();
+    updateTurnUI();
+    // Очищаем лог
+    const logContainer = document.getElementById('gameLog');
+    logContainer.innerHTML = '';
+    const welcome = getTranslation('game.logWelcome') || '🎮 Игра начинается! Бросьте кубик.';
+    addLog(welcome);
+    // Сохраняем новую сессию
+    saveCurrentSession();
+}
+
+function saveCurrentSession() {
+    const sessions = getAllSessions();
+    const sessionData = {
+        players: players.map(p => ({ ...p })),
+        activePlayerIndex,
+        isGameFinished,
+        achievements,
+        logs: gameLog,
+        savedAt: new Date().toISOString()
+    };
+    if (currentSessionId !== null && currentSessionId < sessions.length) {
+        // Обновляем существующую сессию
+        sessions[currentSessionId] = sessionData;
+    } else {
+        // Добавляем новую
+        sessions.push(sessionData);
+        currentSessionId = sessions.length - 1;
+    }
+    saveSessions(sessions);
+}
+
+function exitToMenu() {
+    saveCurrentSession();
+    document.getElementById('gameBoard').style.display = 'none';
+    showMainMenu();
+}
+
 // ========================================================
 // ЗВУКИ
 // ========================================================
@@ -600,8 +1348,7 @@ function playCampfireSound() {
 // ========================================================
 // ДАННЫЕ
 // ========================================================
-// Аватары — теперь это фигурки (эмодзи-персонажи)
-const AVATARS = ['🧙', '🧝', '🦊', '🐺', '🐉', '🦄', '⚔️', '🛡️', '🌟', '🌈', '🎯', '🏹', '🗡️', '👑', '🐱', '🐶', '🐼', '🦁', '🐯', '🦅'];
+const AVATARS = ['🧙', '🧝', '🦊', '🐺', '🐉', '🦄', '⚔️', '🛡️', '🌟', '🌈'];
 
 const MAP_POINTS = [
     {"number":1,"x":8.0,"y":94.8},{"number":2,"x":15.7,"y":94.4},{"number":3,"x":22.5,"y":94.3},
@@ -636,144 +1383,70 @@ const MAP_POINTS = [
     {"number":88,"x":82.3,"y":11.9},{"number":89,"x":90.4,"y":9.2}
 ];
 
+// Задания с возрастными ограничениями и повторениями
 const TASKS = [
-    { name: "Заборчик", desc: "Улыбнуться, с напряжением обнажив сомкнутые зубы." },
-    { name: "Слоник пьёт", desc: "Вытянуть губы трубочкой — «хобот слоника». Набирать водичку, слегка причмокивая." },
-    { name: "Лошадка", desc: "Поцокать узким языком, как цокают копытами лошадки." },
-    { name: "Чашечка", desc: "Улыбнуться, широко открыть рот. Высунуть широкий язык и придать ему форму «чашечки»." },
-    { name: "Дудочка", desc: "С напряжением вытянуть губы вперёд. Зубы сомкнуты." },
-    { name: "Барабанщик", desc: "Улыбнуться, открыть рот. Кончик языка за верхними зубами: «дэ-дэ-дэ...»" },
-    { name: "Месим тесто", desc: "Улыбнуться, покусать язык между зубами. Покусать кончик языка зубками." },
-    { name: "Маляр", desc: "Улыбнуться, приоткрыть рот. Кончиком языка погладить нёбо." },
-    { name: "Качели", desc: "Улыбнуться, открыть рот. Кончик языка за верхние зубы, затем за нижние." },
-    { name: "Вкусное варенье", desc: "Улыбнуться, открыть рот. Широким языком облизать верхнюю губу." },
-    { name: "Гармошка", desc: "Сделать «грибочек». Не отрывая языка, открывать и закрывать рот." },
-    { name: "Блинчик", desc: "Улыбнуться, приоткрыть рот. Положить широкий язык на нижнюю губу." },
-    { name: "Окошко (Бегемот)", desc: "Широко открыть рот — «жарко», закрыть рот — «холодно»." },
-    { name: "Поймали мышку", desc: "Губы в улыбке, приоткрыть рот. Произнести «а-а» и прикусить широкий кончик языка." },
-    { name: "Часики", desc: "Улыбнуться, открыть рот. Кончик языка переводить из одного уголка рта в другой." },
-    { name: "Грибочек", desc: "Улыбнуться, поцокать языком. Присосать широкий язык к нёбу." },
-    { name: "Индюки болтают", desc: "Языком быстро двигать по верхней губе: «бл-бл-бл-бл...»" },
-    { name: "Орешки", desc: "Рот закрыт. Кончик языка с напряжением поочерёдно упирается в щёку." },
-    { name: "Чистим зубки", desc: "Улыбнуться, открыть рот. Кончиком языка почистить зубы изнутри." },
-    { name: "Пароход гудит", desc: "Губы в улыбке, открыть рот. Произнести долгое «ы-ы-ы-ы...»" },
-    { name: "Загнать мяч в ворота", desc: "Высунуть широкий язык между зубами. Дуть на язык. Щёки не надувать." },
-    { name: "Киска", desc: "Губы в улыбке, рот открыт. Кончик языка упирается в нижние зубы. Выгнуть язык горкой." },
-    { name: "Парашютик", desc: "На кончик носа положить ватку. Сдуть ватку с носа вверх языком-«чашечкой»." },
-    { name: "Шарик", desc: "Надуть щёку, затем сдуть щёку." },
-    { name: "Пальчики здороваются", desc: "Соедини большой палец с указательным — «здравствуй», затем со средним, безымянным и мизинцем. Повтори 2 раза." },
-    { name: "Колечки", desc: "Сделай колечко из большого и указательного пальцев, затем из большого и среднего, большого и безымянного, большого и мизинца." },
-    { name: "Хлопки над головой", desc: "Подними руки вверх и хлопни в ладоши 3 раза." },
-    { name: "Наклоны", desc: "Сделай наклон влево, затем вправо. Повтори 2 раза." }
+    { name: "Заборчик", desc: "Улыбнуться, с напряжением обнажив сомкнутые зубы.", minAge: 5, maxAge: 7, reps: {5:3, 6:4, 7:5} },
+    { name: "Слоник пьёт", desc: "Вытянуть губы трубочкой — «хобот слоника». Набирать водичку, слегка причмокивая.", minAge: 5, maxAge: 7, reps: {5:3, 6:4, 7:5} },
+    { name: "Лошадка", desc: "Поцокать узким языком, как цокают копытами лошадки.", minAge: 5, maxAge: 7, reps: {5:5, 6:6, 7:8} },
+    { name: "Чашечка", desc: "Улыбнуться, широко открыть рот. Высунуть широкий язык и придать ему форму «чашечки».", minAge: 5, maxAge: 7, reps: {5:3, 6:4, 7:5} },
+    { name: "Дудочка", desc: "С напряжением вытянуть губы вперёд. Зубы сомкнуты.", minAge: 5, maxAge: 7, reps: {5:3, 6:4, 7:5} },
+    { name: "Барабанщик", desc: "Улыбнуться, открыть рот. Кончик языка за верхними зубами: «дэ-дэ-дэ...»", minAge: 5, maxAge: 7, reps: {5:5, 6:6, 7:8} },
+    { name: "Месим тесто", desc: "Улыбнуться, покусать язык между зубами. Покусать кончик языка зубками.", minAge: 5, maxAge: 7, reps: {5:4, 6:5, 7:6} },
+    { name: "Маляр", desc: "Улыбнуться, приоткрыть рот. Кончиком языка погладить нёбо.", minAge: 5, maxAge: 7, reps: {5:4, 6:5, 7:6} },
+    { name: "Качели", desc: "Улыбнуться, открыть рот. Кончик языка за верхние зубы, затем за нижние.", minAge: 5, maxAge: 7, reps: {5:5, 6:6, 7:8} },
+    { name: "Вкусное варенье", desc: "Улыбнуться, открыть рот. Широким языком облизать верхнюю губу.", minAge: 5, maxAge: 7, reps: {5:4, 6:5, 7:6} },
+    { name: "Гармошка", desc: "Сделать «грибочек». Не отрывая языка, открывать и закрывать рот.", minAge: 5, maxAge: 7, reps: {5:4, 6:5, 7:6} },
+    { name: "Блинчик", desc: "Улыбнуться, приоткрыть рот. Положить широкий язык на нижнюю губу.", minAge: 5, maxAge: 7, reps: {5:4, 6:5, 7:6} },
+    { name: "Окошко (Бегемот)", desc: "Широко открыть рот — «жарко», закрыть рот — «холодно».", minAge: 5, maxAge: 7, reps: {5:3, 6:4, 7:5} },
+    { name: "Поймали мышку", desc: "Губы в улыбке, приоткрыть рот. Произнести «а-а» и прикусить широкий кончик языка.", minAge: 5, maxAge: 7, reps: {5:3, 6:4, 7:5} },
+    { name: "Часики", desc: "Улыбнуться, открыть рот. Кончик языка переводить из одного уголка рта в другой.", minAge: 5, maxAge: 7, reps: {5:5, 6:6, 7:8} },
+    { name: "Грибочек", desc: "Улыбнуться, поцокать языком. Присосать широкий язык к нёбу.", minAge: 5, maxAge: 7, reps: {5:3, 6:4, 7:5} },
+    { name: "Индюки болтают", desc: "Языком быстро двигать по верхней губе: «бл-бл-бл-бл...»", minAge: 5, maxAge: 7, reps: {5:5, 6:6, 7:8} },
+    { name: "Орешки", desc: "Рот закрыт. Кончик языка с напряжением поочерёдно упирается в щёку.", minAge: 5, maxAge: 7, reps: {5:4, 6:5, 7:6} },
+    { name: "Чистим зубки", desc: "Улыбнуться, открыть рот. Кончиком языка почистить зубы изнутри.", minAge: 5, maxAge: 7, reps: {5:4, 6:5, 7:6} },
+    { name: "Пароход гудит", desc: "Губы в улыбке, открыть рот. Произнести долгое «ы-ы-ы-ы...»", minAge: 5, maxAge: 7, reps: {5:3, 6:4, 7:5} },
+    { name: "Загнать мяч в ворота", desc: "Высунуть широкий язык между зубами. Дуть на язык. Щёки не надувать.", minAge: 5, maxAge: 7, reps: {5:3, 6:4, 7:5} },
+    { name: "Киска", desc: "Губы в улыбке, рот открыт. Кончик языка упирается в нижние зубы. Выгнуть язык горкой.", minAge: 5, maxAge: 7, reps: {5:3, 6:4, 7:5} },
+    { name: "Парашютик", desc: "На кончик носа положить ватку. Сдуть ватку с носа вверх языком-«чашечкой».", minAge: 5, maxAge: 7, reps: {5:3, 6:4, 7:5} },
+    { name: "Шарик", desc: "Надуть щёку, затем сдуть щёку.", minAge: 5, maxAge: 7, reps: {5:3, 6:4, 7:5} },
+    { name: "Пальчики здороваются", desc: "Соедини большой палец с указательным — «здравствуй», затем со средним, безымянным и мизинцем. Повтори 2 раза.", minAge: 5, maxAge: 7, reps: {5:2, 6:2, 7:3} },
+    { name: "Колечки", desc: "Сделай колечко из большого и указательного пальцев, затем из большого и среднего, большого и безымянного, большого и мизинца.", minAge: 5, maxAge: 7, reps: {5:2, 6:2, 7:3} },
+    { name: "Хлопки над головой", desc: "Подними руки вверх и хлопни в ладоши 3 раза.", minAge: 5, maxAge: 7, reps: {5:3, 6:4, 7:5} },
+    { name: "Наклоны", desc: "Сделай наклон влево, затем вправо. Повтори 2 раза.", minAge: 5, maxAge: 7, reps: {5:2, 6:3, 7:4} }
 ];
 
 const PLAYER_COLORS = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b'];
 
 // ========================================================
-// СОСТОЯНИЕ ИГРЫ
+// ИГРОВАЯ ЛОГИКА (адаптирована под возраст и частичное выполнение)
 // ========================================================
-let players = [];
-let activePlayerIndex = 0;
-let selectedCount = 1;
-let canRoll = true;
-let isGameFinished = false;
-let isProcessing = false;
-let isMoving = false;
-let achievements = [];
-let animationQueue = [];
-
-// ========================================================
-// НАСТРОЙКА ИГРЫ
-// ========================================================
-function setPlayerCount(count) {
-    selectedCount = count;
-    document.querySelectorAll('.btn-count').forEach((b, i) => {
-        b.classList.toggle('active', i + 1 === count);
-    });
-    renderInputs();
+function getRepetitions(task, age) {
+    if (task.reps && task.reps[age] !== undefined) return task.reps[age];
+    // fallback: если возраст не указан, берём среднее
+    return task.reps[6] || 4;
 }
 
-function renderInputs() {
-    const container = document.getElementById('playerInputs');
-    container.innerHTML = '';
-    for (let i = 0; i < selectedCount; i++) {
-        const avatarOptions = AVATARS.map(a => 
-            `<option value="${a}">${a}</option>`
-        ).join('');
-        container.innerHTML += `
-            <div class="player-input-group">
-                <div class="player-color-dot" style="background:${PLAYER_COLORS[i]}"></div>
-                <select class="player-avatar-select" id="pAvatar${i}">
-                    ${avatarOptions}
-                </select>
-                <input type="text" class="player-input" id="pName${i}" value="Игрок ${i + 1}" placeholder="Имя игрока">
-            </div>
-        `;
-        document.getElementById(`pAvatar${i}`).selectedIndex = i % AVATARS.length;
-    }
-}
-
-function startGame() {
-    players = [];
-    for (let i = 0; i < selectedCount; i++) {
-        const name = document.getElementById(`pName${i}`).value || `Игрок ${i + 1}`;
-        const avatar = document.getElementById(`pAvatar${i}`).value || AVATARS[i % AVATARS.length];
-        players.push({ 
-            id: i, 
-            name, 
-            avatar,
-            cell: 0, 
-            color: PLAYER_COLORS[i], 
-            tasksCompleted: 0 
-        });
-    }
-    achievements = [];
-    isGameFinished = false;
-    activePlayerIndex = 0;
-    document.getElementById('setupModal').style.display = 'none';
-    localStorage.removeItem('speech_game_state');
-    renderStaticMap();
-    updateAllChips();
-    updateTurnUI();
-    addLog('🎮 Игра началась! Бросьте кубик.');
-}
-
-function continueGame() {
-    document.getElementById('setupModal').style.display = 'none';
-    renderStaticMap();
-    updateAllChips();
-    updateTurnUI();
-    addLog('📂 Игра загружена! Продолжайте играть.');
-}
-
-// ========================================================
-// КАРТА
-// ========================================================
 function renderStaticMap() {
     const overlay = document.getElementById('mapOverlay');
     overlay.innerHTML = '';
-    
     const specialCells = {
         0: { emoji: '🌿', label: 'Старт', cls: 'special' },
-        15: { emoji: '🧗', label: 'Переправа', cls: 'special' },  // Клетка 16 → Переправа → клетка 20
-        17: { emoji: '🦛', label: 'Живот гиганта', cls: 'special' }, // Клетка 18 → Живот гиганта → клетка 22
-        31: { emoji: '🔥', label: 'Костёр', cls: 'fire' },      // Клетка 32 → Костёр → бонусный ход
+        15: { emoji: '🧗', label: 'Переправа', cls: 'special' },
+        17: { emoji: '🦛', label: 'Живот гиганта', cls: 'special' },
+        31: { emoji: '🔥', label: 'Костёр', cls: 'fire' },
         88: { emoji: '🏁', label: 'Финиш', cls: 'finish' }
     };
-    
     MAP_POINTS.forEach((pt, index) => {
         const marker = document.createElement('div');
         marker.className = 'map-marker';
         marker.style.left = pt.x + '%';
         marker.style.top = pt.y + '%';
-        
         let dotContent = pt.number;
         let dotClass = '';
         if (specialCells[index]) {
             dotContent = specialCells[index].emoji;
             dotClass = specialCells[index].cls;
         }
-        
         marker.innerHTML = `<div class="marker-dot ${dotClass}">${dotContent}</div>`;
         overlay.appendChild(marker);
     });
@@ -782,7 +1455,6 @@ function renderStaticMap() {
 function updateAllChips() {
     document.querySelectorAll('.player-chip').forEach(c => c.remove());
     const overlay = document.getElementById('mapOverlay');
-    
     players.forEach((p, idx) => {
         const pt = MAP_POINTS[p.cell];
         if (!pt) return;
@@ -791,9 +1463,9 @@ function updateAllChips() {
         const offset = (idx - (players.length - 1) / 2) * 16;
         chip.style.left = `calc(${pt.x}% + ${offset}px)`;
         chip.style.top = `calc(${pt.y}% - ${offset}px)`;
-        chip.style.background = p.color;
+        chip.style.background = PLAYER_COLORS[idx % PLAYER_COLORS.length];
         chip.innerHTML = `<span class="chip-avatar">${p.avatar}</span>`;
-        chip.title = `${p.name} (Клетка ${p.cell + 1})`;
+        chip.title = `${p.name} (${p.age} лет, клетка ${p.cell+1})`;
         overlay.appendChild(chip);
     });
 }
@@ -801,56 +1473,37 @@ function updateAllChips() {
 function updateTurnUI() {
     if (isGameFinished || players.length === 0) return;
     const p = players[activePlayerIndex];
-    document.getElementById('currentAvatar').style.background = p.color;
+    document.getElementById('currentAvatar').style.background = PLAYER_COLORS[activePlayerIndex % PLAYER_COLORS.length];
     document.getElementById('currentAvatar').textContent = p.avatar;
-    document.getElementById('currentPlayerName').textContent = p.name;
+    document.getElementById('currentPlayerName').textContent = `${p.name} (${p.age} лет)`;
     document.getElementById('currentCellDisplay').textContent = p.cell + 1;
     updateAllChips();
 }
 
-// ========================================================
-// ПЛАВНОЕ ПЕРЕМЕЩЕНИЕ ПО КЛЕТКАМ (ПОШАГОВО)
-// ========================================================
 function moveChipStepByStep(playerIndex, fromCell, toCell, callback) {
-    if (fromCell === toCell) {
-        if (callback) callback();
-        return;
-    }
-    
+    if (fromCell === toCell) { if (callback) callback(); return; }
     const overlay = document.getElementById('mapOverlay');
     const chips = overlay.querySelectorAll('.player-chip');
     let chip = null;
-    
-    // Находим фишку по цвету
     const p = players[playerIndex];
+    const color = PLAYER_COLORS[playerIndex % PLAYER_COLORS.length];
     for (const c of chips) {
-        if (c.style.background === p.color || c.style.background === `rgb(${parseInt(p.color.slice(1,3), 16)}, ${parseInt(p.color.slice(3,5), 16)}, ${parseInt(p.color.slice(5,7), 16)})`) {
-            chip = c;
-            break;
-        }
+        if (c.style.background === color) { chip = c; break; }
     }
-    
-    if (!chip) {
-        if (callback) callback();
-        return;
-    }
-    
+    if (!chip) { if (callback) callback(); return; }
     const offset = (playerIndex - (players.length - 1) / 2) * 16;
     let currentStep = fromCell;
     const stepSize = fromCell < toCell ? 1 : -1;
     const steps = Math.abs(toCell - fromCell);
     let completedSteps = 0;
-    
     function doStep() {
         if (completedSteps >= steps) {
-            // Финальная позиция
             const finalPt = MAP_POINTS[toCell];
             chip.style.left = `calc(${finalPt.x}% + ${offset}px)`;
             chip.style.top = `calc(${finalPt.y}% - ${offset}px)`;
             if (callback) callback();
             return;
         }
-        
         currentStep += stepSize;
         const pt = MAP_POINTS[currentStep];
         if (pt) {
@@ -858,32 +1511,24 @@ function moveChipStepByStep(playerIndex, fromCell, toCell, callback) {
             chip.style.top = `calc(${pt.y}% - ${offset}px)`;
         }
         completedSteps++;
-        
-        // Скорость анимации: быстрее для коротких расстояний, медленнее для длинных
         const delay = Math.min(150, 80 + steps * 5);
         setTimeout(doStep, delay);
     }
-    
-    // Запускаем пошаговое движение
     doStep();
 }
 
-// ========================================================
-// КУБИК
-// ========================================================
 function rollDice() {
     if (!canRoll || isGameFinished || isProcessing || isMoving || players.length === 0) return;
     isProcessing = true;
     canRoll = false;
     document.getElementById('rollBtn').disabled = true;
     document.getElementById('btnWin').disabled = true;
+    document.getElementById('btnPartial').disabled = true;
     document.getElementById('btnFail').disabled = true;
-    
     playDiceSound();
-    
+
     const cube = document.getElementById('cube');
     const result = Math.floor(Math.random() * 6) + 1;
-    
     const rotations = {
         1: { x: 0, y: 0 },
         2: { x: 0, y: 180 },
@@ -892,101 +1537,88 @@ function rollDice() {
         5: { x: -90, y: 0 },
         6: { x: 90, y: 0 }
     };
-    
     const extraRoundsX = (Math.floor(Math.random() * 3) + 3) * 360;
     const extraRoundsY = (Math.floor(Math.random() * 3) + 3) * 360;
-    
     cube.style.transform = `rotateX(${rotations[result].x + extraRoundsX}deg) rotateY(${rotations[result].y + extraRoundsY}deg)`;
     document.getElementById('diceValue').textContent = result;
-    
+
     setTimeout(() => {
         moveCurrentPlayer(result);
     }, 1200);
 }
 
-// ========================================================
-// ПЕРЕМЕЩЕНИЕ ИГРОКА
-// ========================================================
+let canRoll = true;
+
 function moveCurrentPlayer(steps) {
     const p = players[activePlayerIndex];
     const oldCell = p.cell;
     let newCell = oldCell + steps;
     let extraMessage = '';
-    let isSpecialMove = false;
-    
-    // Проверка на финиш
+
     if (newCell >= MAP_POINTS.length - 1) {
         newCell = MAP_POINTS.length - 1;
         isGameFinished = true;
         p.cell = newCell;
-        
         isMoving = true;
         moveChipStepByStep(activePlayerIndex, oldCell, newCell, () => {
             updateAllChips();
             updateTurnUI();
             playFanfareSound();
-            addLog(`🏆 <span class="highlight">${p.name} ПОБЕДИЛ!</span>`);
-            document.getElementById('taskName').textContent = '🏆 ПОБЕДА!';
-            document.getElementById('taskDesc').textContent = `${p.name} первым добрался до финиша!`;
+            const winMsg = getTranslation('game.winner') || '🏆 ПОБЕДА!';
+            addLog(`🏆 <span class="highlight">${p.name} ${winMsg}</span>`);
+            document.getElementById('taskName').textContent = '🏆 ' + winMsg;
+            document.getElementById('taskDesc').textContent = `${p.name} ${winMsg}`;
             document.getElementById('rollBtn').disabled = true;
-            
             if (!achievements.includes('winner')) {
                 achievements.push('winner');
-                showAchievementToast('👑', 'Победитель', `${p.name} выиграл игру!`);
+                showAchievementToast('👑', getTranslation('game.winner') || 'Победитель', `${p.name} ${winMsg}`);
             }
+            saveCurrentSession();
             isMoving = false;
             isProcessing = false;
         });
         return;
     }
-    
-    // ОСОБЫЕ КЛЕТКИ (правильная логика)
-    // Клетка 16 (индекс 15) → Переправа → клетка 20 (индекс 19)
-    if (newCell === 15) {
-        extraMessage = `🌀 Переправа! Перемещение на клетку 20`;
-        newCell = 19;
-        isSpecialMove = true;
+
+    // Особые клетки
+    const specialMoves = { 15: 19, 17: 21 };
+    if (specialMoves[newCell] !== undefined) {
+        const target = specialMoves[newCell];
+        const cellName = newCell === 17 ? (getTranslation('game.giantCell') || 'Живот гиганта') : (getTranslation('game.ropeCell') || 'Переправа');
+        extraMessage = `🌀 ${cellName}! ` + (getTranslation('game.moveTo') || 'Перемещение на клетку') + ` ${target + 1}`;
+        newCell = target;
     }
-    // Клетка 18 (индекс 17) → Живот гиганта → клетка 22 (индекс 21)
-    else if (newCell === 17) {
-        extraMessage = `🌀 Живот гиганта! Перемещение на клетку 22 (пляж)`;
-        newCell = 21;
-        isSpecialMove = true;
-    }
-    
-    // Проверка на костёр (клетка 32, индекс 31)
+
     const isCampfire = (newCell === 31);
-    
     p.cell = newCell;
-    
-    // Плавное пошаговое перемещение
+
     isMoving = true;
     moveChipStepByStep(activePlayerIndex, oldCell, newCell, () => {
         updateAllChips();
         updateTurnUI();
-        
-        if (extraMessage) {
-            addLog(`🌀 <span class="highlight">${extraMessage}</span>`);
-        }
-        
-        addLog(`🎲 ${p.name} выбросил <span class="highlight">${steps}</span> → клетка <span class="highlight">${p.cell + 1}</span>`);
-        
-        // Если клетка с костром — бонусный ход
+        if (extraMessage) addLog(`🌀 <span class="highlight">${extraMessage}</span>`);
+        const diceMsg = getTranslation('game.diceRoll') || 'выбросил';
+        addLog(`🎲 ${p.name} ${diceMsg} <span class="highlight">${steps}</span> → клетка <span class="highlight">${p.cell + 1}</span>`);
+
         if (isCampfire) {
             playCampfireSound();
-            addLog(`🔥 <span class="highlight">Костёр!</span> ${p.name} получает дополнительный ход!`);
+            const campfireMsg = getTranslation('game.campfire') || 'Костёр!';
+            const bonusMsg = getTranslation('game.bonusTurn') || 'получает дополнительный ход!';
+            addLog(`🔥 <span class="highlight">${campfireMsg}</span> ${p.name} ${bonusMsg}`);
             setTimeout(() => {
                 canRoll = true;
                 document.getElementById('rollBtn').disabled = false;
-                document.getElementById('taskName').textContent = 'Бонусный ход!';
-                document.getElementById('taskDesc').textContent = `${p.name} может бросить кубик ещё раз!`;
+                document.getElementById('taskName').textContent = '🔥 ' + (getTranslation('game.bonusTurn') || 'Бонусный ход!');
+                document.getElementById('taskDesc').textContent = `${p.name} ${bonusMsg}`;
+                document.getElementById('taskReps').textContent = '';
+                document.getElementById('btnWin').disabled = true;
+                document.getElementById('btnPartial').disabled = true;
+                document.getElementById('btnFail').disabled = true;
                 isMoving = false;
                 isProcessing = false;
             }, 600);
             return;
         }
-        
-        // Показываем задание
         setTimeout(() => {
             showTask();
             isMoving = false;
@@ -994,17 +1626,23 @@ function moveCurrentPlayer(steps) {
     });
 }
 
-// ========================================================
-// ЗАДАНИЯ
-// ========================================================
-let currentTask = null;
-
 function showTask() {
-    const randomTask = TASKS[Math.floor(Math.random() * TASKS.length)];
-    currentTask = randomTask;
-    document.getElementById('taskName').textContent = randomTask.name;
-    document.getElementById('taskDesc').textContent = randomTask.desc;
+    // Выбираем случайное задание, подходящее по возрасту
+    const age = players[activePlayerIndex].age;
+    const available = TASKS.filter(t => age >= t.minAge && age <= t.maxAge);
+    if (available.length === 0) {
+        // fallback
+        const randomTask = TASKS[Math.floor(Math.random() * TASKS.length)];
+        currentTask = randomTask;
+    } else {
+        currentTask = available[Math.floor(Math.random() * available.length)];
+    }
+    const reps = getRepetitions(currentTask, age);
+    document.getElementById('taskName').textContent = currentTask.name;
+    document.getElementById('taskDesc').textContent = currentTask.desc;
+    document.getElementById('taskReps').textContent = `👶 Возраст ${age} лет: сделайте ${reps} раз(а)`;
     document.getElementById('btnWin').disabled = false;
+    document.getElementById('btnPartial').disabled = false;
     document.getElementById('btnFail').disabled = false;
     document.getElementById('rollBtn').disabled = true;
     canRoll = false;
@@ -1014,51 +1652,111 @@ function showTask() {
 function completeTask(success) {
     if (isProcessing || isGameFinished || !currentTask || isMoving) return;
     isProcessing = true;
-    
     const p = players[activePlayerIndex];
     document.getElementById('btnWin').disabled = true;
+    document.getElementById('btnPartial').disabled = true;
     document.getElementById('btnFail').disabled = true;
-    
+
+    const age = p.age;
+    const reps = getRepetitions(currentTask, age);
+    const taskName = currentTask.name;
+    const logEntry = success
+        ? `✅ <span class="success">${p.name} выполнил задание "${taskName}" (${reps} раз(а))</span>`
+        : `❌ <span class="fail">${p.name} не выполнил задание "${taskName}"</span>`;
+    addLog(logEntry);
+
+    // Запись в логи для экспорта
+    gameLog.push({
+        time: new Date().toISOString(),
+        player: p.name,
+        age: p.age,
+        task: taskName,
+        result: success ? 'Выполнено полностью' : 'Не выполнено',
+        repetitions: success ? reps : 0
+    });
+
     if (success) {
         p.tasksCompleted = (p.tasksCompleted || 0) + 1;
-        addLog(`✅ <span class="success">${p.name} выполнил задание!</span>`);
-        
         if (p.tasksCompleted >= 1 && !achievements.includes('first_task')) {
             achievements.push('first_task');
-            showAchievementToast('🌟', 'Первое задание', `${p.name} выполнил первое задание!`);
+            showAchievementToast('🌟', getTranslation('game.firstTask') || 'Первое задание', `${p.name} выполнил первое задание!`);
         }
         if (p.tasksCompleted >= 10 && !achievements.includes('ten_tasks')) {
             achievements.push('ten_tasks');
-            showAchievementToast('⭐', 'Десять заданий', `${p.name} выполнил 10 заданий!`);
+            showAchievementToast('⭐', getTranslation('game.tenTasks') || 'Десять заданий', `${p.name} выполнил 10 заданий!`);
         }
         if (p.tasksCompleted >= 20 && !achievements.includes('twenty_tasks')) {
             achievements.push('twenty_tasks');
-            showAchievementToast('🏆', '20 заданий', `${p.name} выполнил 20 заданий!`);
+            showAchievementToast('🏆', getTranslation('game.twentyTasks') || '20 заданий', `${p.name} выполнил 20 заданий!`);
         }
-        
-        setTimeout(() => {
-            nextTurn();
-            isProcessing = false;
-        }, 600);
-        
     } else {
-        addLog(`❌ <span class="fail">${p.name} не выполнил задание.</span> Возврат на 2 клетки.`);
+        // Откат на 2 клетки
         const oldCell = p.cell;
         const newCell = Math.max(0, p.cell - 2);
         p.cell = newCell;
-        
         isMoving = true;
         moveChipStepByStep(activePlayerIndex, oldCell, newCell, () => {
             updateAllChips();
             updateTurnUI();
-            addLog(`↩️ ${p.name} перешёл на клетку ${p.cell + 1}`);
-            setTimeout(() => {
-                nextTurn();
-                isMoving = false;
-                isProcessing = false;
-            }, 400);
+            const backMsg = getTranslation('game.returnBack') || 'перешёл на клетку';
+            addLog(`↩️ ${p.name} ${backMsg} ${p.cell + 1}`);
+            saveCurrentSession();
+            isMoving = false;
+            isProcessing = false;
+            nextTurn();
         });
+        return;
     }
+
+    saveCurrentSession();
+    setTimeout(() => {
+        nextTurn();
+        isProcessing = false;
+    }, 600);
+}
+
+// Частичное выполнение
+function openPartial() {
+    if (!currentTask || isProcessing || isGameFinished) return;
+    document.getElementById('partialModal').classList.add('active');
+    document.getElementById('partialCount').value = 1;
+    partialTask = currentTask;
+    partialCallback = null;
+}
+
+function closePartial() {
+    document.getElementById('partialModal').classList.remove('active');
+    partialTask = null;
+}
+
+function confirmPartial() {
+    const count = parseInt(document.getElementById('partialCount').value) || 1;
+    if (count <= 0) { alert('Введите число больше 0'); return; }
+    const p = players[activePlayerIndex];
+    const taskName = partialTask.name;
+    const age = p.age;
+    const fullReps = getRepetitions(partialTask, age);
+    const logEntry = `✏️ <span class="partial">${p.name} частично выполнил "${taskName}" (${count} из ${fullReps})</span>`;
+    addLog(logEntry);
+    gameLog.push({
+        time: new Date().toISOString(),
+        player: p.name,
+        age: p.age,
+        task: taskName,
+        result: `Частично (${count}/${fullReps})`,
+        repetitions: count
+    });
+    // Считаем частичное как успех? Можно засчитывать как выполненное, но с пометкой
+    p.tasksCompleted = (p.tasksCompleted || 0) + 1;
+    saveCurrentSession();
+    closePartial();
+    document.getElementById('btnWin').disabled = true;
+    document.getElementById('btnPartial').disabled = true;
+    document.getElementById('btnFail').disabled = true;
+    setTimeout(() => {
+        nextTurn();
+        isProcessing = false;
+    }, 600);
 }
 
 function nextTurn() {
@@ -1067,55 +1765,54 @@ function nextTurn() {
     updateTurnUI();
     canRoll = true;
     document.getElementById('rollBtn').disabled = false;
-    document.getElementById('taskName').textContent = 'Бросьте кубик';
-    document.getElementById('taskDesc').textContent = 'Сделайте ход, чтобы получить упражнение.';
+    document.getElementById('taskName').textContent = getTranslation('game.rollDice') || 'Бросьте кубик';
+    document.getElementById('taskDesc').textContent = getTranslation('game.rollHint') || 'Сделайте ход, чтобы получить упражнение.';
+    document.getElementById('taskReps').textContent = '';
     document.getElementById('diceValue').textContent = '—';
-    saveGameState();
+    document.getElementById('btnWin').disabled = true;
+    document.getElementById('btnPartial').disabled = true;
+    document.getElementById('btnFail').disabled = true;
+    saveCurrentSession();
 }
 
 // ========================================================
-// СОХРАНЕНИЕ ПРОГРЕССА
+// ЛОГИ И ЭКСПОРТ
 // ========================================================
-function saveGameState() {
-    try {
-        const state = {
-            players: players.map(p => ({ ...p })),
-            activePlayerIndex: activePlayerIndex,
-            isGameFinished: isGameFinished,
-            achievements: achievements,
-            savedAt: new Date().toISOString()
-        };
-        localStorage.setItem('speech_game_state', JSON.stringify(state));
-    } catch(e) {}
+function addLog(html) {
+    const logContainer = document.getElementById('gameLog');
+    const entry = document.createElement('div');
+    entry.className = 'log-entry';
+    entry.innerHTML = html;
+    logContainer.appendChild(entry);
+    logContainer.scrollTop = logContainer.scrollHeight;
+    // Сохраняем в gameLog для сессии (но в gameLog храним только текст)
+    // Для истории сохраняем и в массив gameLog для экспорта, но в виде объекта
 }
 
-function loadGameState() {
-    try {
-        const raw = localStorage.getItem('speech_game_state');
-        if (!raw) return false;
-        const state = JSON.parse(raw);
-        if (state.players && state.players.length > 0) {
-            players = state.players;
-            activePlayerIndex = state.activePlayerIndex || 0;
-            isGameFinished = state.isGameFinished || false;
-            achievements = state.achievements || [];
-            return true;
-        }
-    } catch(e) {}
-    return false;
-}
-
-function clearGameState() {
-    localStorage.removeItem('speech_game_state');
+function exportLogs() {
+    if (gameLog.length === 0) {
+        alert('Нет записей для экспорта.');
+        return;
+    }
+    // Формируем CSV
+    let csv = 'Дата,Игрок,Возраст,Задание,Результат,Повторений\n';
+    gameLog.forEach(entry => {
+        csv += `${entry.time},${entry.player},${entry.age},${entry.task},${entry.result},${entry.repetitions}\n`;
+    });
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `лог_игры_${new Date().toISOString().slice(0,10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(link.href);
 }
 
 // ========================================================
-// ДОСТИЖЕНИЯ
+// ДОСТИЖЕНИЯ (тост)
 // ========================================================
 function showAchievementToast(icon, name, desc) {
     const existing = document.querySelector('.achievement-toast');
     if (existing) existing.remove();
-    
     const toast = document.createElement('div');
     toast.className = 'achievement-toast';
     toast.innerHTML = `
@@ -1126,80 +1823,72 @@ function showAchievementToast(icon, name, desc) {
         </div>
     `;
     document.body.appendChild(toast);
-    setTimeout(() => {
-        if (toast.parentElement) toast.remove();
-    }, 4000);
+    setTimeout(() => { if (toast.parentElement) toast.remove(); }, 4000);
 }
 
 // ========================================================
-// ВЫХОД И НОВАЯ ИГРА
+// СБРОС ИГРЫ
 // ========================================================
-function exitGame() {
-    if (confirm('Вы уверены, что хотите выйти? Прогресс сохранится.')) {
-        saveGameState();
-        window.close();
-    }
-}
-
 function resetGame() {
     if (confirm('Начать новую игру? Текущий прогресс будет потерян.')) {
-        clearGameState();
+        // Очищаем текущую сессию
+        if (currentSessionId !== null) {
+            const sessions = getAllSessions();
+            sessions.splice(currentSessionId, 1);
+            saveSessions(sessions);
+        }
         location.reload();
-    }
-}
-
-// ========================================================
-// ЛОГ
-// ========================================================
-function addLog(text) {
-    const log = document.getElementById('gameLog');
-    const entry = document.createElement('div');
-    entry.className = 'log-entry';
-    entry.innerHTML = text;
-    log.prepend(entry);
-    while (log.children.length > 50) {
-        log.removeChild(log.lastChild);
     }
 }
 
 // ========================================================
 // ЗАПУСК
 // ========================================================
-document.addEventListener('DOMContentLoaded', function() {
-    const hasSavedGame = loadGameState();
-    
-    if (hasSavedGame && players.length > 0) {
-        const modal = document.getElementById('setupModal');
-        modal.querySelector('.setup-title').textContent = '📂 Продолжить игру?';
-        modal.querySelector('.player-count-btns').style.display = 'none';
-        modal.querySelector('.player-inputs').style.display = 'none';
-        modal.querySelector('.btn-start').textContent = '✅ Продолжить игру';
-        modal.querySelector('.btn-start').onclick = function() {
-            continueGame();
-        };
-        const resetBtn = document.createElement('button');
-        resetBtn.className = 'btn-start';
-        resetBtn.style.marginTop = '10px';
-        resetBtn.style.background = 'rgba(239,68,68,0.4)';
-        resetBtn.textContent = '🔄 Начать новую игру';
-        resetBtn.onclick = function() {
-            if (confirm('Начать новую игру? Текущий прогресс будет потерян.')) {
-                clearGameState();
-                location.reload();
-            }
-        };
-        modal.querySelector('.setup-card').appendChild(resetBtn);
-    } else {
-        renderInputs();
-    }
-});
+document.addEventListener('DOMContentLoaded', async function() {
+    const savedTheme = localStorage.getItem('theme') || 'game';
+    const savedLang = localStorage.getItem('lang') || 'ru';
+    currentLang = savedLang;
 
-window.setPlayerCount = setPlayerCount;
-window.startGame = startGame;
-window.rollDice = rollDice;
-window.completeTask = completeTask;
-window.exitGame = exitGame;
-window.resetGame = resetGame;
+    changeTheme(savedTheme);
+    document.getElementById('themeSelect').value = savedTheme;
+
+    await loadTranslations(savedLang);
+    document.getElementById('langSelect').value = savedLang;
+    applyTranslations();
+
+    // Показываем главное меню
+    showMainMenu();
+
+    // Если есть сохранённые игры, показываем индикатор
+    const sessions = getAllSessions();
+    if (sessions.length > 0) {
+        document.querySelector('.menu-buttons .btn-success').innerHTML = `<i class="fas fa-folder-open"></i> Продолжить игру (${sessions.length})`;
+    }
+
+    // Глобальные функции
+    window.showSetup = showSetup;
+    window.showContinueMenu = showContinueMenu;
+    window.closeContinueMenu = closeContinueMenu;
+    window.setPlayerCount = setPlayerCount;
+    window.startNewGame = startNewGame;
+    window.closeSetup = closeSetup;
+    window.rollDice = rollDice;
+    window.completeTask = completeTask;
+    window.openPartial = openPartial;
+    window.confirmPartial = confirmPartial;
+    window.closePartial = closePartial;
+    window.toggleSettings = toggleSettings;
+    window.changeTheme = changeTheme;
+    window.changeLanguage = changeLanguage;
+    window.exitGame = exitGame;
+    window.exitToMenu = exitToMenu;
+    window.resetGame = resetGame;
+    window.exportLogs = exportLogs;
+    window.loadSession = loadSession;
+    window.deleteSession = deleteSession;
+
+    console.log('🎮 Игра с новым меню и логированием загружена!');
+});
 </script>
 </body>
 </html>
