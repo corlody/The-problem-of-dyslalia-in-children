@@ -139,5 +139,7 @@
     "firstTask": "First task",
     "tenTasks": "Ten tasks",
     "twentyTasks": "20 tasks"
+    "partial": "Partially",
+    "logExport": "Log export"
   }
 }
