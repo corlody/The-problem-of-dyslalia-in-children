@@ -1,0 +1,300 @@
+/* ==========================================================
+   ТЕМА «САКУРА» — Фудзи, закат, лепестки
+   Применяется через [data-theme="sakura"]
+   ========================================================== */
+
+[data-theme="sakura"] {
+    /* Палитра */
+    --bg-primary: #fdf2f8;      /* нежно-розовый фон */
+    --bg-secondary: #fce7f3;    /* чуть темнее */
+    --bg-card: rgba(255, 255, 255, 0.85);
+    --glass-border: rgba(236, 72, 153, 0.15);
+
+    --purple: #be185d;          /* основной акцент — вишнёвый */
+    --purple-light: #ec4899;    /* розовый */
+    --purple-dark: #831843;     /* тёмно-вишнёвый */
+    --gold: #f97316;            /* закатное солнце */
+    --gold-light: #fb923c;
+    --pink: #f472b6;
+    --cyan: #0891b2;
+    --green: #059669;
+    --red: #dc2626;
+
+    --text-primary: #1f2937;
+    --text-secondary: #4b5563;
+    --text-muted: #9ca3af;
+
+    --shadow-glow: 0 0 40px rgba(236, 72, 153, 0.15);
+    --shadow-card: 0 8px 32px rgba(236, 72, 153, 0.12);
+}
+
+/* ==========================================================
+   ФОН: НЕБО ЗАКАТА + ГОРА ФУДЗИ + ВЕТКИ САКУРЫ
+   ========================================================== */
+[data-theme="sakura"] body {
+    background: 
+        /* Ветка сакуры — правый верхний угол */
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3E%3Cpath d='M400,50 Q350,60 320,90 Q290,120 260,110 M340,70 Q320,100 300,140 M380,80 Q360,110 340,150' stroke='%23a16207' stroke-width='6' fill='none' stroke-linecap='round'/%3E%3Cg fill='%23fbcfe8' stroke='%23ec4899' stroke-width='0.5'%3E%3Ccircle cx='255' cy='112' r='9'/%3E%3Ccircle cx='245' cy='120' r='7'/%3E%3Ccircle cx='262' cy='120' r='7'/%3E%3Ccircle cx='298' cy='142' r='8'/%3E%3Ccircle cx='288' cy='148' r='6'/%3E%3Ccircle cx='340' cy='152' r='8'/%3E%3Ccircle cx='330' cy='158' r='6'/%3E%3Ccircle cx='348' cy='146' r='5'/%3E%3C/g%3E%3C/svg%3E") right top / 420px no-repeat,
+        /* Ветка сакуры — левый нижний угол */
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300'%3E%3Cpath d='M0,280 Q50,270 80,240 Q110,210 140,220 M70,250 Q90,220 110,190 M40,270 Q70,240 90,200' stroke='%23a16207' stroke-width='5' fill='none' stroke-linecap='round'/%3E%3Cg fill='%23fbcfe8' stroke='%23ec4899' stroke-width='0.5'%3E%3Ccircle cx='142' cy='218' r='9'/%3E%3Ccircle cx='152' cy='226' r='7'/%3E%3Ccircle cx='132' cy='226' r='7'/%3E%3Ccircle cx='110' cy='188' r='8'/%3E%3Ccircle cx='100' cy='196' r='6'/%3E%3Ccircle cx='90' cy='198' r='7'/%3E%3C/g%3E%3C/svg%3E") left bottom / 340px no-repeat,
+        /* Гора Фудзи */
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 400' preserveAspectRatio='none'%3E%3Cdefs%3E%3ClinearGradient id='fuji' x1='0%25' y1='0%25' x2='0%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23fbcfe8' stop-opacity='0.6'/%3E%3Cstop offset='40%25' stop-color='%23f9a8d4' stop-opacity='0.4'/%3E%3Cstop offset='100%25' stop-color='%23ec4899' stop-opacity='0.15'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M0,400 L400,200 L450,180 L500,140 L560,60 L600,40 L640,60 L700,140 L750,180 L800,200 L1200,400 Z' fill='url(%23fuji)'/%3E%3Cpath d='M560,60 L600,40 L640,60 L620,75 L600,65 L580,75 Z' fill='%23ffffff' opacity='0.85'/%3E%3C/svg%3E") bottom center / 100% auto no-repeat,
+        /* Небо заката */
+        linear-gradient(180deg, #fce7f3 0%, #fbcfe8 25%, #fde68a 55%, #fed7aa 75%, #fecaca 100%);
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+}
+
+/* Убираем старую canvas-анимацию для этой темы */
+[data-theme="sakura"] #particles-canvas {
+    display: none;
+}
+
+/* Новый canvas для лепестков */
+#sakura-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    display: none;
+}
+[data-theme="sakura"] #sakura-canvas {
+    display: block;
+}
+
+/* ==========================================================
+   HEADER
+   ========================================================== */
+[data-theme="sakura"] header {
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.4) 0%,
+        rgba(252, 231, 243, 0.5) 50%,
+        rgba(255, 255, 255, 0.4) 100%
+    );
+    animation: none;
+    border-color: rgba(236, 72, 153, 0.2);
+    backdrop-filter: blur(15px);
+}
+
+[data-theme="sakura"] header h1 {
+    background: linear-gradient(135deg, #831843 0%, #be185d 40%, #f97316 80%, #831843 100%);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmerText 8s ease-in-out infinite;
+}
+
+[data-theme="sakura"] header .subtitle .highlight {
+    color: #be185d;
+}
+
+[data-theme="sakura"] .authors-badge {
+    background: rgba(255, 255, 255, 0.6);
+    border-color: rgba(236, 72, 153, 0.2);
+    color: #831843;
+}
+
+/* ==========================================================
+   КНОПКИ В ШАПКЕ
+   ========================================================== */
+[data-theme="sakura"] .btn-start-game {
+    background: linear-gradient(135deg, #ec4899, #be185d);
+    color: #fff;
+    box-shadow: 0 4px 25px rgba(236, 72, 153, 0.4);
+}
+[data-theme="sakura"] .btn-start-game:hover {
+    box-shadow: 0 8px 40px rgba(236, 72, 153, 0.55);
+}
+
+/* ==========================================================
+   НАВИГАЦИЯ
+   ========================================================== */
+[data-theme="sakura"] nav {
+    background: rgba(255, 255, 255, 0.7);
+    border-color: rgba(236, 72, 153, 0.2);
+    backdrop-filter: blur(20px);
+}
+
+[data-theme="sakura"] nav button {
+    color: #831843;
+}
+
+[data-theme="sakura"] nav button:hover {
+    background: rgba(236, 72, 153, 0.1);
+    color: #be185d;
+}
+
+[data-theme="sakura"] nav button.active {
+    background: linear-gradient(135deg, #ec4899, #be185d);
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(236, 72, 153, 0.4);
+}
+
+/* ==========================================================
+   СЕКЦИИ
+   ========================================================== */
+[data-theme="sakura"] .section-title {
+    background: linear-gradient(135deg, #831843, #ec4899);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+[data-theme="sakura"] .section-title i {
+    color: #f97316;
+    -webkit-text-fill-color: initial;
+}
+
+[data-theme="sakura"] .glass-card {
+    background: rgba(255, 255, 255, 0.75);
+    border-color: rgba(236, 72, 153, 0.15);
+    box-shadow: 0 4px 20px rgba(236, 72, 153, 0.08);
+}
+
+[data-theme="sakura"] .glass-card:hover {
+    border-color: rgba(236, 72, 153, 0.35);
+    box-shadow: 0 8px 30px rgba(236, 72, 153, 0.15);
+}
+
+[data-theme="sakura"] .task-card {
+    background: rgba(255, 255, 255, 0.8);
+    border-left-color: #ec4899;
+}
+
+[data-theme="sakura"] .task-card.card-blue { border-left-color: #60a5fa; }
+[data-theme="sakura"] .task-card.card-red { border-left-color: #f87171; }
+[data-theme="sakura"] .task-card.card-green { border-left-color: #34d399; }
+[data-theme="sakura"] .task-card.card-yellow { border-left-color: #fbbf24; }
+[data-theme="sakura"] .task-card.card-orange { border-left-color: #fb923c; }
+
+[data-theme="sakura"] .task-card:hover {
+    border-color: #ec4899;
+    box-shadow: 0 8px 30px rgba(236, 72, 153, 0.2);
+}
+
+/* ==========================================================
+   ПРАВИЛА / ТАБЛИЦЫ
+   ========================================================== */
+[data-theme="sakura"] .rules-content {
+    background: rgba(255, 255, 255, 0.75);
+    border-color: rgba(236, 72, 153, 0.15);
+}
+
+[data-theme="sakura"] .rules-content h3 {
+    color: #be185d;
+}
+
+[data-theme="sakura"] .rules-content th {
+    background: rgba(236, 72, 153, 0.1);
+    color: #831843;
+}
+
+[data-theme="sakura"] .rules-content td {
+    color: #4b5563;
+}
+
+/* ==========================================================
+   НАСТРОЙКИ (шестерёнка)
+   ========================================================== */
+[data-theme="sakura"] .settings-gear {
+    background: rgba(255, 255, 255, 0.85);
+    border-color: rgba(236, 72, 153, 0.25);
+}
+
+[data-theme="sakura"] .settings-gear:hover {
+    border-color: #ec4899;
+    box-shadow: 0 0 40px rgba(236, 72, 153, 0.3);
+}
+
+[data-theme="sakura"] .settings-panel {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: rgba(236, 72, 153, 0.2);
+}
+
+[data-theme="sakura"] .settings-panel select {
+    background: #fdf2f8;
+    color: #831843;
+    border-color: rgba(236, 72, 153, 0.25);
+}
+
+[data-theme="sakura"] .settings-panel .close-settings {
+    background: linear-gradient(135deg, #ec4899, #be185d);
+}
+
+/* ==========================================================
+   КНОПКИ
+   ========================================================== */
+[data-theme="sakura"] .btn-primary {
+    background: linear-gradient(135deg, #ec4899, #be185d);
+}
+[data-theme="sakura"] .btn-primary:hover {
+    box-shadow: 0 8px 30px rgba(236, 72, 153, 0.45);
+}
+
+[data-theme="sakura"] .btn-outline {
+    border-color: rgba(236, 72, 153, 0.3);
+    color: #831843;
+}
+[data-theme="sakura"] .btn-outline:hover {
+    border-color: #ec4899;
+    background: rgba(236, 72, 153, 0.08);
+}
+
+/* ==========================================================
+   ФУТЕР
+   ========================================================== */
+[data-theme="sakura"] footer {
+    border-top-color: rgba(236, 72, 153, 0.2);
+    color: #9d174d;
+}
+
+/* ==========================================================
+   ДОПОЛНИТЕЛЬНЫЕ ЭФФЕКТЫ
+   ========================================================== */
+/* Лёгкое свечение карточек */
+[data-theme="sakura"] .glass-card::before,
+[data-theme="sakura"] .task-card::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    background: linear-gradient(135deg, 
+        rgba(236, 72, 153, 0.1),
+        rgba(249, 115, 22, 0.05),
+        rgba(236, 72, 153, 0.1)
+    );
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+    z-index: -1;
+}
+[data-theme="sakura"] .glass-card:hover::before,
+[data-theme="sakura"] .task-card:hover::before {
+    opacity: 1;
+}
+
+/* Мягкий текст */
+[data-theme="sakura"] body {
+    color: #1f2937;
+}
+
+/* Скроллбар в розовых тонах */
+[data-theme="sakura"] ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+[data-theme="sakura"] ::-webkit-scrollbar-track {
+    background: #fce7f3;
+}
+[data-theme="sakura"] ::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #f472b6, #ec4899);
+    border-radius: 5px;
+}
+[data-theme="sakura"] ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #ec4899, #be185d);
+}
