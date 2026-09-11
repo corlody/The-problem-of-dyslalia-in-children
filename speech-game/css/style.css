@@ -279,12 +279,24 @@ header .subtitle .highlight { color: var(--gold); font-weight: 600; }
 [data-theme="elderly"] .authors-badge { background: rgba(0, 0, 0, 0.04); border-color: rgba(0, 0, 0, 0.15); padding: 16px 36px; font-size: 1.2rem; border-width: 2px; }
 
 /* ========================================================
+   КНОПКИ В ШАПКЕ (ИГРА + ИССЛЕДОВАНИЕ)
+   ======================================================== */
+.header-buttons {
+    margin-top: 15px;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* ========================================================
    НАВИГАЦИЯ
    ======================================================== */
 nav {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
+    align-items: center;
     gap: 8px;
     padding: 12px 20px;
     background: var(--bg-card);
@@ -296,6 +308,8 @@ nav {
     top: 80px;
     z-index: 100;
     box-shadow: var(--shadow-card);
+    width: 100%;
+    max-width: 100%;
 }
 [data-theme="elderly"] nav { padding: 16px 24px; gap: 12px; border-width: 2px; }
 
@@ -313,6 +327,7 @@ nav button {
     display: flex;
     align-items: center;
     gap: 10px;
+    white-space: nowrap;
 }
 [data-theme="elderly"] nav button { font-size: 1.3rem; padding: 14px 32px; border: 2px solid transparent; }
 nav button i { font-size: 1.1rem; transition: var(--transition); }
@@ -602,16 +617,35 @@ footer {
     .settings-panel { bottom: 80px; right: 20px; width: 300px; padding: 20px 22px; }
 }
 
+/* ========================================================
+   ПЛАНШЕТЫ И ТЕЛЕФОНЫ — НАВИГАЦИЯ ЦЕНТРИРУЕТСЯ
+   ======================================================== */
 @media (max-width: 768px) {
     .app { padding: 0 10px 10px; }
     .settings-gear { bottom: 16px; right: 16px; width: 44px; height: 44px; }
     .settings-gear i { font-size: 1.1rem; }
     .settings-panel { bottom: 70px; right: 16px; width: calc(100vw - 32px); max-width: 320px; padding: 18px 20px; }
     header { padding: 30px 20px 25px; border-radius: 0 0 30px 30px; }
-    nav { border-radius: 30px; padding: 10px 12px; gap: 4px; top: 10px; overflow-x: auto; flex-wrap: nowrap; justify-content: flex-start; }
-    nav button { padding: 6px 12px; font-size: 0.75rem; white-space: nowrap; }
+    
+    /* ГЛАВНОЕ ИСПРАВЛЕНИЕ: навигация центрируется */
+    nav {
+        border-radius: 30px;
+        padding: 10px 12px;
+        gap: 4px;
+        top: 10px;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        justify-content: center; /* ← ИСПРАВЛЕНО: было flex-start */
+        scrollbar-width: none;   /* Скрыть скроллбар Firefox */
+        -ms-overflow-style: none; /* Скрыть скроллбар IE/Edge */
+    }
+    nav::-webkit-scrollbar {
+        display: none; /* Скрыть скроллбар Chrome/Safari */
+    }
+    nav button { padding: 6px 12px; font-size: 0.75rem; white-space: nowrap; flex-shrink: 0; }
     nav button .nav-label { display: none; }
     nav button i { font-size: 1.2rem; }
+    
     .section { padding: 10px 0 20px; }
     .map-editor-tools { flex-direction: column; align-items: stretch; padding: 12px 16px; gap: 10px; }
     .map-editor-tools .status { text-align: center; font-size: 0.8rem; }
@@ -626,4 +660,8 @@ footer {
     header { padding: 20px 14px 18px; }
     .authors-badge { font-size: 0.7rem; padding: 6px 14px; }
     .map-editor-tools .btn { font-size: 0.75rem; padding: 8px 14px; }
+    
+    /* На очень узких экранах — только иконки, но по центру */
+    nav button { padding: 8px 12px; }
+    nav button i { font-size: 1.3rem; }
 }
