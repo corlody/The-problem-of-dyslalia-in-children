@@ -9,25 +9,31 @@
     <style>
         :root {
             --bg-primary: #0a0e27;
+            --bg-secondary: #12163b;
             --bg-card: rgba(26, 30, 60, 0.85);
             --glass-border: rgba(255, 255, 255, 0.1);
             --purple: #7c3aed;
+            --purple-light: #a78bfa;
             --purple-dark: #5b21b6;
             --gold: #f59e0b;
             --green: #10b981;
             --red: #ef4444;
+            --cyan: #06b6d4;
             --text-primary: #f1f5f9;
             --text-secondary: #cbd5e1;
             --text-muted: #64748b;
             --radius: 20px;
             --radius-sm: 12px;
             --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --shadow-card: 0 8px 32px rgba(0,0,0,0.35);
         }
         [data-theme="official"] {
             --bg-primary: #f1f5f9;
+            --bg-secondary: #e2e8f0;
             --bg-card: rgba(255, 255, 255, 0.92);
             --glass-border: rgba(0, 0, 0, 0.08);
             --purple: #1e40af;
+            --purple-light: #3b82f6;
             --purple-dark: #1e3a8a;
             --gold: #d97706;
             --text-primary: #0f172a;
@@ -36,9 +42,11 @@
         }
         [data-theme="elderly"] {
             --bg-primary: #ffffff;
+            --bg-secondary: #e5e7eb;
             --bg-card: rgba(255, 255, 255, 0.96);
             --glass-border: rgba(0, 0, 0, 0.2);
             --purple: #1e40af;
+            --purple-light: #2563eb;
             --purple-dark: #1e3a8a;
             --gold: #b45309;
             --text-primary: #000000;
@@ -48,9 +56,11 @@
         }
         [data-theme="sakura"] {
             --bg-primary: #fdf2f8;
+            --bg-secondary: #fce7f3;
             --bg-card: rgba(255, 255, 255, 0.85);
             --glass-border: rgba(236, 72, 153, 0.18);
             --purple: #be185d;
+            --purple-light: #ec4899;
             --purple-dark: #831843;
             --gold: #f97316;
             --text-primary: #1f2937;
@@ -59,96 +69,129 @@
         }
         [data-theme="cosmos"] {
             --bg-primary: #030014;
+            --bg-secondary: #0a0428;
             --bg-card: rgba(20, 15, 60, 0.7);
             --glass-border: rgba(139, 92, 246, 0.3);
             --purple: #8b5cf6;
+            --purple-light: #a78bfa;
             --purple-dark: #6d28d9;
             --gold: #fbbf24;
+            --cyan: #22d3ee;
             --text-primary: #e0e7ff;
             --text-secondary: #a5b4fc;
             --text-muted: #6366f1;
         }
         [data-theme="hacker"] {
             --bg-primary: #000000;
+            --bg-secondary: #0a0a0a;
             --bg-card: rgba(0, 20, 0, 0.85);
             --glass-border: rgba(0, 255, 0, 0.3);
             --purple: #00ff41;
+            --purple-light: #4ade80;
             --purple-dark: #16a34a;
             --gold: #00ff41;
+            --green: #00ff41;
             --text-primary: #00ff41;
             --text-secondary: #22c55e;
             --text-muted: #16a34a;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
         body {
             font-family: 'Inter', sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
             min-height: 100vh;
             padding: 20px;
-            font-size: 16px;
+            font-size: var(--font-size-base, 16px);
             transition: background 0.5s ease, color 0.5s ease;
         }
-        [data-theme="hacker"] body { font-family: 'Share Tech Mono', monospace; }
+        [data-theme="hacker"] body {
+            font-family: 'Share Tech Mono', 'Courier New', monospace;
+        }
 
         #bg-canvas {
             position: fixed;
-            inset: 0;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             z-index: 0;
             pointer-events: none;
         }
-        .container-wrap { position: relative; z-index: 1; }
+
+        .container-wrap {
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
 
         /* Шапка */
         .header {
-            max-width: 1400px;
-            margin: 0 auto 24px;
             background: linear-gradient(135deg, rgba(124,58,237,0.15), rgba(245,158,11,0.08));
             border-radius: var(--radius);
             padding: 30px 20px;
             text-align: center;
             border: 1px solid var(--glass-border);
             backdrop-filter: blur(20px);
+            margin-bottom: 20px;
+            transition: background 0.5s ease;
+        }
+        [data-theme="official"] .header {
+            background: linear-gradient(135deg, #dbeafe, #eff6ff);
+        }
+        [data-theme="elderly"] .header {
+            background: linear-gradient(135deg, #e0e7ff, #f0f0f0);
+            border-width: 2px;
         }
         [data-theme="sakura"] .header {
-            background: linear-gradient(135deg, rgba(255,255,255,0.5), rgba(252,231,243,0.6));
+            background: linear-gradient(135deg, rgba(255,255,255,0.6), rgba(252,231,243,0.7));
+            border-color: rgba(236,72,153,0.25);
         }
         [data-theme="cosmos"] .header {
             background: linear-gradient(135deg, rgba(139,92,246,0.15), rgba(6,182,212,0.1));
-            border-color: rgba(139,92,246,0.3);
+            border-color: rgba(139,92,246,0.35);
         }
         [data-theme="hacker"] .header {
             background: rgba(0, 20, 0, 0.7);
             border-color: #00ff41;
             box-shadow: 0 0 40px rgba(0,255,65,0.3);
         }
+
         .header h1 {
             font-family: 'Playfair Display', serif;
-            font-size: clamp(1.6rem, 4vw, 2.5rem);
+            font-size: clamp(1.5rem, 4vw, 2.4rem);
             background: linear-gradient(135deg, var(--gold), var(--purple));
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
             margin-bottom: 10px;
+            line-height: 1.2;
         }
         [data-theme="hacker"] .header h1 {
             background: none;
             -webkit-text-fill-color: #00ff41;
             color: #00ff41;
-            text-shadow: 0 0 20px #00ff41;
+            text-shadow: 0 0 20px #00ff41, 0 0 40px #00ff41;
             font-family: 'Share Tech Mono', monospace;
+            animation: hackerGlitch 4s ease-in-out infinite;
         }
-        .header p { color: var(--text-secondary); font-size: 1rem; }
+        @keyframes hackerGlitch {
+            0%, 90%, 100% { text-shadow: 0 0 20px #00ff41, 0 0 40px #00ff41; }
+            92% { text-shadow: -3px 0 #ff0040, 3px 0 #00ffff; }
+            94% { text-shadow: 3px 0 #ff0040, -3px 0 #00ffff; }
+        }
+        .header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
 
-        /* Шестерёнка */
+        /* Шестерёнка настроек */
         .settings-gear {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
+            bottom: 30px; right: 30px;
             z-index: 9999;
-            width: 56px;
-            height: 56px;
+            width: 56px; height: 56px;
             border-radius: 50%;
             background: var(--bg-card);
             backdrop-filter: blur(20px);
@@ -157,39 +200,58 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            box-shadow: var(--shadow-card);
             transition: 0.6s cubic-bezier(0.34,1.56,0.64,1);
         }
-        .settings-gear:hover { transform: scale(1.08) rotate(90deg); border-color: var(--purple); }
-        .settings-gear i { font-size: 1.6rem; color: var(--text-primary); transition: 0.6s; }
+        .settings-gear:hover {
+            transform: scale(1.08) rotate(90deg);
+            border-color: var(--purple);
+        }
+        .settings-gear i {
+            font-size: 1.6rem;
+            color: var(--text-primary);
+            transition: 0.6s;
+        }
         .settings-gear.open i { transform: rotate(180deg); }
+        [data-theme="hacker"] .settings-gear { box-shadow: 0 0 30px rgba(0,255,65,0.5); }
 
         .settings-panel {
             position: fixed;
-            bottom: 90px;
-            right: 20px;
+            bottom: 100px; right: 30px;
             width: 340px;
             max-width: calc(100vw - 40px);
             background: var(--bg-card);
             backdrop-filter: blur(40px);
             border: 1px solid var(--glass-border);
             border-radius: var(--radius);
-            padding: 24px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            padding: 26px;
+            box-shadow: var(--shadow-card);
             transform: scale(0);
             transform-origin: bottom right;
             opacity: 0;
-            transition: 0.4s cubic-bezier(0.34,1.56,0.64,1);
+            transition: 0.5s cubic-bezier(0.34,1.56,0.64,1);
             z-index: 9998;
             max-height: 85vh;
             overflow-y: auto;
         }
         .settings-panel.open { transform: scale(1); opacity: 1; }
-        .settings-panel h4 { margin-bottom: 16px; font-size: 1.1rem; display: flex; align-items: center; gap: 10px; }
-        .settings-panel label { display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 6px; font-weight: 500; }
+        .settings-panel h4 {
+            font-size: 1.15rem;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .settings-panel label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
         .settings-panel select {
             width: 100%;
-            padding: 12px;
+            padding: 12px 14px;
             border-radius: 12px;
             border: 1px solid var(--glass-border);
             background: rgba(255,255,255,0.05);
@@ -200,7 +262,11 @@
             margin-bottom: 14px;
         }
         .settings-panel select option { background: #1e293b; color: #fff; }
+        [data-theme="official"] .settings-panel select { background: #fff; color: #0f172a; }
+        [data-theme="official"] .settings-panel select option { background: #fff; color: #0f172a; }
         [data-theme="hacker"] .settings-panel select { background: #000; color: #00ff41; border-color: #00ff41; }
+        [data-theme="hacker"] .settings-panel select option { background: #000; color: #00ff41; }
+
         .settings-panel .close-settings {
             width: 100%;
             padding: 12px;
@@ -211,25 +277,35 @@
             font-weight: 600;
             cursor: pointer;
             font-family: inherit;
+            font-size: 0.95rem;
         }
-        [data-theme="hacker"] .settings-panel .close-settings { background: #00ff41; color: #000; }
+        [data-theme="hacker"] .settings-panel .close-settings {
+            background: #00ff41;
+            color: #000;
+            box-shadow: 0 0 20px #00ff41;
+        }
 
-        /* Навигация */
+        /* Навигация по разделам */
         .research-nav {
-            max-width: 1400px;
-            margin: 0 auto 24px;
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
             padding: 12px 16px;
             background: var(--bg-card);
+            backdrop-filter: blur(20px);
             border-radius: 60px;
             border: 1px solid var(--glass-border);
-            backdrop-filter: blur(20px);
+            margin-bottom: 24px;
             justify-content: center;
         }
+        [data-theme="hacker"] .research-nav {
+            background: rgba(0,20,0,0.8);
+            border-color: #00ff41;
+            box-shadow: 0 0 20px rgba(0,255,65,0.2);
+        }
+
         .research-nav button {
-            padding: 10px 18px;
+            padding: 10px 20px;
             border: none;
             background: transparent;
             color: var(--text-secondary);
@@ -238,36 +314,53 @@
             font-family: inherit;
             font-weight: 500;
             font-size: 0.9rem;
+            transition: var(--transition);
             display: flex;
             align-items: center;
             gap: 8px;
-            transition: var(--transition);
             white-space: nowrap;
         }
-        .research-nav button:hover { background: rgba(124,58,237,0.1); color: var(--text-primary); }
+        .research-nav button:hover {
+            background: rgba(124,58,237,0.1);
+            color: var(--text-primary);
+        }
         .research-nav button.active {
             background: linear-gradient(135deg, var(--purple), var(--purple-dark));
             color: #fff;
             box-shadow: 0 4px 15px rgba(124,58,237,0.3);
         }
-        [data-theme="hacker"] .research-nav button.active { background: #00ff41; color: #000; }
+        [data-theme="hacker"] .research-nav button { color: #00ff41; }
+        [data-theme="hacker"] .research-nav button:hover { background: rgba(0,255,65,0.15); }
+        [data-theme="hacker"] .research-nav button.active {
+            background: #00ff41;
+            color: #000;
+            box-shadow: 0 0 20px #00ff41;
+        }
 
-        /* Секции и карточки */
-        .container { max-width: 1400px; margin: 0 auto; }
-        .section { display: none; animation: fadeIn 0.4s ease-out; }
+        /* Секции */
+        .section {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
         .section.active { display: block; }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        [data-theme="official"] .section { animation: none; }
+
         .card {
             background: var(--bg-card);
             border: 1px solid var(--glass-border);
             border-radius: var(--radius);
-            padding: 24px;
+            padding: 26px;
             margin-bottom: 20px;
             backdrop-filter: blur(20px);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            box-shadow: var(--shadow-card);
+        }
+        [data-theme="hacker"] .card {
+            border-color: #00ff41;
+            box-shadow: 0 0 20px rgba(0,255,65,0.15);
         }
         .card h2 {
             font-family: 'Playfair Display', serif;
@@ -280,14 +373,25 @@
             color: #00ff41;
             text-shadow: 0 0 10px #00ff41;
         }
-        .card p, .card li { color: var(--text-secondary); line-height: 1.7; }
-        .card ul { padding-left: 22px; margin: 10px 0; }
+        .card h3 {
+            font-size: 1.1rem;
+            margin: 16px 0 10px;
+            color: var(--text-primary);
+        }
+        .card p, .card li {
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+        .card ul, .card ol {
+            padding-left: 24px;
+            margin: 10px 0;
+        }
 
         /* Таблицы */
         .data-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 12px 0;
+            margin: 14px 0;
             border-radius: var(--radius-sm);
             overflow: hidden;
             font-size: 0.9rem;
@@ -303,7 +407,14 @@
             font-weight: 600;
             font-size: 0.85rem;
         }
-        [data-theme="hacker"] .data-table th { background: rgba(0,255,65,0.1); color: #00ff41; }
+        [data-theme="hacker"] .data-table th {
+            background: rgba(0,255,65,0.1);
+            color: #00ff41;
+            border-color: rgba(0,255,65,0.3);
+        }
+        [data-theme="hacker"] .data-table td {
+            border-color: rgba(0,255,65,0.3);
+        }
         .data-table input, .data-table select {
             width: 100%;
             padding: 6px 8px;
@@ -315,10 +426,16 @@
             font-size: 0.85rem;
         }
         .data-table select option { background: #1e293b; color: #fff; }
+        [data-theme="hacker"] .data-table input,
+        [data-theme="hacker"] .data-table select {
+            background: #000;
+            color: #00ff41;
+            border-color: #00ff41;
+        }
 
         /* Кнопки */
         .btn {
-            padding: 10px 20px;
+            padding: 10px 22px;
             border: none;
             border-radius: 40px;
             font-weight: 600;
@@ -330,23 +447,58 @@
             align-items: center;
             gap: 8px;
         }
-        .btn-primary { background: linear-gradient(135deg, var(--purple), var(--purple-dark)); color: #fff; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(124,58,237,0.4); }
-        .btn-success { background: var(--green); color: #fff; }
-        .btn-success:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(16,185,129,0.4); }
-        .btn-outline { background: transparent; border: 2px solid var(--glass-border); color: var(--text-primary); }
-        .btn-outline:hover { border-color: var(--purple); background: rgba(124,58,237,0.05); }
-        .btn-danger { background: var(--red); color: #fff; }
+        .btn:hover { transform: translateY(-2px); }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--purple), var(--purple-dark));
+            color: #fff;
+        }
+        .btn-primary:hover { box-shadow: 0 6px 20px rgba(124,58,237,0.4); }
+        .btn-success {
+            background: var(--green);
+            color: #fff;
+        }
+        .btn-success:hover { box-shadow: 0 6px 20px rgba(16,185,129,0.4); }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--glass-border);
+            color: var(--text-primary);
+        }
+        .btn-outline:hover {
+            border-color: var(--purple);
+            background: rgba(124,58,237,0.05);
+        }
+        .btn-danger {
+            background: var(--red);
+            color: #fff;
+        }
+        .btn-danger:hover { box-shadow: 0 6px 20px rgba(239,68,68,0.4); }
+        [data-theme="hacker"] .btn-primary {
+            background: #00ff41;
+            color: #000;
+            box-shadow: 0 0 20px #00ff41;
+        }
+        [data-theme="hacker"] .btn-outline {
+            border-color: #00ff41;
+            color: #00ff41;
+        }
 
         /* Формы */
         .form-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
             gap: 14px;
-            margin: 12px 0;
+            margin: 14px 0;
         }
-        .form-field { display: flex; flex-direction: column; gap: 6px; }
-        .form-field label { font-size: 0.85rem; color: var(--text-secondary); font-weight: 500; }
+        .form-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .form-field label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
         .form-field input, .form-field select, .form-field textarea {
             padding: 12px;
             border: 1px solid var(--glass-border);
@@ -355,27 +507,60 @@
             color: var(--text-primary);
             font-family: inherit;
             font-size: 1rem;
+            transition: var(--transition);
         }
-        .form-field textarea { min-height: 80px; resize: vertical; }
+        .form-field input:focus,
+        .form-field select:focus,
+        .form-field textarea:focus {
+            outline: none;
+            border-color: var(--purple);
+            box-shadow: 0 0 0 3px rgba(124,58,237,0.1);
+        }
+        .form-field textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
         .form-field select option { background: #1e293b; color: #fff; }
-        [data-theme="hacker"] .form-field select option { background: #000; color: #00ff41; }
+        [data-theme="hacker"] .form-field input,
+        [data-theme="hacker"] .form-field select,
+        [data-theme="hacker"] .form-field textarea {
+            background: #000;
+            color: #00ff41;
+            border-color: #00ff41;
+        }
+        [data-theme="hacker"] .form-field select option {
+            background: #000;
+            color: #00ff41;
+        }
 
         /* Список детей */
         .child-list {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 14px;
-            margin: 12px 0;
+            margin: 14px 0;
         }
         .child-card {
-            background: rgba(255,255,255,0.03);
+            background: rgba(255,255,255,0.04);
             border: 1px solid var(--glass-border);
             border-radius: var(--radius-sm);
             padding: 14px;
             position: relative;
         }
-        .child-card .child-name { font-weight: 600; font-size: 1.05rem; margin-bottom: 6px; }
-        .child-card .child-info { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; }
+        [data-theme="hacker"] .child-card {
+            background: rgba(0,20,0,0.6);
+            border-color: #00ff41;
+        }
+        .child-card .child-name {
+            font-weight: 600;
+            font-size: 1.05rem;
+            margin-bottom: 6px;
+        }
+        .child-card .child-info {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
         .badge-group {
             display: inline-block;
             padding: 3px 12px;
@@ -384,15 +569,31 @@
             font-weight: 600;
             margin-top: 6px;
         }
-        .badge-exp { background: rgba(124,58,237,0.2); color: #a78bfa; border: 1px solid rgba(124,58,237,0.3); }
-        .badge-ctrl { background: rgba(16,185,129,0.2); color: #10b981; border: 1px solid rgba(16,185,129,0.3); }
-        .delete-child {
-            position: absolute; top: 8px; right: 8px;
-            background: transparent; border: none;
-            color: var(--text-muted); cursor: pointer;
-            padding: 4px 8px; border-radius: 50%;
+        .badge-exp {
+            background: rgba(124,58,237,0.2);
+            color: #a78bfa;
+            border: 1px solid rgba(124,58,237,0.3);
         }
-        .delete-child:hover { color: var(--red); background: rgba(239,68,68,0.1); }
+        .badge-ctrl {
+            background: rgba(16,185,129,0.2);
+            color: #10b981;
+            border: 1px solid rgba(16,185,129,0.3);
+        }
+        .delete-child {
+            position: absolute;
+            top: 8px; right: 8px;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+        .delete-child:hover {
+            color: var(--red);
+            background: rgba(239,68,68,0.1);
+        }
 
         /* Модальные окна */
         .modal-overlay {
@@ -411,13 +612,26 @@
             background: var(--bg-card);
             border: 1px solid var(--glass-border);
             border-radius: var(--radius);
-            padding: 26px;
-            max-width: 520px;
+            padding: 28px;
+            max-width: 560px;
             width: 100%;
             max-height: 90vh;
             overflow-y: auto;
+            box-shadow: var(--shadow-card);
         }
-        .modal-box h3 { margin-bottom: 14px; color: var(--gold); font-size: 1.3rem; }
+        [data-theme="hacker"] .modal-box {
+            border-color: #00ff41;
+            box-shadow: 0 0 40px rgba(0,255,65,0.3);
+        }
+        .modal-box h3 {
+            margin-bottom: 16px;
+            color: var(--gold);
+            font-size: 1.3rem;
+        }
+        [data-theme="hacker"] .modal-box h3 {
+            color: #00ff41;
+            font-family: 'Share Tech Mono', monospace;
+        }
 
         /* Панель скачивания */
         .download-bar {
@@ -428,10 +642,15 @@
             background: rgba(16,185,129,0.08);
             border: 1px solid rgba(16,185,129,0.2);
             border-radius: var(--radius-sm);
-            margin: 12px 0;
+            margin: 14px 0;
             align-items: center;
         }
-        .download-bar .label { font-weight: 600; color: var(--green); font-size: 0.9rem; margin-right: 8px; }
+        .download-bar .label {
+            font-weight: 600;
+            color: var(--green);
+            font-size: 0.9rem;
+            margin-right: 8px;
+        }
 
         /* Инфо-блоки */
         .info-block {
@@ -439,14 +658,24 @@
             border-left: 4px solid var(--gold);
             border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
             padding: 14px 18px;
-            margin: 12px 0;
+            margin: 14px 0;
         }
-        .info-block h4 { color: var(--gold); margin-bottom: 6px; font-size: 1rem; }
-        .info-block p, .info-block li { color: var(--text-secondary); font-size: 0.9rem; }
-        .info-block.success { background: rgba(16,185,129,0.1); border-left-color: var(--green); }
+        .info-block h4 {
+            color: var(--gold);
+            margin-bottom: 6px;
+            font-size: 1rem;
+        }
+        .info-block p, .info-block li {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        .info-block.success {
+            background: rgba(16,185,129,0.1);
+            border-left-color: var(--green);
+        }
         .info-block.success h4 { color: var(--green); }
 
-        /* Фоновые декорации тем (SVG/div) */
+        /* Фоновые декорации тем */
         .sakura-deco, .cosmos-deco, .hacker-deco {
             position: fixed;
             inset: 0;
@@ -460,30 +689,60 @@
         [data-theme="hacker"] .hacker-deco { display: block; }
 
         .sakura-deco .sky {
-            position: absolute; inset: 0;
+            position: absolute;
+            inset: 0;
             background: linear-gradient(180deg, #fce7f3 0%, #fbcfe8 25%, #fde68a 60%, #fecaca 100%);
             opacity: 0.5;
         }
         .sakura-deco .fuji {
-            position: absolute; bottom: 0; left: 0;
+            position: absolute;
+            bottom: 0; left: 0;
             width: 100%; height: 40%;
             background: linear-gradient(180deg, transparent 0%, rgba(190,24,93,0.15) 100%);
             clip-path: polygon(0 100%, 25% 40%, 45% 20%, 50% 15%, 55% 20%, 75% 40%, 100% 100%);
         }
-
         .cosmos-deco .nebula {
-            position: absolute; border-radius: 50%;
-            filter: blur(80px); opacity: 0.3;
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
         }
-        .cosmos-deco .nebula.n1 { top: 10%; left: 5%; width: 400px; height: 300px; background: radial-gradient(circle, #8b5cf6, transparent); }
-        .cosmos-deco .nebula.n2 { bottom: 10%; right: 5%; width: 500px; height: 400px; background: radial-gradient(circle, #ec4899, transparent); }
-
+        .cosmos-deco .nebula.n1 {
+            top: 10%; left: 5%;
+            width: 400px; height: 300px;
+            background: radial-gradient(circle, #8b5cf6, transparent);
+        }
+        .cosmos-deco .nebula.n2 {
+            bottom: 10%; right: 5%;
+            width: 500px; height: 400px;
+            background: radial-gradient(circle, #ec4899, transparent);
+        }
         .hacker-deco .grid-bg {
-            position: absolute; inset: 0;
+            position: absolute;
+            inset: 0;
             background-image:
                 linear-gradient(rgba(0,255,65,0.05) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(0,255,65,0.05) 1px, transparent 1px);
             background-size: 40px 40px;
+            animation: gridScroll 20s linear infinite;
+        }
+        @keyframes gridScroll {
+            0% { background-position: 0 0; }
+            100% { background-position: 40px 40px; }
+        }
+        .hacker-deco .scanline {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #00ff41, transparent);
+            box-shadow: 0 0 20px #00ff41;
+            animation: scanMove 8s linear infinite;
+            opacity: 0.5;
+        }
+        @keyframes scanMove {
+            0% { top: 0; }
+            100% { top: 100%; }
         }
 
         /* Мобильная адаптация */
@@ -501,18 +760,34 @@
                 flex-wrap: nowrap;
                 justify-content: center;
                 scrollbar-width: none;
+                -ms-overflow-style: none;
             }
             .research-nav::-webkit-scrollbar { display: none; }
-            .research-nav button { padding: 6px 12px; font-size: 0.75rem; flex-shrink: 0; }
+            .research-nav button {
+                padding: 6px 12px;
+                font-size: 0.75rem;
+                flex-shrink: 0;
+            }
             .research-nav button span { display: none; }
             .research-nav button i { font-size: 1.1rem; }
             .form-grid { grid-template-columns: 1fr; }
             .child-list { grid-template-columns: 1fr; }
-            .settings-gear { bottom: 15px; right: 15px; width: 50px; height: 50px; }
+            .settings-gear {
+                bottom: 15px; right: 15px;
+                width: 50px; height: 50px;
+            }
             .settings-gear i { font-size: 1.4rem; }
-            .settings-panel { bottom: 75px; right: 15px; width: calc(100vw - 30px); padding: 20px; }
-            .download-bar { flex-direction: column; align-items: stretch; }
+            .settings-panel {
+                bottom: 75px; right: 15px;
+                width: calc(100vw - 30px);
+                padding: 20px;
+            }
+            .download-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
             .download-bar .label { margin-bottom: 6px; }
+            .modal-box { padding: 20px; }
         }
 
         @media (max-width: 480px) {
@@ -525,7 +800,7 @@
 
 <canvas id="bg-canvas"></canvas>
 
-<!-- Декорации тем -->
+<!-- Фоновые декорации тем -->
 <div class="sakura-deco">
     <div class="sky"></div>
     <div class="fuji"></div>
@@ -536,6 +811,7 @@
 </div>
 <div class="hacker-deco">
     <div class="grid-bg"></div>
+    <div class="scanline"></div>
 </div>
 
 <div class="container-wrap">
@@ -543,7 +819,7 @@
     <!-- Шапка -->
     <div class="header">
         <h1><i class="fas fa-flask"></i> Исследование эффективности</h1>
-        <p>Сбор данных о детях с дислалией (5–15 лет). Данные сохраняются локально.</p>
+        <p>Сбор данных о детях с дислалией (5–15 лет). Данные сохраняются локально в браузере.</p>
     </div>
 
     <!-- Навигация -->
@@ -566,38 +842,52 @@
         <button data-section="feedback" onclick="switchSection('feedback', this)">
             <i class="fas fa-comment-dots"></i> <span>Отзыв</span>
         </button>
+        <button data-section="instructions" onclick="switchSection('instructions', this)">
+            <i class="fas fa-question-circle"></i> <span>Инструкция</span>
+        </button>
     </div>
 
-    <div class="container">
+    <div>
 
-        <!-- Что нужно -->
+        <!-- ============ Что нужно ============ -->
         <div id="intro" class="section active">
             <div class="card">
                 <h2><i class="fas fa-info-circle"></i> Что нужно от логопеда</h2>
-                <p>Помоги, пожалуйста, собрать данные для исследования. Возраст детей — от 5 до 15 лет.</p>
-                <h3 style="margin:14px 0 8px;">📋 Обязательные данные:</h3>
+                <p>Привет! Помоги, пожалуйста, собрать данные для исследования. Возраст детей — от 5 до 15 лет. Мне нужно доказать, что игра реально помогает детям с дислалией.</p>
+
+                <h3>📋 Обязательные данные:</h3>
                 <ul>
-                    <li><strong>ФИО и возраст</strong> (5–15 лет)</li>
-                    <li><strong>Класс/группа</strong></li>
-                    <li><strong>Логопедическое заключение</strong></li>
-                    <li><strong>Нарушенные звуки</strong></li>
-                    <li><strong>Этап коррекции</strong></li>
-                    <li><strong>Группа</strong> — экспериментальная или контрольная</li>
+                    <li><strong>ФИО и возраст</strong> каждого ребёнка (5–15 лет)</li>
+                    <li><strong>Класс / группа</strong></li>
+                    <li><strong>Логопедическое заключение</strong> (форма дислалии)</li>
+                    <li><strong>Нарушенные звуки</strong> (какие не получаются)</li>
+                    <li><strong>Этап коррекции</strong> (постановка / слоги / слова / фразы / речь)</li>
+                    <li><strong>Группа исследования</strong> — экспериментальная или контрольная</li>
                     <li><strong>Результаты входной и итоговой диагностики</strong></li>
-                    <li><strong>Протокол каждого занятия</strong> с длительностью (20/30/60 мин)</li>
-                    <li><strong>Ссылки на видео</strong> (если есть)</li>
+                    <li><strong>Протокол каждого занятия</strong> с длительностью (20 / 30 / 60 мин)</li>
+                    <li><strong>Ссылки на видео</strong> — если есть</li>
                 </ul>
+
                 <div class="info-block">
-                    <h4><i class="fas fa-lightbulb"></i> Как работает</h4>
-                    <p>В каждом разделе есть кнопки скачивания (CSV, TXT). Имя файла содержит дату и время. В разделе «Итоги» — «Скачать всё» одним файлом.</p>
+                    <h4><i class="fas fa-lightbulb"></i> Как это работает</h4>
+                    <p>Все данные вводятся на этом мини-сайте. В каждом разделе есть кнопки скачивания (CSV, TXT). Имя файла содержит дату и время. В разделе «Итоги» — кнопка «Скачать всё» одним файлом.</p>
                 </div>
+
+                <h3>🎯 Что мы хотим доказать:</h3>
+                <ul>
+                    <li>Дети в экспериментальной группе быстрее автоматизируют звуки</li>
+                    <li>Игровая форма повышает мотивацию</li>
+                    <li>Дети охотнее выполняют задания</li>
+                    <li>Игра — реальный инструмент, а не пустышка</li>
+                </ul>
             </div>
         </div>
 
-        <!-- Дети -->
+        <!-- ============ Дети ============ -->
         <div id="children" class="section">
             <div class="card">
                 <h2><i class="fas fa-users"></i> Список детей</h2>
+                <p>Добавь детей, участвующих в исследовании.</p>
                 <button class="btn btn-primary" onclick="openChildForm()">
                     <i class="fas fa-plus"></i> Добавить ребёнка
                 </button>
@@ -616,30 +906,30 @@
             </div>
         </div>
 
-        <!-- Диагностика -->
+        <!-- ============ Диагностика ============ -->
         <div id="diagnostics" class="section">
             <div class="card">
                 <h2><i class="fas fa-clipboard-check"></i> Диагностика «до» и «после»</h2>
 
                 <div class="info-block">
                     <h4><i class="fas fa-lightbulb"></i> Что это значит?</h4>
-                    <p><strong>«До»</strong> — состояние ребёнка <u>до начала занятий</u>.</p>
-                    <p><strong>«После»</strong> — после курса занятий (8–10 занятий).</p>
+                    <p><strong>«До»</strong> — состояние ребёнка <u>до начала занятий с игрой</u>. Заполняется, когда ребёнок только начинает участвовать.</p>
+                    <p><strong>«После»</strong> — состояние <u>после курса занятий</u> (8–10 занятий). Заполняется в конце исследования.</p>
                     <p>Сравнивая данные, мы увидим улучшение звукопроизношения.</p>
                 </div>
 
                 <div style="display:flex; gap:12px; flex-wrap:wrap; margin:12px 0;">
-                    <label style="display:flex; align-items:center; gap:8px; color:var(--text-secondary);">
+                    <label style="display:flex; align-items:center; gap:8px; color:var(--text-secondary); font-size:0.9rem;">
                         <i class="fas fa-filter"></i> Группа:
-                        <select id="diagFilter" onchange="renderDiagnosticsTable()" style="padding:8px 12px; border-radius:8px; background:rgba(0,0,0,0.2); color:var(--text-primary); border:1px solid var(--glass-border); font-family:inherit;">
+                        <select id="diagFilter" onchange="renderDiagnosticsTable()" style="padding:8px 12px; border-radius:8px; background:rgba(0,0,0,0.2); color:var(--text-primary); border:1px solid var(--glass-border); font-family:inherit; cursor:pointer;">
                             <option value="all">Все</option>
                             <option value="exp">Экспериментальная</option>
                             <option value="ctrl">Контрольная</option>
                         </select>
                     </label>
-                    <label style="display:flex; align-items:center; gap:8px; color:var(--text-secondary);">
-                        <i class="fas fa-cake"></i> Возраст:
-                        <select id="ageFilter" onchange="renderDiagnosticsTable()" style="padding:8px 12px; border-radius:8px; background:rgba(0,0,0,0.2); color:var(--text-primary); border:1px solid var(--glass-border); font-family:inherit;">
+                    <label style="display:flex; align-items:center; gap:8px; color:var(--text-secondary); font-size:0.9rem;">
+                        <i class="fas fa-birthday-cake"></i> Возраст:
+                        <select id="ageFilter" onchange="renderDiagnosticsTable()" style="padding:8px 12px; border-radius:8px; background:rgba(0,0,0,0.2); color:var(--text-primary); border:1px solid var(--glass-border); font-family:inherit; cursor:pointer;">
                             <option value="all">Все</option>
                         </select>
                     </label>
@@ -676,10 +966,11 @@
             </div>
         </div>
 
-        <!-- Протоколы -->
+        <!-- ============ Протоколы ============ -->
         <div id="protocols" class="section">
             <div class="card">
                 <h2><i class="fas fa-file-medical"></i> Протоколы занятий</h2>
+                <p>Заполняется после каждого занятия с ребёнком из экспериментальной группы.</p>
                 <button class="btn btn-primary" onclick="openProtocolForm()">
                     <i class="fas fa-plus"></i> Добавить протокол
                 </button>
@@ -698,8 +989,1121 @@
             </div>
         </div>
 
-        <!-- Итоги -->
+        <!-- ============ Итоги ============ -->
         <div id="summary" class="section">
             <div class="card">
-                <h2><i class="fas fa-chart-bar"></i> Итоги</h2>
-                <div id="summaryStats" style="margin:16
+                <h2><i class="fas fa-chart-bar"></i> Итоги исследования</h2>
+                <div id="summaryStats" style="margin:16px 0;"></div>
+            </div>
+
+            <div class="card" style="text-align:center; background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(124,58,237,0.1)); border: 2px solid rgba(16,185,129,0.3);">
+                <h3 style="color:var(--green); margin-bottom:14px; font-size:1.3rem;">
+                    <i class="fas fa-save"></i> Скачать ВСЕ данные
+                </h3>
+                <p style="color:var(--text-secondary); margin-bottom:16px;">
+                    Один файл со всеми разделами: дети, диагностика, протоколы, отзыв.
+                </p>
+                <button class="btn btn-success" onclick="saveAllData()">
+                    <i class="fas fa-download"></i> Скачать всё (.json)
+                </button>
+                <button class="btn btn-outline" onclick="saveAllDataCSV()">
+                    <i class="fas fa-file-csv"></i> Скачать всё (CSV)
+                </button>
+            </div>
+        </div>
+
+        <!-- ============ Отзыв ============ -->
+        <div id="feedback" class="section">
+            <div class="card">
+                <h2><i class="fas fa-comment-dots"></i> Отзыв логопеда</h2>
+                <p>Заполняется после курса занятий. После нажатия «Сохранить» скачивается TXT-файл и поля очищаются.</p>
+
+                <div class="form-grid">
+                    <div class="form-field">
+                        <label>Считаете ли игру эффективной?</label>
+                        <select id="fbEffective">
+                            <option value="yes">Да</option>
+                            <option value="no">Нет</option>
+                            <option value="unsure">Затрудняюсь ответить</option>
+                        </select>
+                    </div>
+                    <div class="form-field">
+                        <label>Оценка удобства (1-5)</label>
+                        <input type="number" id="fbConvenience" min="1" max="5" value="5">
+                    </div>
+                    <div class="form-field">
+                        <label>Рекомендовали бы коллегам?</label>
+                        <select id="fbRecommend">
+                            <option value="yes">Да</option>
+                            <option value="no">Нет</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-field" style="margin-top:14px;">
+                    <label>Каких заданий не хватает?</label>
+                    <textarea id="fbMissing" placeholder="Например, больше заданий на звук Р..."></textarea>
+                </div>
+                <div class="form-field" style="margin-top:14px;">
+                    <label>Что улучшить в интерфейсе?</label>
+                    <textarea id="fbImprove" placeholder="Например, крупнее карта на телефоне..."></textarea>
+                </div>
+                <div class="form-field" style="margin-top:14px;">
+                    <label>Трудности в работе с игрой</label>
+                    <textarea id="fbDifficulties" placeholder="Что было неудобно..."></textarea>
+                </div>
+
+                <div style="display:flex; gap:10px; margin-top:16px; flex-wrap:wrap;">
+                    <button class="btn btn-success" onclick="saveFeedback()">
+                        <i class="fas fa-save"></i> Сохранить (скачать TXT)
+                    </button>
+                    <button class="btn btn-outline" onclick="exportFeedbackCSV()">
+                        <i class="fas fa-file-csv"></i> CSV
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ Инструкция ============ -->
+        <div id="instructions" class="section">
+            <div class="card">
+                <h2><i class="fas fa-question-circle"></i> Как пользоваться сайтом</h2>
+
+                <h3>1. Что нужно</h3>
+                <p>Список того, что требуется от логопеда для исследования.</p>
+
+                <h3>2. Дети</h3>
+                <p>Нажмите «Добавить ребёнка», укажите ФИО, возраст (5–15), группу (экспериментальная или контрольная).</p>
+
+                <h3>3. Диагностика</h3>
+                <p>Заполните «до» и «после» для каждого ребёнка. Используйте фильтры по группе и возрасту.</p>
+
+                <h3>4. Протоколы</h3>
+                <p>После каждого занятия добавляйте протокол. Указывайте длительность (20/30/60 мин), количество выполненных заданий, настроение.</p>
+
+                <h3>5. Итоги</h3>
+                <p>Автоматический анализ данных. Кнопка «Скачать всё» собирает все разделы в один файл.</p>
+
+                <h3>6. Отзыв</h3>
+                <p>После курса заполните анкету. Нажмите «Сохранить (скачать TXT)» — данные попадут в общий файл, а поля очистятся.</p>
+
+                <div class="info-block success">
+                    <h4><i class="fas fa-save"></i> Где сохраняются данные?</h4>
+                    <p>Все данные сохраняются локально в браузере (localStorage). Они не отправляются в интернет.</p>
+                    <p><strong>Важно:</strong> в конце работы нажмите <strong>«Скачать всё»</strong> в разделе «Итоги» и отправьте файл разработчику. Если очистить кэш — данные удалятся.</p>
+                </div>
+
+                <div class="info-block">
+                    <h4><i class="fas fa-palette"></i> Настройки</h4>
+                    <p>Шестерёнка в правом нижнем углу открывает выбор темы (6 тем: игровая, официальная, для пожилых, сакура, космос, хакер) и языка (русский, английский, китайский).</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ========================================================
+     МОДАЛКА: Добавить ребёнка
+     ======================================================== -->
+<div class="modal-overlay" id="childModal">
+    <div class="modal-box">
+        <h3><i class="fas fa-user-plus"></i> Добавить ребёнка</h3>
+        <div class="form-grid">
+            <div class="form-field">
+                <label>ФИО ребёнка</label>
+                <input type="text" id="childName" placeholder="Иванов Иван">
+            </div>
+            <div class="form-field">
+                <label>Возраст (5-15 лет)</label>
+                <input type="number" id="childAge" min="5" max="15" value="6">
+            </div>
+            <div class="form-field">
+                <label>Класс / группа</label>
+                <input type="text" id="childGroup" placeholder="Подготовительная группа №3">
+            </div>
+            <div class="form-field">
+                <label>Группа исследования</label>
+                <select id="childResearchGroup">
+                    <option value="exp">Экспериментальная (играет)</option>
+                    <option value="ctrl">Контрольная (не играет)</option>
+                </select>
+            </div>
+            <div class="form-field">
+                <label>Логопедическое заключение</label>
+                <input type="text" id="childDiagnosis" placeholder="Дислалия, функциональная, полиморфная">
+            </div>
+            <div class="form-field">
+                <label>Нарушенные звуки</label>
+                <input type="text" id="childSounds" placeholder="С, Ш, Р, Л">
+            </div>
+            <div class="form-field">
+                <label>Текущий этап коррекции</label>
+                <select id="childStage">
+                    <option value="post">Постановка (учимся произносить)</option>
+                    <option value="syll">Автоматизация в слогах (СА, СО, СУ)</option>
+                    <option value="words">Автоматизация в словах (САМ, СОК)</option>
+                    <option value="phrases">Автоматизация во фразах (САМ СКАЗАЛ)</option>
+                    <option value="speech">Автоматизация в речи (в предложениях)</option>
+                </select>
+            </div>
+            <div class="form-field">
+                <label>Мотивация до (1-5)</label>
+                <input type="number" id="childMotivation" min="1" max="5" value="3">
+            </div>
+        </div>
+        <div style="display:flex; gap:10px; margin-top:18px;">
+            <button class="btn btn-success" onclick="saveChild()">
+                <i class="fas fa-check"></i> Сохранить
+            </button>
+            <button class="btn btn-outline" onclick="closeModal('childModal')">
+                <i class="fas fa-times"></i> Отмена
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================================
+     МОДАЛКА: Протокол занятия
+     ======================================================== -->
+<div class="modal-overlay" id="protocolModal">
+    <div class="modal-box">
+        <h3><i class="fas fa-file-medical"></i> Новый протокол занятия</h3>
+        <div class="form-grid">
+            <div class="form-field">
+                <label>ФИО ребёнка</label>
+                <select id="protocolChild"></select>
+            </div>
+            <div class="form-field">
+                <label>Дата занятия</label>
+                <input type="date" id="protocolDate">
+            </div>
+            <div class="form-field">
+                <label>Длительность занятия</label>
+                <select id="protocolDuration">
+                    <option value="20">20 минут</option>
+                    <option value="30">30 минут</option>
+                    <option value="60">1 час</option>
+                </select>
+            </div>
+            <div class="form-field">
+                <label>Количество ходов</label>
+                <input type="number" id="protocolMoves" min="1" value="10">
+            </div>
+            <div class="form-field">
+                <label>Выполнено полностью</label>
+                <input type="number" id="protocolComplete" min="0" value="0">
+            </div>
+            <div class="form-field">
+                <label>Выполнено частично</label>
+                <input type="number" id="protocolPartial" min="0" value="0">
+            </div>
+            <div class="form-field">
+                <label>Не выполнено</label>
+                <input type="number" id="protocolFailed" min="0" value="0">
+            </div>
+            <div class="form-field">
+                <label>Настроение ребёнка</label>
+                <select id="protocolMood">
+                    <option value="happy">😊 Радостное</option>
+                    <option value="neutral">😐 Нейтральное</option>
+                    <option value="sad">😢 Грустное</option>
+                </select>
+            </div>
+            <div class="form-field">
+                <label>Вовлечённость</label>
+                <select id="protocolEngagement">
+                    <option value="high">Высокая</option>
+                    <option value="medium">Средняя</option>
+                    <option value="low">Низкая</option>
+                </select>
+            </div>
+            <div class="form-field">
+                <label>Какие звуки автоматизировались</label>
+                <input type="text" id="protocolSounds" placeholder="С, Ш">
+            </div>
+            <div class="form-field" style="grid-column: 1 / -1;">
+                <label>Ссылка на видео занятия</label>
+                <input type="url" id="protocolVideo" placeholder="https://drive.google.com/... или YouTube">
+            </div>
+        </div>
+
+        <div class="form-field" style="margin-top:12px;">
+            <label>Замечания логопеда</label>
+            <textarea id="protocolNotes" placeholder="Ребёнок хорошо справился..."></textarea>
+        </div>
+
+        <div style="display:flex; gap:10px; margin-top:18px;">
+            <button class="btn btn-success" onclick="saveProtocol()">
+                <i class="fas fa-check"></i> Сохранить
+            </button>
+            <button class="btn btn-outline" onclick="closeModal('protocolModal')">
+                <i class="fas fa-times"></i> Отмена
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================================
+     ШЕСТЕРЁНКА НАСТРОЕК
+     ======================================================== -->
+<div class="settings-gear" id="settingsGear" onclick="toggleSettings()">
+    <i class="fas fa-cog"></i>
+</div>
+
+<div class="settings-panel" id="settingsPanel">
+    <h4><i class="fas fa-sliders-h"></i> Настройки</h4>
+
+    <label>🎨 Тема</label>
+    <select id="themeSelect" onchange="changeTheme(this.value)">
+        <option value="game">🎮 Игровая</option>
+        <option value="official">📄 Официальная</option>
+        <option value="elderly">👴 Для пожилых</option>
+        <option value="sakura">🌸 Сакура</option>
+        <option value="cosmos">🌌 Космос</option>
+        <option value="hacker">💻 Хакер</option>
+    </select>
+
+    <label>🌍 Язык</label>
+    <select id="langSelect" onchange="changeLanguage(this.value)">
+        <option value="ru">🇷🇺 Русский</option>
+        <option value="en">🇬🇧 English</option>
+        <option value="zh">🇨🇳 中文</option>
+    </select>
+
+    <button class="close-settings" onclick="toggleSettings()">Закрыть</button>
+</div>
+
+<script>
+// ========================================================
+// ХРАНИЛИЩЕ
+// ========================================================
+const STORAGE_KEY = 'research_data_v3';
+
+let data = {
+    children: [],
+    protocols: [],
+    feedback: null
+};
+
+function loadData() {
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) data = JSON.parse(raw);
+    } catch(e) { console.warn('Ошибка загрузки'); }
+    renderAll();
+}
+
+function saveData() {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    } catch(e) { console.warn('Ошибка сохранения'); }
+    renderAll();
+}
+
+// ========================================================
+// УТИЛИТЫ
+// ========================================================
+function fileTimestamp() {
+    const now = new Date();
+    const date = now.toISOString().slice(0,10);
+    const time = `${String(now.getHours()).padStart(2,'0')}-${String(now.getMinutes()).padStart(2,'0')}-${String(now.getSeconds()).padStart(2,'0')}`;
+    return `${date}_${time}`;
+}
+
+const STAGE_LABELS = {
+    post: 'Постановка',
+    syll: 'Автоматизация в слогах',
+    words: 'Автоматизация в словах',
+    phrases: 'Автоматизация во фразах',
+    speech: 'Автоматизация в речи'
+};
+const MOOD_LABELS = { happy: 'Радостное', neutral: 'Нейтральное', sad: 'Грустное' };
+const ENGAGEMENT_LABELS = { high: 'Высокая', medium: 'Средняя', low: 'Низкая' };
+const GROUP_LABELS = { exp: 'Экспериментальная', ctrl: 'Контрольная' };
+
+function downloadFile(filename, content, mime = 'text/plain;charset=utf-8;') {
+    const blob = new Blob([content], { type: mime });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    link.click();
+    URL.revokeObjectURL(link.href);
+}
+
+// ========================================================
+// НАВИГАЦИЯ
+// ========================================================
+function switchSection(id, btn) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    const target = document.getElementById(id);
+    if (target) target.classList.add('active');
+    document.querySelectorAll('.research-nav button').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+}
+
+// ========================================================
+// ДЕТИ
+// ========================================================
+function openChildForm() {
+    document.getElementById('childModal').classList.add('active');
+}
+
+function closeModal(id) {
+    document.getElementById(id).classList.remove('active');
+}
+
+function saveChild() {
+    const name = document.getElementById('childName').value.trim();
+    if (!name) { alert('Введите ФИО ребёнка'); return; }
+    const age = Math.max(5, Math.min(15, parseInt(document.getElementById('childAge').value) || 6));
+    data.children.push({
+        id: Date.now(),
+        name,
+        age,
+        group: document.getElementById('childGroup').value.trim(),
+        researchGroup: document.getElementById('childResearchGroup').value,
+        diagnosis: document.getElementById('childDiagnosis').value.trim(),
+        sounds: document.getElementById('childSounds').value.trim(),
+        stage: document.getElementById('childStage').value,
+        motivation: parseInt(document.getElementById('childMotivation').value) || 3,
+        soundsAfter: '',
+        stageAfter: '',
+        motivationAfter: ''
+    });
+    saveData();
+    closeModal('childModal');
+    document.getElementById('childName').value = '';
+    document.getElementById('childGroup').value = '';
+    document.getElementById('childDiagnosis').value = '';
+    document.getElementById('childSounds').value = '';
+}
+
+function deleteChild(id) {
+    if (!confirm('Удалить ребёнка и все его данные?')) return;
+    data.children = data.children.filter(c => c.id !== id);
+    data.protocols = data.protocols.filter(p => p.childId !== id);
+    saveData();
+}
+
+function renderChildList() {
+    const list = document.getElementById('childList');
+    if (!list) return;
+    if (data.children.length === 0) {
+        list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted);">Нет добавленных детей</div>';
+        return;
+    }
+    list.innerHTML = '';
+    data.children.forEach(child => {
+        const card = document.createElement('div');
+        card.className = 'child-card';
+        card.innerHTML = `
+            <button class="delete-child" onclick="deleteChild(${child.id})" title="Удалить">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="child-name">${child.name}</div>
+            <div class="child-info"><i class="fas fa-birthday-cake"></i> ${child.age} лет</div>
+            <div class="child-info"><i class="fas fa-users"></i> ${child.group || '—'}</div>
+            <div class="child-info"><i class="fas fa-stethoscope"></i> ${child.diagnosis || '—'}</div>
+            <div class="child-info"><i class="fas fa-volume-up"></i> Звуки: ${child.sounds || '—'}</div>
+            <div class="child-info"><i class="fas fa-tasks"></i> Этап: ${STAGE_LABELS[child.stage] || '—'}</div>
+            <div class="badge-group ${child.researchGroup === 'exp' ? 'badge-exp' : 'badge-ctrl'}">
+                ${GROUP_LABELS[child.researchGroup]}
+            </div>
+        `;
+        list.appendChild(card);
+    });
+}
+
+function exportChildren() {
+    if (data.children.length === 0) { alert('Нет данных'); return; }
+    const rows = [['ФИО', 'Возраст', 'Класс/группа', 'Группа исследования', 'Диагноз', 'Нарушенные звуки', 'Этап', 'Мотивация до']];
+    data.children.forEach(c => {
+        rows.push([c.name, c.age, c.group, GROUP_LABELS[c.researchGroup], c.diagnosis, c.sounds, STAGE_LABELS[c.stage], c.motivation]);
+    });
+    let csv = '\uFEFF';
+    rows.forEach(r => csv += r.map(c => `"${String(c||'').replace(/"/g,'""')}"`).join(',') + '\n');
+    downloadFile(`дети_${fileTimestamp()}.csv`, csv, 'text/csv;charset=utf-8;');
+}
+
+function exportChildrenTXT() {
+    if (data.children.length === 0) { alert('Нет данных'); return; }
+    const lines = ['===========================================', '  СПИСОК ДЕТЕЙ — ИССЛЕДОВАНИЕ', '===========================================', `Дата: ${new Date().toLocaleString('ru-RU')}`, ''];
+    data.children.forEach((c, i) => {
+        lines.push(`--- Ребёнок #${i+1} ---`);
+        lines.push(`ФИО: ${c.name}`);
+        lines.push(`Возраст: ${c.age} лет`);
+        lines.push(`Класс/группа: ${c.group || '—'}`);
+        lines.push(`Группа исследования: ${GROUP_LABELS[c.researchGroup]}`);
+        lines.push(`Диагноз: ${c.diagnosis || '—'}`);
+        lines.push(`Нарушенные звуки: ${c.sounds || '—'}`);
+        lines.push(`Этап коррекции: ${STAGE_LABELS[c.stage] || '—'}`);
+        lines.push(`Мотивация до: ${c.motivation}`);
+        lines.push('');
+    });
+    downloadFile(`дети_${fileTimestamp()}.txt`, lines.join('\n'));
+}
+
+// ========================================================
+// ДИАГНОСТИКА
+// ========================================================
+function renderAgeFilter() {
+    const sel = document.getElementById('ageFilter');
+    if (!sel) return;
+    const ages = [...new Set(data.children.map(c => c.age))].sort((a,b) => a-b);
+    const current = sel.value;
+    sel.innerHTML = '<option value="all">Все</option>';
+    ages.forEach(a => {
+        const opt = document.createElement('option');
+        opt.value = a;
+        opt.textContent = `${a} лет`;
+        if (String(a) === current) opt.selected = true;
+        sel.appendChild(opt);
+    });
+}
+
+function renderDiagnosticsTable() {
+    const tbody = document.getElementById('diagnosticsBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    const groupFilter = document.getElementById('diagFilter')?.value || 'all';
+    const ageFilter = document.getElementById('ageFilter')?.value || 'all';
+
+    const filtered = data.children.filter(c => {
+        if (groupFilter !== 'all' && c.researchGroup !== groupFilter) return false;
+        if (ageFilter !== 'all' && String(c.age) !== ageFilter) return false;
+        return true;
+    });
+
+    if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--text-muted);">Нет данных</td></tr>';
+        return;
+    }
+
+    filtered.forEach(child => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${child.name}</td>
+            <td>${child.age}</td>
+            <td><span class="badge-group ${child.researchGroup === 'exp' ? 'badge-exp' : 'badge-ctrl'}">${child.researchGroup === 'exp' ? 'Эксп.' : 'Контр.'}</span></td>
+            <td>${child.sounds || '—'}</td>
+            <td>${STAGE_LABELS[child.stage] || '—'}</td>
+            <td><input type="text" data-child="${child.id}" data-field="soundsAfter" value="${child.soundsAfter || ''}" placeholder="Введите"></td>
+            <td>
+                <select data-child="${child.id}" data-field="stageAfter">
+                    <option value="">—</option>
+                    ${Object.entries(STAGE_LABELS).map(([k,v]) => `<option value="${k}" ${child.stageAfter === k ? 'selected' : ''}>${v}</option>`).join('')}
+                </select>
+            </td>
+            <td>${child.motivation}</td>
+            <td><input type="number" min="1" max="5" data-child="${child.id}" data-field="motivationAfter" value="${child.motivationAfter || ''}" placeholder="1-5" style="width:60px;"></td>
+        `;
+        tbody.appendChild(tr);
+    });
+
+    tbody.querySelectorAll('input, select').forEach(el => {
+        el.addEventListener('change', function() {
+            const childId = parseInt(this.dataset.child);
+            const field = this.dataset.field;
+            const child = data.children.find(c => c.id === childId);
+            if (child) {
+                child[field] = this.value;
+                saveData();
+            }
+        });
+    });
+}
+
+function exportDiagnostics() {
+    if (data.children.length === 0) { alert('Нет данных'); return; }
+    const rows = [['ФИО', 'Возраст', 'Группа', 'Звуки ДО', 'Этап ДО', 'Звуки ПОСЛЕ', 'Этап ПОСЛЕ', 'Мотивация ДО', 'Мотивация ПОСЛЕ']];
+    data.children.forEach(c => {
+        rows.push([
+            c.name, c.age, GROUP_LABELS[c.researchGroup],
+            c.sounds, STAGE_LABELS[c.stage],
+            c.soundsAfter || '', STAGE_LABELS[c.stageAfter] || '',
+            c.motivation, c.motivationAfter || ''
+        ]);
+    });
+    let csv = '\uFEFF';
+    rows.forEach(r => csv += r.map(c => `"${String(c||'').replace(/"/g,'""')}"`).join(',') + '\n');
+    downloadFile(`диагностика_${fileTimestamp()}.csv`, csv, 'text/csv;charset=utf-8;');
+}
+
+function exportDiagnosticsTXT() {
+    if (data.children.length === 0) { alert('Нет данных'); return; }
+    const lines = ['===========================================', '  ДИАГНОСТИКА', '===========================================', `Дата: ${new Date().toLocaleString('ru-RU')}`, ''];
+    data.children.forEach(c => {
+        lines.push(`--- ${c.name} (${c.age} лет) ---`);
+        lines.push(`Группа: ${GROUP_LABELS[c.researchGroup]}`);
+        lines.push(`Звуки ДО: ${c.sounds || '—'}`);
+        lines.push(`Этап ДО: ${STAGE_LABELS[c.stage] || '—'}`);
+        lines.push(`Звуки ПОСЛЕ: ${c.soundsAfter || '—'}`);
+        lines.push(`Этап ПОСЛЕ: ${STAGE_LABELS[c.stageAfter] || '—'}`);
+        lines.push(`Мотивация ДО: ${c.motivation}`);
+        lines.push(`Мотивация ПОСЛЕ: ${c.motivationAfter || '—'}`);
+        lines.push('');
+    });
+    downloadFile(`диагностика_${fileTimestamp()}.txt`, lines.join('\n'));
+}
+
+// ========================================================
+// ПРОТОКОЛЫ
+// ========================================================
+function openProtocolForm() {
+    if (data.children.length === 0) {
+        alert('Сначала добавьте детей');
+        return;
+    }
+    const sel = document.getElementById('protocolChild');
+    sel.innerHTML = '';
+    const expChildren = data.children.filter(c => c.researchGroup === 'exp');
+    if (expChildren.length === 0) {
+        alert('Нет детей в экспериментальной группе');
+        return;
+    }
+    expChildren.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.id;
+        opt.textContent = `${c.name} (${c.age} лет)`;
+        sel.appendChild(opt);
+    });
+    document.getElementById('protocolDate').value = new Date().toISOString().slice(0,10);
+    document.getElementById('protocolModal').classList.add('active');
+}
+
+function saveProtocol() {
+    const childId = parseInt(document.getElementById('protocolChild').value);
+    if (!childId) { alert('Выберите ребёнка'); return; }
+    data.protocols.push({
+        id: Date.now(),
+        childId,
+        date: document.getElementById('protocolDate').value,
+        duration: parseInt(document.getElementById('protocolDuration').value),
+        moves: parseInt(document.getElementById('protocolMoves').value),
+        complete: parseInt(document.getElementById('protocolComplete').value),
+        partial: parseInt(document.getElementById('protocolPartial').value),
+        failed: parseInt(document.getElementById('protocolFailed').value),
+        mood: document.getElementById('protocolMood').value,
+        engagement: document.getElementById('protocolEngagement').value,
+        sounds: document.getElementById('protocolSounds').value.trim(),
+        video: document.getElementById('protocolVideo').value.trim(),
+        notes: document.getElementById('protocolNotes').value.trim()
+    });
+    saveData();
+    closeModal('protocolModal');
+    document.getElementById('protocolComplete').value = 0;
+    document.getElementById('protocolPartial').value = 0;
+    document.getElementById('protocolFailed').value = 0;
+    document.getElementById('protocolVideo').value = '';
+    document.getElementById('protocolNotes').value = '';
+}
+
+function deleteProtocol(id) {
+    if (!confirm('Удалить протокол?')) return;
+    data.protocols = data.protocols.filter(p => p.id !== id);
+    saveData();
+}
+
+function toggleMonth(key) {
+    const el = document.getElementById('month-' + key);
+    if (el) el.classList.toggle('collapsed');
+}
+
+function renderProtocolList() {
+    const list = document.getElementById('protocolList');
+    if (!list) return;
+    if (data.protocols.length === 0) {
+        list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted);">Нет протоколов</div>';
+        return;
+    }
+
+    const grouped = {};
+    data.protocols.forEach(p => {
+        const key = p.date ? p.date.slice(0, 7) : 'unknown';
+        if (!grouped[key]) grouped[key] = [];
+        grouped[key].push(p);
+    });
+
+    const months = Object.keys(grouped).sort((a,b) => b.localeCompare(a));
+    const monthNames = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+
+    list.innerHTML = '';
+    months.forEach(key => {
+        const prots = grouped[key].sort((a,b) => b.date.localeCompare(a.date));
+        let title = 'Без даты';
+        if (key !== 'unknown') {
+            const [y, m] = key.split('-');
+            title = `${monthNames[parseInt(m)-1]} ${y}`;
+        }
+
+        const div = document.createElement('div');
+        div.id = 'month-' + key;
+        div.className = 'month-group';
+        div.style.cssText = 'background:rgba(255,255,255,0.03);border:1px solid var(--glass-border);border-radius:12px;margin-bottom:12px;overflow:hidden;';
+
+        div.innerHTML = `
+            <div onclick="toggleMonth('${key}')" style="display:flex;justify-content:space-between;align-items:center;padding:14px 18px;cursor:pointer;background:rgba(124,58,237,0.1);user-select:none;">
+                <div style="font-weight:600;display:flex;align-items:center;gap:10px;">
+                    <i class="fas fa-calendar-alt"></i> ${title}
+                    <span style="background:rgba(124,58,237,0.3);color:#fff;padding:2px 10px;border-radius:30px;font-size:0.8rem;">${prots.length}</span>
+                </div>
+                <i class="fas fa-chevron-down" style="transition:0.3s;"></i>
+            </div>
+            <div style="padding:12px 18px;display:flex;flex-direction:column;gap:8px;">
+                ${prots.map(p => {
+                    const child = data.children.find(c => c.id === p.childId);
+                    const name = child ? `${child.name} (${child.age} лет)` : '—';
+                    const moodIcon = {happy:'😊',neutral:'😐',sad:'😢'}[p.mood] || '';
+                    return `
+                        <div class="child-card" style="margin:0;">
+                            <button class="delete-child" onclick="deleteProtocol(${p.id})" title="Удалить">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            <div class="child-name">${name} — ${p.date}</div>
+                            <div class="child-info">
+                                <span>⏱ ${p.duration} мин</span> · <span>🎲 ${p.moves} ходов</span> · <span>${moodIcon}</span>
+                            </div>
+                            <div class="child-info" style="margin-top:4px;">
+                                ✅ ${p.complete} | ✏️ ${p.partial} | ❌ ${p.failed}
+                            </div>
+                            <div class="child-info" style="margin-top:4px;">
+                                Вовлечённость: ${ENGAGEMENT_LABELS[p.engagement] || '—'}
+                            </div>
+                            ${p.sounds ? `<div class="child-info" style="margin-top:4px;">🔊 Звуки: ${p.sounds}</div>` : ''}
+                            ${p.video ? `<div style="margin-top:6px;"><a href="${p.video}" target="_blank" style="color:var(--purple);">🎥 Смотреть видео</a></div>` : ''}
+                            ${p.notes ? `<div class="child-info" style="margin-top:6px;font-style:italic;">"${p.notes}"</div>` : ''}
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+        `;
+        list.appendChild(div);
+    });
+}
+
+function exportProtocols() {
+    if (data.protocols.length === 0) { alert('Нет данных'); return; }
+    const rows = [['Дата', 'ФИО', 'Возраст', 'Длительность', 'Ходов', 'Полностью', 'Частично', 'Не выполнено', 'Настроение', 'Вовлечённость', 'Звуки', 'Видео', 'Замечания']];
+    data.protocols.forEach(p => {
+        const child = data.children.find(c => c.id === p.childId);
+        rows.push([
+            p.date,
+            child ? child.name : '',
+            child ? child.age : '',
+            p.duration, p.moves, p.complete, p.partial, p.failed,
+            MOOD_LABELS[p.mood], ENGAGEMENT_LABELS[p.engagement],
+            p.sounds, p.video, p.notes
+        ]);
+    });
+    let csv = '\uFEFF';
+    rows.forEach(r => csv += r.map(c => `"${String(c||'').replace(/"/g,'""')}"`).join(',') + '\n');
+    downloadFile(`протоколы_${fileTimestamp()}.csv`, csv, 'text/csv;charset=utf-8;');
+}
+
+function exportProtocolsTXT() {
+    if (data.protocols.length === 0) { alert('Нет данных'); return; }
+    const lines = ['===========================================', '  ПРОТОКОЛЫ ЗАНЯТИЙ', '===========================================', `Дата: ${new Date().toLocaleString('ru-RU')}`, ''];
+    const sorted = [...data.protocols].sort((a,b) => b.date.localeCompare(a.date));
+    sorted.forEach((p, i) => {
+        const child = data.children.find(c => c.id === p.childId);
+        lines.push(`--- Протокол #${i+1} ---`);
+        lines.push(`Дата: ${p.date}`);
+        lines.push(`Ребёнок: ${child ? `${child.name} (${child.age} лет)` : '—'}`);
+        lines.push(`Длительность: ${p.duration} мин`);
+        lines.push(`Ходов: ${p.moves}`);
+        lines.push(`✅ Полностью: ${p.complete}`);
+        lines.push(`✏️ Частично: ${p.partial}`);
+        lines.push(`❌ Не выполнено: ${p.failed}`);
+        lines.push(`Настроение: ${MOOD_LABELS[p.mood]}`);
+        lines.push(`Вовлечённость: ${ENGAGEMENT_LABELS[p.engagement]}`);
+        lines.push(`Звуки: ${p.sounds || '—'}`);
+        if (p.video) lines.push(`Видео: ${p.video}`);
+        if (p.notes) lines.push(`Замечания: ${p.notes}`);
+        lines.push('');
+    });
+    downloadFile(`протоколы_${fileTimestamp()}.txt`, lines.join('\n'));
+}
+
+// ========================================================
+// ИТОГИ
+// ========================================================
+function renderSummary() {
+    const container = document.getElementById('summaryStats');
+    if (!container) return;
+
+    const total = data.children.length;
+    const exp = data.children.filter(c => c.researchGroup === 'exp').length;
+    const ctrl = data.children.filter(c => c.researchGroup === 'ctrl').length;
+    const protocols = data.protocols.length;
+    const videos = data.protocols.filter(p => p.video).length;
+
+    let avgComplete = 0, avgPartial = 0, avgFailed = 0;
+    if (protocols > 0) {
+        const sum = data.protocols.reduce((acc, p) => {
+            acc.c += p.complete;
+            acc.p += p.partial;
+            acc.f += p.failed;
+            return acc;
+        }, { c: 0, p: 0, f: 0 });
+        avgComplete = (sum.c / protocols).toFixed(1);
+        avgPartial = (sum.p / protocols).toFixed(1);
+        avgFailed = (sum.f / protocols).toFixed(1);
+    }
+
+    container.innerHTML = `
+        <div class="form-grid">
+            <div class="child-card" style="text-align:center;">
+                <div style="font-size:0.85rem; color:var(--text-muted); text-transform:uppercase;">Всего детей</div>
+                <div style="font-size:2.5rem; font-weight:900; color:var(--gold);">${total}</div>
+                <div class="child-info">Эксп: ${exp} | Контр: ${ctrl}</div>
+            </div>
+            <div class="child-card" style="text-align:center;">
+                <div style="font-size:0.85rem; color:var(--text-muted); text-transform:uppercase;">Протоколов</div>
+                <div style="font-size:2.5rem; font-weight:900; color:var(--gold);">${protocols}</div>
+                <div class="child-info">Видео: ${videos}</div>
+            </div>
+            <div class="child-card" style="text-align:center;">
+                <div style="font-size:0.85rem; color:var(--text-muted); text-transform:uppercase;">Средние показатели</div>
+                <div class="child-info" style="margin-top:10px; font-size:0.95rem;">
+                    ✅ Полностью: ${avgComplete}<br>
+                    ✏️ Частично: ${avgPartial}<br>
+                    ❌ Не выполнено: ${avgFailed}
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// ========================================================
+// ОТЗЫВ
+// ========================================================
+function saveFeedback() {
+    const fb = {
+        effective: document.getElementById('fbEffective').value,
+        convenience: document.getElementById('fbConvenience').value,
+        recommend: document.getElementById('fbRecommend').value,
+        missing: document.getElementById('fbMissing').value.trim(),
+        improve: document.getElementById('fbImprove').value.trim(),
+        difficulties: document.getElementById('fbDifficulties').value.trim(),
+        savedAt: new Date().toISOString()
+    };
+
+    const hasContent = fb.missing || fb.improve || fb.difficulties;
+    if (!hasContent) {
+        alert('Заполните хотя бы одно текстовое поле');
+        return;
+    }
+
+    data.feedback = fb;
+    saveData();
+
+    const lines = [
+        '===========================================',
+        '  ОТЗЫВ ЛОГОПЕДА ОБ ИГРЕ «ГОВОРЮ ПРАВИЛЬНО»',
+        '===========================================',
+        `Дата: ${new Date().toLocaleString('ru-RU')}`,
+        '',
+        '--- ОБЩАЯ ОЦЕНКА ---',
+        `Эффективность: ${fb.effective === 'yes' ? 'Да' : fb.effective === 'no' ? 'Нет' : 'Затрудняюсь'}`,
+        `Удобство (1-5): ${fb.convenience}`,
+        `Рекомендация коллегам: ${fb.recommend === 'yes' ? 'Да' : 'Нет'}`,
+        '',
+        '--- ПОДРОБНЫЕ ОТВЕТЫ ---',
+        '',
+        'Каких заданий не хватает:',
+        fb.missing || '(не заполнено)',
+        '',
+        'Что улучшить в интерфейсе:',
+        fb.improve || '(не заполнено)',
+        '',
+        'Трудности в работе с игрой:',
+        fb.difficulties || '(не заполнено)',
+        '',
+        '==========================================='
+    ];
+    downloadFile(`отзыв_${fileTimestamp()}.txt`, lines.join('\n'));
+
+    // Очистка полей
+    document.getElementById('fbMissing').value = '';
+    document.getElementById('fbImprove').value = '';
+    document.getElementById('fbDifficulties').value = '';
+
+    alert('✅ Отзыв сохранён и скачан как TXT-файл!');
+}
+
+function exportFeedbackCSV() {
+    if (!data.feedback) { alert('Сначала сохраните отзыв'); return; }
+    const fb = data.feedback;
+    const rows = [
+        ['Показатель', 'Значение'],
+        ['Дата', fb.savedAt || ''],
+        ['Эффективность', fb.effective],
+        ['Удобство', fb.convenience],
+        ['Рекомендация', fb.recommend],
+        ['Чего не хватает', fb.missing],
+        ['Что улучшить', fb.improve],
+        ['Трудности', fb.difficulties]
+    ];
+    let csv = '\uFEFF';
+    rows.forEach(r => csv += r.map(c => `"${String(c||'').replace(/"/g,'""')}"`).join(',') + '\n');
+    downloadFile(`отзыв_${fileTimestamp()}.csv`, csv, 'text/csv;charset=utf-8;');
+}
+
+function loadFeedback() {
+    if (!data.feedback) return;
+    const fb = data.feedback;
+    document.getElementById('fbEffective').value = fb.effective || 'yes';
+    document.getElementById('fbConvenience').value = fb.convenience || 5;
+    document.getElementById('fbRecommend').value = fb.recommend || 'yes';
+    document.getElementById('fbMissing').value = fb.missing || '';
+    document.getElementById('fbImprove').value = fb.improve || '';
+    document.getElementById('fbDifficulties').value = fb.difficulties || '';
+}
+
+// ========================================================
+// СКАЧАТЬ ВСЁ
+// ========================================================
+function saveAllData() {
+    if (data.children.length === 0 && data.protocols.length === 0 && !data.feedback) {
+        alert('Нет данных для сохранения');
+        return;
+    }
+    const exportData = {
+        exportedAt: new Date().toISOString(),
+        version: '3.0',
+        children: data.children,
+        protocols: data.protocols,
+        feedback: data.feedback
+    };
+    downloadFile(`исследование_ВСЁ_${fileTimestamp()}.json`, JSON.stringify(exportData, null, 2), 'application/json');
+}
+
+function saveAllDataCSV() {
+    if (data.children.length === 0) { alert('Нет данных'); return; }
+    let csv = '\uFEFF';
+
+    csv += '=== ДЕТИ ===\n';
+    csv += 'ФИО,Возраст,Класс/группа,Группа исследования,Диагноз,Нарушенные звуки,Этап,Мотивация до,Звуки после,Этап после,Мотивация после\n';
+    data.children.forEach(c => {
+        csv += `"${c.name || ''}",${c.age || ''},"${c.group || ''}","${GROUP_LABELS[c.researchGroup]}","${c.diagnosis || ''}","${c.sounds || ''}","${STAGE_LABELS[c.stage] || ''}",${c.motivation || ''},"${c.soundsAfter || ''}","${STAGE_LABELS[c.stageAfter] || ''}",${c.motivationAfter || ''}\n`;
+    });
+    csv += '\n';
+
+    csv += '=== ПРОТОКОЛЫ ===\n';
+    csv += 'Дата,ФИО,Возраст,Длительность,Ходов,Полностью,Частично,Не выполнено,Настроение,Вовлечённость,Звуки,Видео,Замечания\n';
+    data.protocols.forEach(p => {
+        const child = data.children.find(c => c.id === p.childId);
+        csv += `"${p.date}","${child ? child.name : ''}",${child ? child.age : ''},${p.duration},${p.moves},${p.complete},${p.partial},${p.failed},"${MOOD_LABELS[p.mood] || ''}","${ENGAGEMENT_LABELS[p.engagement] || ''}","${p.sounds || ''}","${p.video || ''}","${p.notes || ''}"\n`;
+    });
+    csv += '\n';
+
+    if (data.feedback) {
+        csv += '=== ОТЗЫВ ===\n';
+        csv += 'Эффективность,Удобство,Рекомендация,Чего не хватает,Что улучшить,Трудности\n';
+        csv += `"${data.feedback.effective}","${data.feedback.convenience}","${data.feedback.recommend}","${data.feedback.missing}","${data.feedback.improve}","${data.feedback.difficulties}"\n`;
+    }
+
+    downloadFile(`исследование_ВСЁ_${fileTimestamp()}.csv`, csv, 'text/csv;charset=utf-8;');
+}
+
+// ========================================================
+// НАСТРОЙКИ (темы, язык, фон)
+// ========================================================
+function toggleSettings() {
+    document.getElementById('settingsPanel').classList.toggle('open');
+    document.getElementById('settingsGear').classList.toggle('open');
+}
+
+function changeTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+    document.getElementById('themeSelect').value = theme;
+    startBgAnimation(theme);
+}
+
+function changeLanguage(lang) {
+    localStorage.setItem('lang', lang);
+    document.getElementById('langSelect').value = lang;
+}
+
+// ========================================================
+// ФОНОВЫЕ АНИМАЦИИ
+// ========================================================
+let _bgAnimId = null;
+
+function startBgAnimation(theme) {
+    if (_bgAnimId) { cancelAnimationFrame(_bgAnimId); _bgAnimId = null; }
+    const canvas = document.getElementById('bg-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let w = canvas.width = innerWidth;
+    let h = canvas.height = innerHeight;
+
+    window.addEventListener('resize', () => {
+        w = canvas.width = innerWidth;
+        h = canvas.height = innerHeight;
+    });
+
+    if (theme === 'cosmos') {
+        const stars = Array.from({length: 150}, () => ({
+            x: Math.random() * w,
+            y: Math.random() * h,
+            r: Math.random() * 1.5 + 0.3,
+            tw: Math.random() * Math.PI * 2,
+            tws: Math.random() * 0.02 + 0.005
+        }));
+        function draw() {
+            ctx.clearRect(0, 0, w, h);
+            for (const s of stars) {
+                s.tw += s.tws;
+                const a = 0.5 + 0.5 * Math.sin(s.tw);
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(224,231,255,${a})`;
+                ctx.fill();
+            }
+            _bgAnimId = requestAnimationFrame(draw);
+        }
+        draw();
+    } else if (theme === 'sakura') {
+        const petals = Array.from({length: 40}, () => ({
+            x: Math.random() * w,
+            y: Math.random() * h - h,
+            size: Math.random() * 8 + 6,
+            sy: Math.random() * 1.5 + 0.5,
+            sx: (Math.random() - 0.5) * 0.8,
+            rot: Math.random() * 360,
+            rs: (Math.random() - 0.5) * 2,
+            sway: Math.random() * 6
+        }));
+        function draw() {
+            ctx.clearRect(0, 0, w, h);
+            for (const p of petals) {
+                p.sway += 0.01;
+                p.x += p.sx + Math.sin(p.sway) * 0.6;
+                p.y += p.sy;
+                p.rot += p.rs;
+                if (p.y > h + 20) { p.y = -20; p.x = Math.random() * w; }
+                if (p.x < -20) p.x = w + 20;
+                if (p.x > w + 20) p.x = -20;
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate(p.rot * Math.PI / 180);
+                ctx.fillStyle = 'rgba(244,114,182,0.7)';
+                ctx.beginPath();
+                ctx.ellipse(0, 0, p.size, p.size * 0.55, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+            _bgAnimId = requestAnimationFrame(draw);
+        }
+        draw();
+    } else if (theme === 'hacker') {
+        const fontSize = 18;
+        const cols = Math.floor(w / fontSize);
+        const drops = Array.from({length: cols}, () => Math.random() * h / fontSize);
+        const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモ';
+        let lastTime = 0;
+        const INTERVAL = 130;
+        function draw(timestamp) {
+            if (timestamp - lastTime < INTERVAL) {
+                _bgAnimId = requestAnimationFrame(draw);
+                return;
+            }
+            lastTime = timestamp;
+            ctx.fillStyle = 'rgba(0,0,0,0.08)';
+            ctx.fillRect(0, 0, w, h);
+            ctx.fillStyle = '#00ff41';
+            ctx.font = `${fontSize}px 'Share Tech Mono', monospace`;
+            for (let i = 0; i < drops.length; i++) {
+                const ch = chars[Math.floor(Math.random() * chars.length)];
+                ctx.fillText(ch, i * fontSize, drops[i] * fontSize);
+                drops[i]++;
+                if (drops[i] * fontSize > h && Math.random() > 0.98) drops[i] = 0;
+            }
+            _bgAnimId = requestAnimationFrame(draw);
+        }
+        _bgAnimId = requestAnimationFrame(draw);
+    } else {
+        const particles = Array.from({length: 25}, () => ({
+            x: Math.random() * w,
+            y: Math.random() * h,
+            s: Math.random() * 1.5 + 0.5,
+            sx: (Math.random() - 0.5) * 0.1,
+            sy: (Math.random() - 0.5) * 0.1,
+            op: Math.random() * 0.3 + 0.1
+        }));
+        function draw() {
+            ctx.clearRect(0, 0, w, h);
+            for (const p of particles) {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.s, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255,255,255,${p.op})`;
+                ctx.fill();
+                p.x += p.sx;
+                p.y += p.sy;
+                if (p.x < 0) p.x = w;
+                if (p.x > w) p.x = 0;
+                if (p.y < 0) p.y = h;
+                if (p.y > h) p.y = 0;
+            }
+            _bgAnimId = requestAnimationFrame(draw);
+        }
+        draw();
+    }
+}
+
+// ========================================================
+// РЕНДЕРИНГ
+// ========================================================
+function renderAll() {
+    renderChildList();
+    renderDiagnosticsTable();
+    renderAgeFilter();
+    renderProtocolList();
+    renderSummary();
+    loadFeedback();
+}
+
+// ========================================================
+// ЗАПУСК
+// ========================================================
+document.addEventListener('DOMContentLoaded', function() {
+    const savedTheme = localStorage.getItem('theme') || 'game';
+    changeTheme(savedTheme);
+
+    const savedLang = localStorage.getItem('lang') || 'ru';
+    document.getElementById('langSelect').value = savedLang;
+
+    loadData();
+});
+
+// Глобальные функции
+window.switchSection = switchSection;
+window.openChildForm = openChildForm;
+window.closeModal = closeModal;
+window.saveChild = saveChild;
+window.deleteChild = deleteChild;
+window.openProtocolForm = openProtocolForm;
+window.saveProtocol = saveProtocol;
+window.deleteProtocol = deleteProtocol;
+window.toggleMonth = toggleMonth;
+window.saveFeedback = saveFeedback;
+window.saveAllData = saveAllData;
+window.saveAllDataCSV = saveAllDataCSV;
+window.exportChildren = exportChildren;
+window.exportChildrenTXT = exportChildrenTXT;
+window.exportDiagnostics = exportDiagnostics;
+window.exportDiagnosticsTXT = exportDiagnosticsTXT;
+window.exportProtocols = exportProtocols;
+window.exportProtocolsTXT = exportProtocolsTXT;
+window.exportFeedbackCSV = exportFeedbackCSV;
+window.renderDiagnosticsTable = renderDiagnosticsTable;
+window.toggleSettings = toggleSettings;
+window.changeTheme = changeTheme;
+window.changeLanguage = changeLanguage;
+</script>
+</body>
+</html>
