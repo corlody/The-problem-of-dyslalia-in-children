@@ -758,7 +758,21 @@
             <button data-duration="30">30 мин</button>
             <button data-duration="60">1 час</button>
         </div>
-
+         
+        <div style="margin-top:16px; padding:14px; background:rgba(255,255,255,0.04); border-radius:12px; border:1px solid var(--glass-border);">
+            <label style="display:flex; align-items:center; gap:10px; cursor:pointer; font-weight:500;">
+                <input type="checkbox" id="sameAgeCheckbox" onchange="toggleSameAge()" style="width:20px; height:20px; cursor:pointer;">
+                <span>👥 Все игроки одного возраста</span>
+            </label>
+            <div id="teamAgeBlock" style="display:none; margin-top:12px;">
+                <label style="display:block; font-size:0.85rem; color:var(--text-secondary); margin-bottom:6px;">
+                    Возраст команды (5–15 лет):
+                </label>
+                <input type="number" id="teamAge" min="5" max="15" value="7"
+                       style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--glass-border); background:rgba(0,0,0,0.3); color:var(--text-primary); font-family:inherit; font-size:1rem; text-align:center;">
+            </div>
+        </div>
+        
         <div id="playerInputs" style="margin-top:16px;"></div>
 
         <div style="display:flex; gap:10px; margin-top:16px;">
@@ -846,7 +860,9 @@
 
     <div class="game-panel">
         <div class="panel-top">
-            <div class="timer-display" id="timerDisplay">⏱ 20:00</div>
+            <div style="font-size:0.9rem; color:var(--text-muted);">
+                <i class="fas fa-gamepad"></i> Игра
+            </div>
             <div style="display:flex; gap:4px;">
                 <button class="btn-icon" onclick="resetGame()" title="Новая игра">
                     <i class="fas fa-redo"></i>
@@ -1053,8 +1069,7 @@ let achievements = [];
 let currentTask = null;
 let currentSessionId = null;
 let gameLog = []; // Логи сохраняются до победы
-let timerInterval = null;
-let timeRemaining = 0; // в секундах
+
 
 // ========================================================
 // НАСТРОЙКА ИГРОКОВ
@@ -1067,17 +1082,37 @@ function setPlayerCount(count) {
     renderSetupInputs();
 }
 
+function toggleSameAge() {
+    const isChecked = document.getElementById('sameAgeCheckbox').checked;
+    const teamAgeBlock = document.getElementById('teamAgeBlock');
+    if (isChecked) {
+        teamAgeBlock.style.display = 'block';
+    } else {
+        teamAgeBlock.style.display = 'none';
+    }
+    renderSetupInputs();
+}
+
 function renderSetupInputs() {
     const container = document.getElementById('playerInputs');
+    if (!container) return;
     container.innerHTML = '';
+
+    const sameAge = document.getElementById('sameAgeCheckbox')?.checked || false;
+    const teamAge = parseInt(document.getElementById('teamAge')?.value) || 7;
+
     for (let i = 0; i < selectedCount; i++) {
         const avatarOptions = AVATARS.map(a => `<option value="${a}">${a}</option>`).join('');
+        const ageField = sameAge
+            ? `<input type="number" class="player-age-input" value="${teamAge}" disabled title="Возраст задаётся для всей команды" style="opacity:0.6;">`
+            : `<input type="number" class="player-age-input" id="pAge${i}" value="7" min="5" max="15" placeholder="Лет">`;
+
         container.innerHTML += `
             <div class="player-input-group">
                 <div class="player-color-dot" style="background:${PLAYER_COLORS[i]}"></div>
                 <select class="player-avatar-select" id="pAvatar${i}">${avatarOptions}</select>
                 <input type="text" class="player-input" id="pName${i}" value="Игрок ${i+1}" placeholder="Имя">
-                <input type="number" class="player-age-input" id="pAge${i}" value="5" min="5" max="15" placeholder="Лет">
+                ${ageField}
             </div>
         `;
         document.getElementById(`pAvatar${i}`).selectedIndex = i % AVATARS.length;
@@ -1156,7 +1191,6 @@ function loadSession(index) {
     updateAllChips();
     updateTurnUI();
     renderLogFromArray();
-    startTimer();
 }
 
 function deleteSession(index) {
@@ -1171,11 +1205,17 @@ function deleteSession(index) {
 // СТАРТ НОВОЙ ИГРЫ
 // ========================================================
 function startNewGame() {
+    const sameAge = document.getElementById('sameAgeCheckbox')?.checked || false;
+    const teamAge = Math.max(5, Math.min(15, parseInt(document.getElementById('teamAge')?.value) || 7));
+
     players = [];
     for (let i = 0; i < selectedCount; i++) {
         const name = document.getElementById(`pName${i}`).value || `Игрок ${i+1}`;
         const avatar = document.getElementById(`pAvatar${i}`).value || '🧙';
-        const age = Math.max(5, Math.min(15, parseInt(document.getElementById(`pAge${i}`).value) || 5));
+        const age = sameAge
+            ? teamAge
+            : Math.max(5, Math.min(15, parseInt(document.getElementById(`pAge${i}`)?.value) || 7));
+
         players.push({ id: i, name, avatar, age, cell: 0, tasksCompleted: 0 });
     }
     achievements = [];
@@ -1191,35 +1231,8 @@ function startNewGame() {
     updateTurnUI();
     renderLogFromArray();
     addLog('🎮 Игра началась! Бросьте кубик.');
-    startTimer();
     saveCurrentSession();
 }
-
-// ========================================================
-// ТАЙМЕР
-// ========================================================
-function startTimer() {
-    if (timerInterval) clearInterval(timerInterval);
-    timeRemaining = selectedDuration * 60;
-    updateTimerDisplay();
-    timerInterval = setInterval(() => {
-        timeRemaining--;
-        if (timeRemaining <= 0) {
-            clearInterval(timerInterval);
-            timeRemaining = 0;
-            addLog('⏰ Время занятия вышло!', 'highlight');
-            document.getElementById('rollBtn').disabled = true;
-        }
-        updateTimerDisplay();
-    }, 1000);
-}
-
-function updateTimerDisplay() {
-    const min = Math.floor(timeRemaining / 60);
-    const sec = timeRemaining % 60;
-    document.getElementById('timerDisplay').textContent = `⏱ ${String(min).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
-}
-
 // ========================================================
 // КАРТА
 // ========================================================
@@ -1750,20 +1763,17 @@ function startBgAnimation(theme) {
 // ========================================================
 function exitToMenu() {
     saveCurrentSession();
-    if (timerInterval) clearInterval(timerInterval);
     document.getElementById('gameBoard').style.display = 'none';
     document.getElementById('mainMenu').classList.remove('hidden');
 }
 
 function exitToSite() {
     saveCurrentSession();
-    if (timerInterval) clearInterval(timerInterval);
     window.location.href = 'index.html';
 }
 
 function resetGame() {
     if (confirm('Начать новую игру? Текущий прогресс будет сохранён, но вы начнёте заново.')) {
-        if (timerInterval) clearInterval(timerInterval);
         location.reload();
     }
 }
