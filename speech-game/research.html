@@ -836,6 +836,9 @@
         <button data-section="protocols" onclick="switchSection('protocols', this)">
             <i class="fas fa-file-medical"></i> <span>Протоколы</span>
         </button>
+        <button data-section="gamesessions" onclick="switchSection('gamesessions', this)">
+            <i class="fas fa-gamepad"></i> <span>Игровые сессии</span>
+        </button>
         <button data-section="summary" onclick="switchSection('summary', this)">
             <i class="fas fa-chart-bar"></i> <span>Итоги</span>
         </button>
@@ -988,6 +991,46 @@
                 <div id="protocolList"></div>
             </div>
         </div>
+
+        <!-- ============ Игровые сессии ============ -->
+        <div id="gamesessions" class="section">
+            <div class="card">
+                <h2><i class="fas fa-gamepad"></i> Игровые сессии</h2>
+                <p>Здесь автоматически собираются данные из игры. Каждая сессия — это одна партия.</p>
+
+                <div style="display:flex; gap:12px; flex-wrap:wrap; margin:14px 0;">
+                    <label style="display:flex; align-items:center; gap:8px; color:var(--text-secondary); font-size:0.9rem;">
+                        <i class="fas fa-user"></i> Ребёнок:
+                        <select id="sessionChildFilter" onchange="renderGameSessions()" style="padding:8px 12px; border-radius:8px; background:rgba(0,0,0,0.2); color:var(--text-primary); border:1px solid var(--glass-border); font-family:inherit; cursor:pointer;">
+                            <option value="all">Все</option>
+                        </select>
+                    </label>
+                    <label style="display:flex; align-items:center; gap:8px; color:var(--text-secondary); font-size:0.9rem;">
+                        <i class="fas fa-calendar"></i> Период:
+                        <input type="date" id="sessionDateFrom" onchange="renderGameSessions()" style="padding:8px 12px; border-radius:8px; background:rgba(0,0,0,0.2); color:var(--text-primary); border:1px solid var(--glass-border); font-family:inherit;">
+                        <span style="color:var(--text-muted);">—</span>
+                        <input type="date" id="sessionDateTo" onchange="renderGameSessions()" style="padding:8px 12px; border-radius:8px; background:rgba(0,0,0,0.2); color:var(--text-primary); border:1px solid var(--glass-border); font-family:inherit;">
+                    </label>
+                </div>
+
+                <div class="download-bar">
+                    <span class="label"><i class="fas fa-download"></i> Скачать:</span>
+                    <button class="btn btn-success" onclick="exportGameSessions()">
+                        <i class="fas fa-file-csv"></i> CSV
+                    </button>
+                    <button class="btn btn-outline" onclick="exportGameSessionsTXT()">
+                        <i class="fas fa-file-alt"></i> TXT
+                    </button>
+                    <button class="btn btn-danger" onclick="clearAllGameSessions()">
+                        <i class="fas fa-trash"></i> Очистить все
+                    </button>
+                </div>
+
+                <div id="sessionStats" style="margin:16px 0;"></div>
+                <div id="gameSessionsList"></div>
+            </div>
+        </div>
+
 
         <!-- ============ Итоги ============ -->
         <div id="summary" class="section">
@@ -2064,6 +2107,7 @@ function renderAll() {
     renderAgeFilter();
     renderProtocolList();
     renderSummary();
+    renderGameSessions();
     loadFeedback();
 }
 
@@ -2080,6 +2124,280 @@ document.addEventListener('DOMContentLoaded', function() {
     loadData();
 });
 
+// ========================================================
+// ИГРОВЫЕ СЕССИИ (из game.html через localStorage)
+// ========================================================
+const GAME_SESSIONS_KEY = 'speech_game_sessions_v2';
+
+function getAllGameSessions() {
+    try {
+        return JSON.parse(localStorage.getItem(GAME_SESSIONS_KEY) || '[]');
+    } catch(e) { return []; }
+}
+
+function getFilteredGameSessions() {
+    let sessions = getAllGameSessions();
+    const childFilter = document.getElementById('sessionChildFilter')?.value || 'all';
+    const dateFrom = document.getElementById('sessionDateFrom')?.value || '';
+    const dateTo = document.getElementById('sessionDateTo')?.value || '';
+
+    if (childFilter !== 'all') {
+        sessions = sessions.filter(s => String(s.childId) === childFilter);
+    }
+    if (dateFrom) sessions = sessions.filter(s => s.date >= dateFrom);
+    if (dateTo) sessions = sessions.filter(s => s.date <= dateTo);
+    return sessions.sort((a, b) => (b.startedAt || '').localeCompare(a.startedAt || ''));
+}
+
+function renderSessionChildFilter() {
+    const sel = document.getElementById('sessionChildFilter');
+    if (!sel) return;
+    const current = sel.value;
+    sel.innerHTML = '<option value="all">Все</option>';
+    data.children.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.id;
+        opt.textContent = `${c.name} (${c.age} лет)`;
+        if (String(c.id) === current) opt.selected = true;
+        sel.appendChild(opt);
+    });
+}
+
+function renderGameSessions() {
+    renderSessionChildFilter();
+    const list = document.getElementById('gameSessionsList');
+    const stats = document.getElementById('sessionStats');
+    if (!list) return;
+
+    const sessions = getFilteredGameSessions();
+
+    // Статистика
+    const total = sessions.length;
+    let totalTasks = 0, doneTasks = 0, partialTasks = 0, failedTasks = 0;
+    const soundCount = {};
+
+    sessions.forEach(s => {
+        (s.tasks || []).forEach(t => {
+            totalTasks++;
+            if (t.result === 'done') doneTasks++;
+            else if (t.result === 'partial') partialTasks++;
+            else if (t.result === 'failed') failedTasks++;
+            if (t.sound) soundCount[t.sound] = (soundCount[t.sound] || 0) + 1;
+        });
+    });
+
+    const successRate = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0;
+
+    stats.innerHTML = `
+        <div class="form-grid">
+            <div class="child-card" style="text-align:center;">
+                <div style="font-size:0.85rem; color:var(--text-muted); text-transform:uppercase;">Сессий</div>
+                <div style="font-size:2rem; font-weight:900; color:var(--gold);">${total}</div>
+            </div>
+            <div class="child-card" style="text-align:center;">
+                <div style="font-size:0.85rem; color:var(--text-muted); text-transform:uppercase;">Всего заданий</div>
+                <div style="font-size:2rem; font-weight:900; color:var(--gold);">${totalTasks}</div>
+            </div>
+            <div class="child-card" style="text-align:center;">
+                <div style="font-size:0.85rem; color:var(--text-muted); text-transform:uppercase;">Успешность</div>
+                <div style="font-size:2rem; font-weight:900; color:var(--green);">${successRate}%</div>
+                <div class="child-info">✅ ${doneTasks} · ✏️ ${partialTasks} · ❌ ${failedTasks}</div>
+            </div>
+        </div>
+        ${Object.keys(soundCount).length > 0 ? `
+        <div class="child-card" style="margin-top:12px;">
+            <div style="font-weight:600; margin-bottom:8px;">🔊 Звуки в сессиях:</div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                ${Object.entries(soundCount).map(([s, n]) => `
+                    <span class="badge-group badge-exp">${s}: ${n}</span>
+                `).join('')}
+            </div>
+        </div>
+        ` : ''}
+    `;
+
+    // Список сессий
+    if (sessions.length === 0) {
+        list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted);">Нет игровых сессий. Играйте в игру, и они появятся здесь.</div>';
+        return;
+    }
+
+    list.innerHTML = '';
+    sessions.forEach(s => {
+        const child = data.children.find(c => c.id === s.childId);
+        const childName = child ? child.name : (s.players?.[0]?.name || 'Неизвестный');
+        const startTime = s.startedAt ? new Date(s.startedAt).toLocaleString('ru-RU') : '—';
+        const endTime = s.endedAt ? new Date(s.endedAt).toLocaleTimeString('ru-RU') : '—';
+        const sStat = s.stats || { total: 0, done: 0, partial: 0, failed: 0 };
+
+        const div = document.createElement('div');
+        div.className = 'child-card';
+        div.style.marginBottom = '12px';
+        div.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px;">
+                <div style="flex:1; min-width:200px;">
+                    <div class="child-name">🎮 ${childName}</div>
+                    <div class="child-info">📅 ${startTime} → ${endTime}</div>
+                    <div class="child-info">🔊 Звуки: <strong>${(s.sounds || []).join(', ') || '—'}</strong></div>
+                    <div class="child-info">
+                        ✅ ${sStat.done || 0} · ✏️ ${sStat.partial || 0} · ❌ ${sStat.failed || 0} (всего ${sStat.total || 0})
+                    </div>
+                </div>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                    <button class="btn btn-sm btn-primary" onclick="importSessionToProtocol(${s.sessionId})" style="padding:8px 16px; font-size:0.85rem;">
+                        <i class="fas fa-file-medical"></i> В протокол
+                    </button>
+                    <button class="btn btn-sm btn-outline" onclick="viewSessionDetails(${s.sessionId})" style="padding:8px 16px; font-size:0.85rem;">
+                        <i class="fas fa-eye"></i> Детали
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteGameSession(${s.sessionId})" style="padding:8px 16px; font-size:0.85rem;">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+        list.appendChild(div);
+    });
+}
+
+function deleteGameSession(sessionId) {
+    if (!confirm('Удалить сессию?')) return;
+    try {
+        const sessions = getAllGameSessions();
+        const filtered = sessions.filter(s => s.sessionId !== sessionId);
+        localStorage.setItem(GAME_SESSIONS_KEY, JSON.stringify(filtered));
+        renderGameSessions();
+    } catch(e) { alert('Ошибка'); }
+}
+
+function clearAllGameSessions() {
+    if (!confirm('Удалить ВСЕ игровые сессии? Это нельзя отменить.')) return;
+    localStorage.setItem(GAME_SESSIONS_KEY, '[]');
+    renderGameSessions();
+}
+
+function viewSessionDetails(sessionId) {
+    const session = getAllGameSessions().find(s => s.sessionId === sessionId);
+    if (!session) return;
+    const child = data.children.find(c => c.id === session.childId);
+    const childName = child ? child.name : (session.players?.[0]?.name || 'Неизвестный');
+
+    let details = `🎮 Сессия: ${childName}\n`;
+    details += `📅 Начало: ${new Date(session.startedAt).toLocaleString('ru-RU')}\n`;
+    if (session.endedAt) details += `📅 Конец: ${new Date(session.endedAt).toLocaleString('ru-RU')}\n`;
+    details += `🔊 Звуки: ${(session.sounds || []).join(', ')}\n`;
+    details += `\n--- Задания ---\n`;
+    (session.tasks || []).forEach((t, i) => {
+        const emoji = t.result === 'done' ? '✅' : t.result === 'partial' ? '✏️' : '❌';
+        details += `${i + 1}. ${emoji} ${t.taskName} (${t.sound || '—'}) — ${t.result}${t.reps ? `, повторов: ${t.reps}` : ''}\n`;
+    });
+    alert(details);
+}
+
+// Импорт сессии в протокол занятия
+function importSessionToProtocol(sessionId) {
+    const session = getAllGameSessions().find(s => s.sessionId === sessionId);
+    if (!session) return;
+    if (!session.childId) {
+        alert('У сессии нет привязки к ребёнку из исследования. Импорт невозможен.');
+        return;
+    }
+
+    // Открываем модалку протокола и заполняем
+    if (data.children.length === 0) {
+        alert('Сначала добавьте детей');
+        return;
+    }
+
+    const sel = document.getElementById('protocolChild');
+    sel.innerHTML = '';
+    const expChildren = data.children.filter(c => c.researchGroup === 'exp');
+    if (expChildren.length === 0) {
+        alert('Нет детей в экспериментальной группе');
+        return;
+    }
+    expChildren.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.id;
+        opt.textContent = `${c.name} (${c.age} лет)`;
+        sel.appendChild(opt);
+    });
+
+    // Заполняем поля
+    sel.value = session.childId;
+    document.getElementById('protocolDate').value = session.date || new Date().toISOString().slice(0, 10);
+    document.getElementById('protocolDuration').value = '30';
+    document.getElementById('protocolMoves').value = (session.tasks || []).length;
+    document.getElementById('protocolComplete').value = session.stats?.done || 0;
+    document.getElementById('protocolPartial').value = session.stats?.partial || 0;
+    document.getElementById('protocolFailed').value = session.stats?.failed || 0;
+    document.getElementById('protocolSounds').value = (session.sounds || []).join(', ');
+    document.getElementById('protocolNotes').value = `[Из игры] Сессия от ${new Date(session.startedAt).toLocaleString('ru-RU')}. Всего заданий: ${session.stats?.total || 0}`;
+
+    // Подсвечиваем, что импортировано
+    const modal = document.getElementById('protocolModal');
+    modal.classList.add('active');
+
+    // Метка импорта
+    const h3 = modal.querySelector('h3');
+    h3.innerHTML = '<i class="fas fa-download"></i> Протокол из игровой сессии';
+    setTimeout(() => {
+        h3.innerHTML = '<i class="fas fa-file-medical"></i> Новый протокол занятия';
+    }, 5000);
+}
+
+// Экспорт игровых сессий
+function exportGameSessions() {
+    const sessions = getFilteredGameSessions();
+    if (sessions.length === 0) { alert('Нет данных'); return; }
+    const rows = [['Дата', 'Ребёнок', 'Звуки', 'Заданий', 'Выполнено', 'Частично', 'Не выполнено', 'Успешность %', 'Начало', 'Конец']];
+    sessions.forEach(s => {
+        const child = data.children.find(c => c.id === s.childId);
+        const name = child ? child.name : (s.players?.[0]?.name || '—');
+        const total = s.stats?.total || 0;
+        const done = s.stats?.done || 0;
+        const rate = total > 0 ? Math.round((done / total) * 100) : 0;
+        rows.push([
+            s.date || '', name, (s.sounds || []).join('; '),
+            total, done, s.stats?.partial || 0, s.stats?.failed || 0, rate,
+            s.startedAt ? new Date(s.startedAt).toLocaleString('ru-RU') : '',
+            s.endedAt ? new Date(s.endedAt).toLocaleString('ru-RU') : ''
+        ]);
+    });
+    let csv = '\uFEFF';
+    rows.forEach(r => csv += r.map(c => `"${String(c || '').replace(/"/g, '""')}"`).join(',') + '\n');
+    downloadFile(`игровые_сессии_${fileTimestamp()}.csv`, csv, 'text/csv;charset=utf-8;');
+}
+
+function exportGameSessionsTXT() {
+    const sessions = getFilteredGameSessions();
+    if (sessions.length === 0) { alert('Нет данных'); return; }
+    const lines = [
+        '===========================================',
+        '  ИГРОВЫЕ СЕССИИ — ИССЛЕДОВАНИЕ',
+        '===========================================',
+        `Дата: ${new Date().toLocaleString('ru-RU')}`,
+        `Всего сессий: ${sessions.length}`,
+        ''
+    ];
+    sessions.forEach((s, i) => {
+        const child = data.children.find(c => c.id === s.childId);
+        const name = child ? child.name : (s.players?.[0]?.name || '—');
+        lines.push(`--- Сессия #${i + 1} ---`);
+        lines.push(`Ребёнок: ${name}`);
+        lines.push(`Дата: ${s.date || '—'}`);
+        lines.push(`Звуки: ${(s.sounds || []).join(', ') || '—'}`);
+        lines.push(`Заданий: ${s.stats?.total || 0} (✅ ${s.stats?.done || 0} / ✏️ ${s.stats?.partial || 0} / ❌ ${s.stats?.failed || 0})`);
+        lines.push('');
+        (s.tasks || []).forEach((t, j) => {
+            const emoji = t.result === 'done' ? '✅' : t.result === 'partial' ? '✏️' : '❌';
+            lines.push(`  ${j + 1}. ${emoji} ${t.taskName} — ${t.result}${t.reps ? `, ${t.reps} раз` : ''}`);
+        });
+        lines.push('');
+    });
+    downloadFile(`игровые_сессии_${fileTimestamp()}.txt`, lines.join('\n'));
+}
+    
 // Глобальные функции
 window.switchSection = switchSection;
 window.openChildForm = openChildForm;
@@ -2104,6 +2422,13 @@ window.renderDiagnosticsTable = renderDiagnosticsTable;
 window.toggleSettings = toggleSettings;
 window.changeTheme = changeTheme;
 window.changeLanguage = changeLanguage;
+window.renderGameSessions = renderGameSessions;
+window.importSessionToProtocol = importSessionToProtocol;
+window.viewSessionDetails = viewSessionDetails;
+window.deleteGameSession = deleteGameSession;
+window.clearAllGameSessions = clearAllGameSessions;
+window.exportGameSessions = exportGameSessions;
+window.exportGameSessionsTXT = exportGameSessionsTXT;
 </script>
 </body>
 </html>
