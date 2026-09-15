@@ -1477,6 +1477,32 @@
             </div>
         </div>
         <div id="orangeCards" class="card-grid"></div>
+        <!-- НОВЫЕ КАРТОЧКИ ИЗ МЕТОДИЧКИ -->
+        <div style="margin-top:50px; padding-top:30px; border-top:2px solid var(--glass-border);">
+            <h2 class="section-title"><i class="fas fa-book"></i> Карточки из методички Л.А. Комаровой</h2>
+            <p style="color:var(--text-secondary); margin-bottom:20px;">
+                Артикуляционная гимнастика и лабиринты для автоматизации звуков Л и Р.
+                Подтверждено логопедом.
+            </p>
+
+            <h3 style="margin:30px 0 15px; font-size:1.4rem;">
+                <i class="fas fa-language"></i> Звук Л <span class="card-count" id="soundLCount">0</span>
+            </h3>
+            <div id="soundLCards" class="card-grid"></div>
+
+            <h3 style="margin:30px 0 15px; font-size:1.4rem;">
+                <i class="fas fa-language"></i> Звук Р <span class="card-count" id="soundRCount">0</span>
+            </h3>
+            <div id="soundRCards" class="card-grid"></div>
+        
+            <h3 style="margin:30px 0 15px; font-size:1.4rem;">
+                <i class="fas fa-images"></i> Галерея картинок <span class="card-count" id="taskImageCount">0</span>
+            </h3>
+            <p style="color:var(--text-secondary); margin-bottom:12px; font-size:0.9rem;">
+                Реальные карточки упражнений из методички. Кликни для увеличения.
+            </p>
+            <div id="taskImagesGallery" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(180px, 1fr)); gap:16px;"></div>
+        </div>
     </section>
 
     <!-- СЕКЦИЯ: КАРТА -->
@@ -1831,6 +1857,40 @@ const motorCards = {
     ]
 };
 
+// ========================================================
+// КАРТОЧКИ ПО ЗВУКАМ Л И Р (из методички Комаровой)
+// ========================================================
+const soundCards = {
+    "Л": [
+        { title: "Заборчик", desc: "Улыбнуться (зубы сомкнуты и видны). Удерживать губы в таком положении.", img: "images/tasks/common/zaborchik.png" },
+        { title: "Лопаточка", desc: "Рот открыть. Положить широкий расслабленный язык на нижнюю губу. Занести «лопатку» в рот.", img: "images/tasks/common/lopatochka.png" },
+        { title: "Иголочка", desc: "Открыть рот. Язык сделать узким (напрячь). Узкий язык выдвинуть далеко вперёд, затем убрать вглубь рта.", img: "images/tasks/common/igolochka.png" },
+        { title: "Чашечка", desc: "Широко открыть рот. Широкий расслабленный язык поднять к верхней губе. Прогнуть среднюю часть языка, загнув кверху боковые края.", img: "images/tasks/common/chashechka.png" },
+        { title: "Грибок", desc: "Улыбнуться (зубы видны), приоткрыть рот. Присосать широкий язык всей плоскостью к нёбу и открыть рот.", img: "images/tasks/common/gribok.png" },
+        { title: "Гармошка", desc: "Рот приоткрыть. Язык присосать к нёбу. Не опуская языка, открывать и закрывать рот.", img: "images/tasks/common/garmoshka.png" },
+        { title: "Конфета", desc: "Губы сомкнуть. Напряжённым языком упираться то в одну щёку, то в другую.", img: "images/tasks/common/konfeta.png" },
+        { title: "Вкусное варенье", desc: "Рот приоткрыть. Широким языком облизывать верхнюю губу, делая движения сверху вниз. Нижняя челюсть неподвижна!", img: "images/tasks/common/vkusnoe_varene.png" },
+        { title: "Маляр", desc: "Рот открыть. Широким кончиком языка, как кисточкой маляра, проводить от верхних резцов до мягкого нёба.", img: "images/tasks/common/maliar.png" },
+        { title: "Почистим зубки", desc: "«Почистить» кончиком языка нижние зубы с внутренней стороны. Нижняя челюсть неподвижна!", img: "images/tasks/common/pochistim_zubki.png" },
+        { title: "Лошадка", desc: "Присасывать язык к нёбу, растягивая подъязычную связку. Щёлкать языком медленно и сильно.", img: "images/tasks/common/loshadka.png" },
+        { title: "Индюк", desc: "Рот открыть. Широким кончиком языка проводить по верхней губе вперёд-назад. Произносить: БЛ-БЛ-БЛ...", img: "images/tasks/common/indyuk.png" }
+    ],
+    "Р": [
+        { title: "Заборчик", desc: "Улыбнуться (зубы сомкнуты и видны). Удерживать губы в таком положении.", img: "images/tasks/common/zaborchik.png" },
+        { title: "Лопаточка", desc: "Рот открыть. Положить широкий расслабленный язык на нижнюю губу.", img: "images/tasks/common/lopatochka.png" },
+        { title: "Чашечка", desc: "Широко открыть рот. Широкий расслабленный язык поднять к верхней губе.", img: "images/tasks/common/chashechka.png" },
+        { title: "Лошадка", desc: "Присасывать язык к нёбу, растягивая подъязычную связку. Щёлкать языком.", img: "images/tasks/common/loshadka.png" },
+        { title: "Грибок", desc: "Улыбнуться, приоткрыть рот. Присосать широкий язык к нёбу.", img: "images/tasks/common/gribok.png" },
+        { title: "Вкусное варенье", desc: "Рот приоткрыть. Широким языком облизывать верхнюю губу.", img: "images/tasks/common/vkusnoe_varene.png" },
+        { title: "Качели", desc: "Открыть рот. Языком тянуться попеременно то к носу, то к подбородку.", img: "images/tasks/common/kacheli.png" },
+        { title: "Конфета", desc: "Губы сомкнуть. Напряжённым языком упираться то в одну щёку, то в другую.", img: "images/tasks/common/konfeta.png" },
+        { title: "Почистим зубки", desc: "«Почистить» кончиком языка нижние зубы с внутренней стороны.", img: "images/tasks/common/pochistim_zubki.png" },
+        { title: "Гармошка", desc: "Рот приоткрыть. Язык присосать к нёбу. Открывать и закрывать рот.", img: "images/tasks/common/garmoshka.png" },
+        { title: "Барабанщик", desc: "Рот приоткрыть. Кончик языка за верхними зубами. Быстро произносить: Д-Д-Д...", img: "images/tasks/common/barabanshchik.png" },
+        { title: "Индюк", desc: "Рот открыть. Широким кончиком языка проводить по верхней губе. БЛ-БЛ-БЛ...", img: "images/tasks/common/indyuk.png" }
+    ]
+};
+
 let currentMotorFilter = 'all';
 
 // ========================================================
@@ -1965,6 +2025,82 @@ function renderMotorCards() {
     const countEl = document.getElementById('orangeCount');
     if (countEl) countEl.textContent = cards.length;
     init3DCards();
+}
+
+function renderSoundCards() {
+    ['Л', 'Р'].forEach(sound => {
+        const container = document.getElementById(`sound${sound === 'Л' ? 'L' : 'R'}Cards`);
+        if (!container) return;
+        const cards = soundCards[sound] || [];
+        let html = '';
+        cards.forEach(card => {
+            html += `
+                <div class="card card-blue" style="cursor:pointer;" onclick="openTaskImage('${card.img}', '${card.title}', '${card.desc.replace(/'/g, "\\'")}')">
+                    <div class="card-title">${card.title} <span class="card-badge badge-confirmed">✓</span></div>
+                    <div class="card-desc">${card.desc}</div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+        const countEl = document.getElementById(`sound${sound === 'Л' ? 'L' : 'R'}Count`);
+        if (countEl) countEl.textContent = cards.length;
+    });
+    renderTaskImagesGallery();
+    init3DCards();
+}
+
+function renderTaskImagesGallery() {
+    const gallery = document.getElementById('taskImagesGallery');
+    if (!gallery) return;
+    const list = [
+        { img: 'zaborchik.png', name: 'Заборчик' },
+        { img: 'lopatochka.png', name: 'Лопаточка' },
+        { img: 'chashechka.png', name: 'Чашечка' },
+        { img: 'loshadka.png', name: 'Лошадка' },
+        { img: 'gribok.png', name: 'Грибок' },
+        { img: 'vkusnoe_varene.png', name: 'Вкусное варенье' },
+        { img: 'konfeta.png', name: 'Конфета' },
+        { img: 'maliar.png', name: 'Маляр' },
+        { img: 'pochistim_zubki.png', name: 'Почистим зубки' },
+        { img: 'indyuk.png', name: 'Индюк' },
+        { img: 'igolochka.png', name: 'Иголочка' },
+        { img: 'garmoshka.png', name: 'Гармошка' },
+        { img: 'kacheli.png', name: 'Качели' }
+    ];
+    let html = '';
+    list.forEach(t => {
+        html += `
+            <div class="card" style="padding:10px; text-align:center; cursor:pointer;"
+                 onclick="openTaskImage('images/tasks/common/${t.img}', '${t.name}', '')">
+                <img src="images/tasks/common/${t.img}" alt="${t.name}"
+                     style="width:100%; border-radius:12px; background:#fff; padding:8px; aspect-ratio:1; object-fit:contain;"
+                     onerror="this.src='images/tasks/_placeholder.svg'">
+                <div style="margin-top:8px; font-size:0.85rem; color:var(--text-secondary);">${t.name}</div>
+            </div>
+        `;
+    });
+    gallery.innerHTML = html;
+    const countEl = document.getElementById('taskImageCount');
+    if (countEl) countEl.textContent = list.length;
+}
+
+function openTaskImage(imgSrc, name, desc) {
+    // Простая модалка через prompt не подойдёт — создаём на лету
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.95);
+        display:flex; flex-direction:column; align-items:center; justify-content:center;
+        padding:20px; cursor:pointer;
+    `;
+    modal.innerHTML = `
+        <img src="${imgSrc}" alt="${name}"
+             style="max-width:90vw; max-height:75vh; border-radius:20px; background:#fff; padding:16px;"
+             onerror="this.src='images/tasks/_placeholder.svg'">
+        <div style="color:#fff; font-size:1.5rem; margin-top:16px; font-weight:700;">${name}</div>
+        ${desc ? `<div style="color:#cbd5e1; margin-top:10px; max-width:700px; text-align:center; line-height:1.5;">${desc}</div>` : ''}
+    `;
+    modal.onclick = () => modal.remove();
+    document.body.appendChild(modal);
 }
 
 // ========================================================
@@ -2439,6 +2575,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setupNavigation();
     renderSpeechCards();
     renderMotorCards();
+    renderSoundCards();
 
     // Обработчики
     document.getElementById('toggleCards')?.addEventListener('change', toggleCardFilter);
@@ -2463,6 +2600,8 @@ window.toggleCardFilter = toggleCardFilter;
 window.setMotorFilter = setMotorFilter;
 window.openCardsGallery = openCardsGallery;
 window.downloadWordCard = downloadWordCard;
+window.renderSoundCards = renderSoundCards;
+window.openTaskImage = openTaskImage;
 </script>
 </body>
 </html>
