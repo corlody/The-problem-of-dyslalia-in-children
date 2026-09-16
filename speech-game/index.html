@@ -176,7 +176,14 @@
 
         /* Показываем нужный canvas по теме */
         [data-theme="game"] #particles-canvas,
-        :root:not([data-theme]) #particles-canvas { display: block; }
+        :root:not([data-theme]) #particles-canvas,
+        [data-theme="official"] #particles-canvas,
+        [data-theme="elderly"] #particles-canvas,
+        [data-theme="summer"] #particles-canvas,
+        [data-theme="autumn"] #particles-canvas,
+        [data-theme="winter"] #particles-canvas,
+        [data-theme="spring"] #particles-canvas,
+        [data-theme="ocean"] #particles-canvas { display: block; }
         [data-theme="sakura"] #sakura-canvas { display: block; }
         [data-theme="cosmos"] #cosmos-canvas { display: block; }
         [data-theme="hacker"] #hacker-canvas { display: block; }
