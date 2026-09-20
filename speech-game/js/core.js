@@ -1,12 +1,12 @@
 /* ============================================================
-   core.js — общий модуль для "Говорю правильно" v5.0
-   Подключается на всех страницах (index, game, research)
+   core.js — общий модуль для "Говорю правильно" v5.1
+   Языки загружаются из data/i18n/{code}.json
    ============================================================ */
 
-export const CORE_VERSION = '5.0.0';
+export const CORE_VERSION = '5.1.0';
 
 // ------------------------------------------------------------
-// ЯЗЫКИ
+// ЯЗЫКИ (только метаданные, переводы — в JSON)
 // ------------------------------------------------------------
 export const LANGUAGES = [
   { code: 'ru', label: '🇷🇺 Русский',    name: 'Русский' },
@@ -20,54 +20,6 @@ export const LANGUAGES = [
   { code: 'es', label: '🇪🇸 Español',    name: 'Español' },
   { code: 'tr', label: '🇹🇷 Türkçe',     name: 'Türkçe' },
 ];
-
-export const TRANSLATIONS = {
-  ru: {
-    settings: 'Настройки', theme: 'Тема', language: 'Язык', appearance: 'Внешний вид',
-    day: 'День', night: 'Ночь', fontSize: 'Размер шрифта', small: 'Мелкий',
-    normal: 'Средний', large: 'Крупный', huge: 'Огромный',
-    highContrast: 'Высокий контраст', dyslexiaFont: 'Шрифт для дислексии',
-    haptics: 'Вибрация', soundEffects: 'Звуковые эффекты', reducedMotion: 'Меньше анимаций',
-    bugReport: 'Сообщить о проблеме', bugTitle: 'Что-то сломалось?',
-    bugName: 'Ваше имя (необязательно)', bugProblem: 'Опишите проблему',
-    bugSteps: 'Что вы делали перед этим?', bugDownload: 'Скачать отчёт',
-    bugCopy: 'Скопировать', bugClose: 'Закрыть', bugThanks: 'Спасибо! Отчёт сохранён.',
-    bugCopied: 'Скопировано в буфер', bugAuto: 'Автоматически прикреплено',
-    achievements: 'Достижения', backup: 'Резервная копия', downloadAll: 'Скачать все данные',
-    restore: 'Восстановить из файла', close: 'Закрыть', save: 'Сохранить',
-    voiceDownload: 'Скачать русский голос', voiceHint: 'Как установить русскую озвучку',
-    aiHelp: 'Помощник', aiPlaceholder: 'Напишите вопрос...', aiSend: 'Отправить',
-    fullscreen: 'Полный экран', restoreSuccess: 'Данные восстановлены!',
-    restoreError: 'Не удалось прочитать файл', confirmRestore: 'Заменить текущие данные?',
-  },
-  en: {
-    settings: 'Settings', theme: 'Theme', language: 'Language', appearance: 'Appearance',
-    day: 'Day', night: 'Night', fontSize: 'Font size', small: 'Small',
-    normal: 'Normal', large: 'Large', huge: 'Huge',
-    highContrast: 'High contrast', dyslexiaFont: 'Dyslexia-friendly font',
-    haptics: 'Vibration', soundEffects: 'Sound effects', reducedMotion: 'Reduce motion',
-    bugReport: 'Report a problem', bugTitle: 'Something broke?',
-    bugName: 'Your name (optional)', bugProblem: 'Describe the problem',
-    bugSteps: 'What were you doing?', bugDownload: 'Download report',
-    bugCopy: 'Copy', bugClose: 'Close', bugThanks: 'Thank you! Report saved.',
-    bugCopied: 'Copied to clipboard', bugAuto: 'Attached automatically',
-    achievements: 'Achievements', backup: 'Backup', downloadAll: 'Download all data',
-    restore: 'Restore from file', close: 'Close', save: 'Save',
-    voiceDownload: 'Download Russian voice', voiceHint: 'How to install Russian TTS',
-    aiHelp: 'Assistant', aiPlaceholder: 'Ask a question...', aiSend: 'Send',
-    fullscreen: 'Fullscreen', restoreSuccess: 'Data restored!',
-    restoreError: 'Could not read the file', confirmRestore: 'Replace current data?',
-  },
-  // остальные языки: тот же набор ключей, отличаются переводами (сокращено для размера)
-  uk: { settings: 'Налаштування', theme: 'Тема', language: 'Мова', day: 'День', night: 'Ніч', bugReport: 'Повідомити про проблему', achievements: 'Досягнення', backup: 'Резервна копія', close: 'Закрити', save: 'Зберегти', aiHelp: 'Помічник', fullscreen: 'Повний екран' },
-  kk: { settings: 'Параметрлер', theme: 'Тақырып', language: 'Тіл', day: 'Күндіз', night: 'Түн', bugReport: 'Мәселе туралы хабарлау', achievements: 'Жетістіктер', backup: 'Сақтық көшірме', close: 'Жабу', save: 'Сақтау', aiHelp: 'Көмекші', fullscreen: 'Толық экран' },
-  be: { settings: 'Налады', theme: 'Тэма', language: 'Мова', day: 'Дзень', night: 'Ноч', bugReport: 'Паведаміць пра праблему', achievements: 'Дасягненні', backup: 'Рэзервовая копія', close: 'Закрыць', save: 'Захаваць', aiHelp: 'Памочнік', fullscreen: 'Поўны экран' },
-  de: { settings: 'Einstellungen', theme: 'Thema', language: 'Sprache', day: 'Tag', night: 'Nacht', bugReport: 'Problem melden', achievements: 'Erfolge', backup: 'Sicherung', close: 'Schließen', save: 'Speichern', aiHelp: 'Assistent', fullscreen: 'Vollbild' },
-  fr: { settings: 'Paramètres', theme: 'Thème', language: 'Langue', day: 'Jour', night: 'Nuit', bugReport: 'Signaler un problème', achievements: 'Succès', backup: 'Sauvegarde', close: 'Fermer', save: 'Enregistrer', aiHelp: 'Assistant', fullscreen: 'Plein écran' },
-  es: { settings: 'Ajustes', theme: 'Tema', language: 'Idioma', day: 'Día', night: 'Noche', bugReport: 'Reportar un problema', achievements: 'Logros', backup: 'Copia de seguridad', close: 'Cerrar', save: 'Guardar', aiHelp: 'Asistente', fullscreen: 'Pantalla completa' },
-  tr: { settings: 'Ayarlar', theme: 'Tema', language: 'Dil', day: 'Gündüz', night: 'Gece', bugReport: 'Sorun bildir', achievements: 'Başarılar', backup: 'Yedek', close: 'Kapat', save: 'Kaydet', aiHelp: 'Yardımcı', fullscreen: 'Tam ekran' },
-  zh: { settings: '设置', theme: '主题', language: '语言', day: '白天', night: '夜晚', bugReport: '报告问题', achievements: '成就', backup: '备份', close: '关闭', save: '保存', aiHelp: '助手', fullscreen: '全屏' },
-};
 
 // ------------------------------------------------------------
 // ТЕМЫ (с вариациями день/ночь для природных)
@@ -106,13 +58,96 @@ const DEFAULTS = {
   haptics: true,
   soundEffects: true,
   reducedMotion: false,
-  autoDetectTheme: false,
 };
 
 export const state = { ...DEFAULTS, achievements: [] };
 
 // ------------------------------------------------------------
-// ХРАНИЛИЩЕ
+// I18N — ЗАГРУЗКА ЯЗЫКОВ ИЗ data/i18n/{code}.json
+// ------------------------------------------------------------
+let translations = {};
+let fallbackTranslations = null;
+let loadingPromise = null;
+
+async function fetchJSON(path) {
+  const r = await fetch(path);
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  return r.json();
+}
+
+async function ensureFallback() {
+  if (fallbackTranslations) return fallbackTranslations;
+  try { fallbackTranslations = await fetchJSON('data/i18n/ru.json'); }
+  catch (e) { fallbackTranslations = {}; }
+  return fallbackTranslations;
+}
+
+export async function loadLanguage(code) {
+  if (loadingPromise && translations._lang === code) return loadingPromise;
+
+  loadingPromise = (async () => {
+    // Всегда держим ru как fallback
+    await ensureFallback();
+
+    if (code === 'ru') {
+      translations = { ...fallbackTranslations, _lang: 'ru' };
+      return translations;
+    }
+
+    try {
+      const data = await fetchJSON(`data/i18n/${code}.json`);
+      translations = { ...data, _lang: code };
+    } catch (e) {
+      console.warn(`Язык "${code}" не загружен, использую ru`);
+      translations = { ...fallbackTranslations, _lang: 'ru' };
+    }
+    return translations;
+  })();
+
+  return loadingPromise;
+}
+
+// Поиск ключа с fallback-цепочкой: текущий язык → ru → default
+export function t(key, fallbackValue) {
+  const parts = String(key).split('.');
+
+  const dig = (obj) => {
+    let v = obj;
+    for (const p of parts) {
+      if (v && v[p] !== undefined) v = v[p];
+      else return undefined;
+    }
+    return v;
+  };
+
+  let v = dig(translations);
+  if (v !== undefined) return v;
+
+  v = dig(fallbackTranslations || {});
+  if (v !== undefined) return v;
+
+  return fallbackValue !== undefined ? fallbackValue : key;
+}
+
+export function applyTranslations() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    const v = t(key);
+    if (v && v !== key) el.textContent = v;
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach(el => {
+    const key = el.dataset.i18nHtml;
+    const v = t(key);
+    if (v && v !== key) el.innerHTML = v;
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const v = t(el.dataset.i18nPlaceholder);
+    if (v) el.placeholder = v;
+  });
+}
+
+// ------------------------------------------------------------
+// ХРАНИЛИЩЕ СОСТОЯНИЯ
 // ------------------------------------------------------------
 export function loadState() {
   try {
@@ -138,7 +173,7 @@ export function setTheme(id, options = {}) {
   if (!supportsVariants) dayNight = 'day';
   if (options.dayNight) dayNight = options.dayNight;
   state.dayNight = dayNight;
-  const attr = dayNight === 'night' && supportsVariants ? `${id}-night` : id;
+  const attr = (dayNight === 'night' && supportsVariants) ? `${id}-night` : id;
   document.documentElement.setAttribute('data-theme', attr);
   document.documentElement.setAttribute('data-theme-base', id);
   document.documentElement.setAttribute('data-daynight', dayNight);
@@ -148,41 +183,18 @@ export function setTheme(id, options = {}) {
 
 export function setDayNight(mode) { setTheme(state.theme, { dayNight: mode }); }
 
-export function getThemeVariants(id) {
-  const t = THEMES.find(x => x.id === id);
-  return t && t.variants ? t.variants : [];
-}
-
 // ------------------------------------------------------------
 // ЯЗЫК
 // ------------------------------------------------------------
-export function setLanguage(code) {
+export async function setLanguage(code) {
   if (!LANGUAGES.find(l => l.code === code)) return;
   state.language = code;
+  await loadLanguage(code);
   document.documentElement.lang = code;
-  document.documentElement.dir = (code === 'ar' || code === 'he') ? 'rtl' : 'ltr';
+  document.documentElement.dir = 'ltr'; // rtl для ar/he, но их нет
   saveState();
   applyTranslations();
   document.dispatchEvent(new CustomEvent('core:languagechange', { detail: { code } }));
-}
-
-export function t(key, fallback) {
-  const dict = TRANSLATIONS[state.language] || TRANSLATIONS.ru;
-  if (dict[key] !== undefined) return dict[key];
-  if (TRANSLATIONS.ru[key] !== undefined) return TRANSLATIONS.ru[key];
-  return fallback !== undefined ? fallback : key;
-}
-
-export function applyTranslations() {
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const key = el.dataset.i18n;
-    const v = t(key);
-    if (v && v !== key) el.textContent = v;
-  });
-  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-    const v = t(el.dataset.i18nPlaceholder);
-    if (v) el.placeholder = v;
-  });
 }
 
 // ------------------------------------------------------------
@@ -247,7 +259,7 @@ export function unlockAchievement(id) {
   saveState();
   const a = ACHIEVEMENTS.find(x => x.id === id);
   if (a) {
-    toast(`${a.emoji} Достижение: ${a.name}`, 'success', 4000);
+    toast(`${a.emoji} ${a.name}`, 'success', 4000);
     haptic([30, 40, 30]);
   }
   return true;
@@ -259,14 +271,12 @@ export function getAchievements() { return state.achievements.slice(); }
 // BUG REPORT
 // ------------------------------------------------------------
 let actionLog = [];
-
 export function logAction(action) {
   actionLog.push({ t: new Date().toISOString(), a: action });
   if (actionLog.length > 30) actionLog.shift();
 }
 
 function collectDiagnostics() {
-  let ua = navigator.userAgent;
   return {
     version: CORE_VERSION,
     page: location.pathname,
@@ -277,7 +287,7 @@ function collectDiagnostics() {
     highContrast: state.highContrast,
     dyslexiaFont: state.dyslexiaFont,
     reducedMotion: state.reducedMotion,
-    ua,
+    ua: navigator.userAgent,
     screen: `${screen.width}x${screen.height}`,
     viewport: `${innerWidth}x${innerHeight}`,
     dpr: window.devicePixelRatio || 1,
@@ -295,21 +305,21 @@ export function openBugReport() {
     modal.className = 'core-modal';
     modal.innerHTML = `
       <div class="core-modal-box">
-        <h3>🐞 ${t('bugTitle')}</h3>
-        <label>${t('bugName')}</label>
+        <h3>🐞 ${t('core.bugTitle', 'Что-то сломалось?')}</h3>
+        <label>${t('core.bugName', 'Ваше имя (необязательно)')}</label>
         <input type="text" id="bugName" placeholder="—">
-        <label>${t('bugProblem')}</label>
+        <label>${t('core.bugProblem', 'Опишите проблему')}</label>
         <textarea id="bugProblem" rows="4" placeholder="Что не работает?"></textarea>
-        <label>${t('bugSteps')}</label>
+        <label>${t('core.bugSteps', 'Что вы делали перед этим?')}</label>
         <textarea id="bugSteps" rows="3" placeholder="Нажимал... открывал..."></textarea>
         <details style="margin-top:12px;">
-          <summary style="cursor:pointer;color:var(--text-secondary);font-size:.9rem;">🔍 ${t('bugAuto')}</summary>
+          <summary style="cursor:pointer;color:var(--text-secondary);font-size:.9rem;">🔍 ${t('core.bugAuto', 'Автоматически прикреплено')}</summary>
           <pre id="bugDiag" style="font-size:.7rem;overflow:auto;max-height:150px;background:rgba(0,0,0,.25);padding:8px;border-radius:8px;margin-top:6px;"></pre>
         </details>
         <div class="core-modal-actions">
-          <button class="core-btn primary" id="bugDownload">⬇ ${t('bugDownload')}</button>
-          <button class="core-btn" id="bugCopy">📋 ${t('bugCopy')}</button>
-          <button class="core-btn" id="bugCancel">${t('bugClose')}</button>
+          <button class="core-btn primary" id="bugDownload">⬇ ${t('core.bugDownload', 'Скачать отчёт')}</button>
+          <button class="core-btn" id="bugCopy">📋 ${t('core.bugCopy', 'Скопировать')}</button>
+          <button class="core-btn" id="bugCancel">${t('core.bugClose', 'Закрыть')}</button>
         </div>
       </div>`;
     document.body.appendChild(modal);
@@ -341,10 +351,10 @@ export function openBugReport() {
     a.download = `bug_${stamp}.txt`;
     a.click();
     URL.revokeObjectURL(a.href);
-    toast(t('bugThanks'), 'success');
+    toast(t('core.bugThanks', 'Спасибо! Отчёт сохранён.'), 'success');
   };
   document.getElementById('bugCopy').onclick = async () => {
-    try { await navigator.clipboard.writeText(buildText()); toast(t('bugCopied'), 'success'); }
+    try { await navigator.clipboard.writeText(buildText()); toast(t('core.bugCopied', 'Скопировано'), 'success'); }
     catch (e) { toast('Не удалось скопировать', 'error'); }
   };
   document.getElementById('bugCancel').onclick = () => modal.classList.remove('active');
@@ -361,11 +371,7 @@ export function exportAllData() {
     try { dump[k] = JSON.parse(localStorage.getItem(k)); }
     catch (e) { dump[k] = localStorage.getItem(k); }
   }
-  const payload = {
-    exportedAt: new Date().toISOString(),
-    version: CORE_VERSION,
-    data: dump,
-  };
+  const payload = { exportedAt: new Date().toISOString(), version: CORE_VERSION, data: dump };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
   const stamp = new Date().toISOString().slice(0, 10);
@@ -382,21 +388,21 @@ export function importAllData(file) {
     try {
       const parsed = JSON.parse(reader.result);
       const data = parsed.data || parsed;
-      if (!confirm(t('confirmRestore'))) return;
+      if (!confirm(t('core.confirmRestore', 'Заменить текущие данные?'))) return;
       Object.entries(data).forEach(([k, v]) => {
         localStorage.setItem(k, typeof v === 'string' ? v : JSON.stringify(v));
       });
-      toast(t('restoreSuccess'), 'success');
+      toast(t('core.restoreSuccess', 'Данные восстановлены!'), 'success');
       setTimeout(() => location.reload(), 800);
     } catch (e) {
-      toast(t('restoreError'), 'error');
+      toast(t('core.restoreError', 'Ошибка чтения файла'), 'error');
     }
   };
   reader.readAsText(file);
 }
 
 // ------------------------------------------------------------
-// КНОПКИ В УГЛУ (шестерёнка, баг, достижения, ИИ)
+// ПЛАВАЮЩИЕ КНОПКИ
 // ------------------------------------------------------------
 function buildFloatingButtons() {
   let wrap = document.getElementById('core-float-buttons');
@@ -404,10 +410,10 @@ function buildFloatingButtons() {
   wrap = document.createElement('div');
   wrap.id = 'core-float-buttons';
   wrap.innerHTML = `
-    <button id="core-btn-ai" class="core-fab" title="${t('aiHelp')}">🤖</button>
-    <button id="core-btn-achievements" class="core-fab" title="${t('achievements')}">🏅</button>
-    <button id="core-btn-bug" class="core-fab bug" title="${t('bugReport')}">🐞</button>
-    <button id="core-btn-settings" class="core-fab" title="${t('settings')}">⚙️</button>
+    <button id="core-btn-ai" class="core-fab" title="${t('core.aiHelp', 'Помощник')}">🤖</button>
+    <button id="core-btn-achievements" class="core-fab" title="${t('core.achievements', 'Достижения')}">🏅</button>
+    <button id="core-btn-bug" class="core-fab bug" title="${t('core.bugReport', 'Сообщить о проблеме')}">🐞</button>
+    <button id="core-btn-settings" class="core-fab" title="${t('core.settings', 'Настройки')}">⚙️</button>
   `;
   document.body.appendChild(wrap);
   document.getElementById('core-btn-bug').onclick = openBugReport;
@@ -434,50 +440,52 @@ function buildSettingsPanel() {
   panel.id = 'core-settings-panel';
   panel.className = 'core-settings-panel';
   const themeOptions = THEMES.map(th => {
-    const variants = th.variants ? th.variants : [];
+    const variants = th.variants || [];
     return `<div class="core-theme-card" data-theme="${th.id}">
       <div class="core-theme-label">${th.label}</div>
       ${variants.length ? `<div class="core-daynight">
-        <button data-daynight="day" class="core-dn-btn">☀️ ${t('day')}</button>
-        <button data-daynight="night" class="core-dn-btn">🌙 ${t('night')}</button>
+        <button data-daynight="day" class="core-dn-btn">☀️ ${t('core.day', 'День')}</button>
+        <button data-daynight="night" class="core-dn-btn">🌙 ${t('core.night', 'Ночь')}</button>
       </div>` : ''}
     </div>`;
   }).join('');
   const langOptions = LANGUAGES.map(l => `<option value="${l.code}">${l.label}</option>`).join('');
+
   panel.innerHTML = `
-    <h3>⚙️ ${t('settings')}</h3>
+    <h3>⚙️ ${t('core.settings', 'Настройки')}</h3>
 
     <div class="core-setting">
-      <label>${t('theme')}</label>
+      <label>${t('core.theme', 'Тема')}</label>
       <div class="core-theme-grid">${themeOptions}</div>
     </div>
 
     <div class="core-setting">
-      <label>${t('language')}</label>
+      <label>${t('core.language', 'Язык')}</label>
       <select id="core-lang-select">${langOptions}</select>
     </div>
 
     <div class="core-setting">
-      <label>${t('fontSize')}</label>
+      <label>${t('core.fontSize', 'Размер шрифта')}</label>
       <div class="core-btn-row">
-        <button data-fs="small">${t('small')}</button>
-        <button data-fs="normal">${t('normal')}</button>
-        <button data-fs="large">${t('large')}</button>
-        <button data-fs="huge">${t('huge')}</button>
+        <button data-fs="small">${t('core.small', 'Мелкий')}</button>
+        <button data-fs="normal">${t('core.normal', 'Средний')}</button>
+        <button data-fs="large">${t('core.large', 'Крупный')}</button>
+        <button data-fs="huge">${t('core.huge', 'Огромный')}</button>
       </div>
     </div>
 
     <div class="core-setting core-switches">
-      <label class="core-switch"><input type="checkbox" id="core-hc"><span></span>${t('highContrast')}</label>
-      <label class="core-switch"><input type="checkbox" id="core-df"><span></span>${t('dyslexiaFont')}</label>
-      <label class="core-switch"><input type="checkbox" id="core-hp"><span></span>${t('haptics')}</label>
-      <label class="core-switch"><input type="checkbox" id="core-se"><span></span>${t('soundEffects')}</label>
-      <label class="core-switch"><input type="checkbox" id="core-rm"><span></span>${t('reducedMotion')}</label>
+      <label class="core-switch"><input type="checkbox" id="core-hc"><span></span>${t('core.highContrast', 'Высокий контраст')}</label>
+      <label class="core-switch"><input type="checkbox" id="core-df"><span></span>${t('core.dyslexiaFont', 'Шрифт для дислексии')}</label>
+      <label class="core-switch"><input type="checkbox" id="core-hp"><span></span>${t('core.haptics', 'Вибрация')}</label>
+      <label class="core-switch"><input type="checkbox" id="core-se"><span></span>${t('core.soundEffects', 'Звуковые эффекты')}</label>
+      <label class="core-switch"><input type="checkbox" id="core-rm"><span></span>${t('core.reducedMotion', 'Меньше анимаций')}</label>
     </div>
 
     <div class="core-setting">
-      <label>🔊 ${t('voiceDownload')}</label>
-      <div class="core-voice-hint">${t('voiceHint')}:<br>
+      <label>🔊 ${t('core.voiceDownload', 'Скачать русский голос')}</label>
+      <div class="core-voice-hint">
+        ${t('core.voiceHint', 'Как установить русскую озвучку')}:<br>
         • Android: Настройки → Язык и ввод → Синтез речи → Google → Русский<br>
         • iOS: Настройки → Универсальный доступ → Речь → Голоса → Русский<br>
         • <a href="https://play.google.com/store/apps/details?id=com.google.android.tts" target="_blank">Google TTS</a>
@@ -485,14 +493,14 @@ function buildSettingsPanel() {
     </div>
 
     <div class="core-setting">
-      <label>💾 ${t('backup')}</label>
+      <label>💾 ${t('core.backup', 'Резервная копия')}</label>
       <div class="core-btn-row">
-        <button id="core-export">${t('downloadAll')}</button>
-        <label class="core-btn" style="cursor:pointer;">${t('restore')}<input type="file" id="core-import" accept=".json" hidden></label>
+        <button id="core-export">${t('core.downloadAll', 'Скачать все данные')}</button>
+        <label class="core-btn" style="cursor:pointer;">${t('core.restore', 'Восстановить из файла')}<input type="file" id="core-import" accept=".json" hidden></label>
       </div>
     </div>
 
-    <button class="core-btn primary" id="core-close-settings">${t('close')}</button>
+    <button class="core-btn primary" id="core-close-settings">${t('core.close', 'Закрыть')}</button>
   `;
   document.body.appendChild(panel);
 
@@ -501,6 +509,7 @@ function buildSettingsPanel() {
     const id = card.dataset.theme;
     const theme = THEMES.find(th => th.id === id);
     if (state.theme === id) card.classList.add('active');
+
     card.querySelector('.core-theme-label').onclick = () => {
       setTheme(id);
       panel.querySelectorAll('.core-theme-card').forEach(c => c.classList.remove('active'));
@@ -535,8 +544,8 @@ function buildSettingsPanel() {
   });
 
   // Свитчи
-  const bind = (id, key) => {
-    const el = panel.querySelector(id);
+  const bind = (sel, key) => {
+    const el = panel.querySelector(sel);
     el.checked = !!state[key];
     el.onchange = () => { state[key] = el.checked; saveState(); applyAccessibility(); };
   };
@@ -577,9 +586,9 @@ export function openAchievementsPanel() {
   }).join('');
   p.innerHTML = `
     <div class="core-modal-box">
-      <h3>🏅 ${t('achievements')} (${state.achievements.length}/${ACHIEVEMENTS.length})</h3>
+      <h3>🏅 ${t('core.achievements', 'Достижения')} (${state.achievements.length}/${ACHIEVEMENTS.length})</h3>
       <div class="core-ach-grid">${list}</div>
-      <button class="core-btn primary" id="core-ach-close">${t('close')}</button>
+      <button class="core-btn primary" id="core-ach-close">${t('core.close', 'Закрыть')}</button>
     </div>`;
   p.classList.add('active');
   p.querySelector('#core-ach-close').onclick = () => p.classList.remove('active');
@@ -589,30 +598,32 @@ export function openAchievementsPanel() {
 // ------------------------------------------------------------
 // ИНИЦИАЛИЗАЦИЯ
 // ------------------------------------------------------------
-export function initCore(options = {}) {
+export async function initCore(options = {}) {
   loadState();
+
+  // Авто-определение тёмной темы
   if (options.autoDetectTheme && !localStorage.getItem('core_state_v5')) {
     const prefersDark = matchMedia('(prefers-color-scheme: dark)').matches;
     state.dayNight = prefersDark ? 'night' : 'day';
   }
+
+  await loadLanguage(state.language);
   setTheme(state.theme, { dayNight: state.dayNight });
-  setLanguage(state.language);
   applyAccessibility();
   buildFloatingButtons();
   applyTranslations();
 
-  // Лог действий
   document.addEventListener('click', e => {
-    const t2 = e.target.closest('button, a, [role="button"]');
-    if (t2) logAction('click:' + (t2.id || t2.textContent || '').toString().slice(0, 40));
+    const el = e.target.closest('button, a, [role="button"]');
+    if (el) logAction('click:' + (el.id || el.textContent || '').toString().slice(0, 40));
   }, true);
 
   document.dispatchEvent(new CustomEvent('core:ready'));
 }
 
-// Экспорт для глобального доступа
+// Глобальный доступ
 window.Core = {
   initCore, setTheme, setDayNight, setLanguage, t, toast,
   exportAllData, importAllData, openBugReport, unlockAchievement,
-  getAchievements, logAction, haptic, state,
+  getAchievements, logAction, haptic, state, loadLanguage,
 };
