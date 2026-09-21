@@ -111,20 +111,39 @@ export async function loadLanguage(code) {
 export function t(key, fallbackValue) {
   const parts = String(key).split('.');
 
-  const dig = (obj) => {
+  const dig = (obj, path) => {
     let v = obj;
-    for (const p of parts) {
+    for (const p of path) {
       if (v && v[p] !== undefined) v = v[p];
       else return undefined;
     }
     return v;
   };
 
-  let v = dig(translations);
+  // 1. Прямой поиск
+  let v = dig(translations, parts);
   if (v !== undefined) return v;
 
-  v = dig(fallbackTranslations || {});
+  // 2. Если ключ однословный — ищем во вложенных разделах
+  if (parts.length === 1) {
+    const sections = ['core', 'header', 'nav', 'about', 'rules', 'cards', 'map', 'parent', 'game', 'research', 'footer'];
+    for (const sec of sections) {
+      v = dig(translations, [sec, parts[0]]);
+      if (v !== undefined) return v;
+    }
+  }
+
+  // 3. Fallback на ru
+  v = dig(fallbackTranslations || {}, parts);
   if (v !== undefined) return v;
+
+  if (parts.length === 1) {
+    const sections = ['core', 'header', 'nav', 'about', 'rules', 'cards', 'map', 'parent', 'game', 'research', 'footer'];
+    for (const sec of sections) {
+      v = dig(fallbackTranslations || {}, [sec, parts[0]]);
+      if (v !== undefined) return v;
+    }
+  }
 
   return fallbackValue !== undefined ? fallbackValue : key;
 }
