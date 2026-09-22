@@ -227,15 +227,12 @@ button{cursor:pointer;border:none;background:none;}
 .btn-action:disabled{opacity:.4;cursor:not-allowed;}
 .btn-action .label-short{display:none;}
 
-.game-log{background:rgba(0,0,0,.25);border-radius:var(--radius-sm);padding:10px 14px;max-height:160px;overflow-y:auto;font-size:.85rem;color:var(--text-secondary);border:1px solid var(--glass-border);scrollbar-width:thin;}
-.game-log .log-entry{padding:4px 0;border-bottom:1px solid rgba(255,255,255,.03);}
-.game-log .log-entry:last-child{border-bottom:none;}
-.game-log .highlight{color:var(--gold);font-weight:600;}
-.game-log .success{color:var(--green);}
-.game-log .fail{color:var(--red);}
-.game-log .partial{color:#f59e0b;}
-.log-export-btn{padding:8px 16px;border:none;border-radius:30px;background:var(--purple);color:#fff;font-weight:500;cursor:pointer;font-family:inherit;font-size:.85rem;align-self:flex-end;margin-top:6px;transition:var(--transition);}
-.log-export-btn:hover{filter:brightness(1.1);}
+/* Лог убран из интерфейса — данные всё равно сохраняются в gameLog/sessionTasks */
+.game-log, .log-export-btn { display: none !important; }
+
+/* Панель игры — даём больше места контенту */
+.game-panel { gap: 12px; }
+.task-area { min-height: auto !important; }
 
 /* ============================================================
    РЕЖИМЫ
@@ -537,7 +534,7 @@ button{cursor:pointer;border:none;background:none;}
 <div class="task-image-modal" id="taskImageModal" onclick="closeTaskImage(event)">
   <button class="task-image-close" onclick="closeTaskImage(event)">✕</button>
   <div class="task-image-content" onclick="event.stopPropagation()">
-    <img id="taskImageBig" src="" alt="" onerror="this.src='images/tasks/_placeholder.svg'">
+    <img id="taskImageBig" src="" alt="" onerror="this.style.display='none';">
     <div class="task-image-name" id="taskImageName"></div>
     <div class="task-image-desc" id="taskImageDesc"></div>
     <div class="task-image-reps" id="taskImageReps"></div>
@@ -644,8 +641,8 @@ button{cursor:pointer;border:none;background:none;}
       </div>
     </div>
 
-    <div class="game-log" id="gameLog"></div>
-    <button class="log-export-btn" onclick="exportLogs()"><i class="fas fa-download"></i> <span data-i18n="game.logExport">Экспорт логов</span></button>
+        <!-- Лог скрыт: данные сохраняются в gameLog, но не показываются -->
+    <div class="game-log" id="gameLog" style="display:none;"></div>
   </div>
 </div>
 
@@ -681,7 +678,7 @@ button{cursor:pointer;border:none;background:none;}
     <div class="physical-task-name" id="physTaskName">Готовы?</div>
     <div class="physical-task-desc" id="physTaskDesc">Нажмите кнопку ниже, чтобы начать.</div>
     <div class="physical-task-reps" id="physTaskReps" style="display:none;"></div>
-    <img class="physical-task-img" id="physTaskImg" src="" alt="" style="display:none;" onerror="this.style.display='none';this.src='images/tasks/_placeholder.svg'">
+    <img class="physical-task-img" id="physTaskImg" src="" alt="" style="display:none;">
 
     <div class="physical-actions" id="physActions" style="display:none;">
       <button class="btn-action" style="background:var(--green);" onclick="completeTask(true)">
@@ -698,6 +695,13 @@ button{cursor:pointer;border:none;background:none;}
       </button>
     </div>
 
+    <div style="margin-top:16px;display:flex;align-items:center;justify-content:center;gap:12px;">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.9rem;color:var(--text-secondary);user-select:none;">
+        <input type="checkbox" id="physAutoSpeak" style="width:18px;height:18px;accent-color:var(--purple);cursor:pointer;">
+        🔊 Автоматически озвучивать задания
+      </label>
+    </div>
+    
     <button class="menu-btn primary" id="physNextBtn" style="margin-top:16px;width:100%;" onclick="physicalNextTask()">
       <i class="fas fa-play"></i> <span id="physNextLabel">Начать</span>
     </button>
@@ -1307,41 +1311,54 @@ async function startGame() {
 // ФИЗИЧЕСКАЯ ВЕРСИЯ
 // ============================================================
 function physicalNextTask() {
-  if (physicalAwaitingNext) {
-    physicalAwaitingNext = false;
-    document.getElementById('physNextBtn').style.display = 'none';
-    document.getElementById('physActions').style.display = 'grid';
-    const task = getNextTaskByFilter(selectedSounds, getCurrentTypes());
-    if (!task) {
-      document.getElementById('physTaskName').textContent = 'Нет заданий';
-      document.getElementById('physTaskDesc').textContent = 'Проверьте настройки и файл tasks_by_sound.json';
-      document.getElementById('physActions').style.display = 'none';
-      document.getElementById('physNextBtn').style.display = 'block';
-      document.getElementById('physNextLabel').textContent = 'Дальше';
-      physicalAwaitingNext = true;
-      return;
-    }
-    currentTask = task;
-    const age = players[0].age;
-    const reps = getReps(task, age);
-    document.getElementById('physTaskName').textContent = task.name;
-    document.getElementById('physTaskDesc').textContent = task.desc || '';
-    document.getElementById('physTaskReps').textContent = `👤 ${age} лет → повторить ${reps} раз`;
-    document.getElementById('physTaskReps').style.display = 'inline-block';
-    const img = document.getElementById('physTaskImg');
-    if (task.img) {
-      img.src = task.img;
-      img.style.display = 'block';
-      img.onerror = function() { this.src = 'images/tasks/_placeholder.svg'; };
-    } else {
-      img.style.display = 'none';
-    }
-    // Озвучка
-    if (Speech && Speech.hasRussianVoice()) {
-      Speech.speak(`${task.name}. ${task.desc || ''}. Повторить ${reps} раз.`);
-    }
-    logAction('physical_task_shown');
+  if (!physicalAwaitingNext) return;
+
+  physicalAwaitingNext = false;
+  document.getElementById('physNextBtn').style.display = 'none';
+  document.getElementById('physActions').style.display = 'grid';
+
+  const task = getNextTaskByFilter(selectedSounds, getCurrentTypes());
+  if (!task) {
+    document.getElementById('physTaskName').textContent = 'Нет заданий';
+    document.getElementById('physTaskDesc').textContent = 'Проверьте настройки и файл tasks_by_sound.json';
+    document.getElementById('physActions').style.display = 'none';
+    document.getElementById('physNextBtn').style.display = 'block';
+    document.getElementById('physNextLabel').textContent = 'Дальше';
+    physicalAwaitingNext = true;
+    return;
   }
+
+  currentTask = task;
+  const age = players[0].age;
+  const reps = getReps(task, age);
+
+  document.getElementById('physTaskName').textContent = task.name;
+  document.getElementById('physTaskDesc').textContent = task.desc || '';
+  document.getElementById('physTaskReps').textContent = `👤 ${age} лет → повторить ${reps} раз`;
+  document.getElementById('physTaskReps').style.display = 'inline-block';
+
+  // Картинка — если нет, полностью скрываем
+  const img = document.getElementById('physTaskImg');
+  img.onerror = null;
+  img.src = '';
+  if (task.img) {
+    img.style.display = 'block';
+    img.onerror = function() {
+      this.style.display = 'none';
+      this.src = '';
+    };
+    img.src = task.img;
+  } else {
+    img.style.display = 'none';
+  }
+
+  // Озвучка — ТОЛЬКО если включена галочка
+  const autoSpeak = document.getElementById('physAutoSpeak')?.checked || false;
+  if (autoSpeak && Speech && Speech.hasRussianVoice()) {
+    Speech.speak(`${task.name}. ${task.desc || ''}. Повторить ${reps} раз.`);
+  }
+
+  logAction('physical_task_shown');
 }
 
 function updatePhysicalCounters() {
@@ -1901,6 +1918,15 @@ function completeTask(success) {
 
     saveCurrentSession();
 
+      // Настройка автоозвучки в физической версии
+  const autoSpeakEl = document.getElementById('physAutoSpeak');
+  if (autoSpeakEl) {
+    autoSpeakEl.checked = localStorage.getItem('phys_auto_speak') === '1';
+    autoSpeakEl.onchange = () => {
+      localStorage.setItem('phys_auto_speak', autoSpeakEl.checked ? '1' : '0');
+    };
+  }
+    
     // Логика переходов
     if (currentVersion === 'physical') {
       updatePhysicalCounters();
