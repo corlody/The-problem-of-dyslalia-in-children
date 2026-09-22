@@ -1,13 +1,16 @@
 /* ============================================================
-   core.js — общий модуль для "Говорю правильно" v5.1
-   Языки загружаются из data/i18n/{code}.json
+   core.js — общий модуль для "Говорю правильно" v5.2
+   - Языки из data/i18n/{code}.json
+   - 18 тем с день/ночь
+   - Выбор и прослушивание голоса
+   - Бэкап, баг-репорт, достижения, ИИ-кнопки
    ============================================================ */
 
-export const CORE_VERSION = '5.1.0';
+export const CORE_VERSION = '5.2.0';
 
-// ------------------------------------------------------------
-// ЯЗЫКИ (только метаданные, переводы — в JSON)
-// ------------------------------------------------------------
+// ============================================================
+// ЯЗЫКИ
+// ============================================================
 export const LANGUAGES = [
   { code: 'ru', label: '🇷🇺 Русский',    name: 'Русский' },
   { code: 'en', label: '🇬🇧 English',    name: 'English' },
@@ -21,9 +24,9 @@ export const LANGUAGES = [
   { code: 'tr', label: '🇹🇷 Türkçe',     name: 'Türkçe' },
 ];
 
-// ------------------------------------------------------------
-// ТЕМЫ (с вариациями день/ночь для природных)
-// ------------------------------------------------------------
+// ============================================================
+// ТЕМЫ
+// ============================================================
 export const THEMES = [
   { id: 'game',      label: '🎮 Игровая' },
   { id: 'official',  label: '📄 Официальная' },
@@ -45,9 +48,9 @@ export const THEMES = [
   { id: 'neon',      label: '⚡ Неон' },
 ];
 
-// ------------------------------------------------------------
+// ============================================================
 // СОСТОЯНИЕ
-// ------------------------------------------------------------
+// ============================================================
 const DEFAULTS = {
   theme: 'game',
   dayNight: 'day',
@@ -58,13 +61,30 @@ const DEFAULTS = {
   haptics: true,
   soundEffects: true,
   reducedMotion: false,
+  preferredVoiceURI: '',
 };
 
 export const state = { ...DEFAULTS, achievements: [] };
 
-// ------------------------------------------------------------
-// I18N — ЗАГРУЗКА ЯЗЫКОВ ИЗ data/i18n/{code}.json
-// ------------------------------------------------------------
+// ============================================================
+// ХРАНИЛИЩЕ
+// ============================================================
+export function loadState() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('core_state_v5') || '{}');
+    Object.assign(state, DEFAULTS, saved);
+    if (!Array.isArray(state.achievements)) state.achievements = [];
+  } catch (e) {}
+  return state;
+}
+
+export function saveState() {
+  try { localStorage.setItem('core_state_v5', JSON.stringify(state)); } catch (e) {}
+}
+
+// ============================================================
+// I18N — загрузка языков
+// ============================================================
 let translations = {};
 let fallbackTranslations = null;
 let loadingPromise = null;
@@ -86,14 +106,11 @@ export async function loadLanguage(code) {
   if (loadingPromise && translations._lang === code) return loadingPromise;
 
   loadingPromise = (async () => {
-    // Всегда держим ru как fallback
     await ensureFallback();
-
     if (code === 'ru') {
       translations = { ...fallbackTranslations, _lang: 'ru' };
       return translations;
     }
-
     try {
       const data = await fetchJSON(`data/i18n/${code}.json`);
       translations = { ...data, _lang: code };
@@ -107,7 +124,7 @@ export async function loadLanguage(code) {
   return loadingPromise;
 }
 
-// Поиск ключа с fallback-цепочкой: текущий язык → ru → default
+// Умный t() с fallback по секциям
 export function t(key, fallbackValue) {
   const parts = String(key).split('.');
 
@@ -124,7 +141,7 @@ export function t(key, fallbackValue) {
   let v = dig(translations, parts);
   if (v !== undefined) return v;
 
-  // 2. Если ключ однословный — ищем во вложенных разделах
+  // 2. Если ключ однословный — ищем во всех секциях
   if (parts.length === 1) {
     const sections = ['core', 'header', 'nav', 'about', 'rules', 'cards', 'map', 'parent', 'game', 'research', 'footer'];
     for (const sec of sections) {
@@ -147,6 +164,7 @@ export function t(key, fallbackValue) {
 
   return fallbackValue !== undefined ? fallbackValue : key;
 }
+
 export function applyTranslations() {
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.dataset.i18n;
@@ -164,24 +182,9 @@ export function applyTranslations() {
   });
 }
 
-// ------------------------------------------------------------
-// ХРАНИЛИЩЕ СОСТОЯНИЯ
-// ------------------------------------------------------------
-export function loadState() {
-  try {
-    const saved = JSON.parse(localStorage.getItem('core_state_v5') || '{}');
-    Object.assign(state, DEFAULTS, saved);
-  } catch (e) {}
-  return state;
-}
-
-export function saveState() {
-  try { localStorage.setItem('core_state_v5', JSON.stringify(state)); } catch (e) {}
-}
-
-// ------------------------------------------------------------
+// ============================================================
 // ТЕМА
-// ------------------------------------------------------------
+// ============================================================
 export function setTheme(id, options = {}) {
   const theme = THEMES.find(t => t.id === id);
   if (!theme) return;
@@ -201,23 +204,23 @@ export function setTheme(id, options = {}) {
 
 export function setDayNight(mode) { setTheme(state.theme, { dayNight: mode }); }
 
-// ------------------------------------------------------------
+// ============================================================
 // ЯЗЫК
-// ------------------------------------------------------------
+// ============================================================
 export async function setLanguage(code) {
   if (!LANGUAGES.find(l => l.code === code)) return;
   state.language = code;
   await loadLanguage(code);
   document.documentElement.lang = code;
-  document.documentElement.dir = 'ltr'; // rtl для ar/he, но их нет
+  document.documentElement.dir = 'ltr';
   saveState();
   applyTranslations();
   document.dispatchEvent(new CustomEvent('core:languagechange', { detail: { code } }));
 }
 
-// ------------------------------------------------------------
+// ============================================================
 // ДОСТУПНОСТЬ
-// ------------------------------------------------------------
+// ============================================================
 export function applyAccessibility() {
   const r = document.documentElement;
   r.classList.toggle('font-small',  state.fontSize === 'small');
@@ -229,17 +232,17 @@ export function applyAccessibility() {
   r.classList.toggle('reduce-motion', !!state.reducedMotion);
 }
 
-// ------------------------------------------------------------
+// ============================================================
 // ВИБРАЦИЯ
-// ------------------------------------------------------------
+// ============================================================
 export function haptic(pattern = 20) {
   if (!state.haptics) return;
   if (navigator.vibrate) { try { navigator.vibrate(pattern); } catch (e) {} }
 }
 
-// ------------------------------------------------------------
+// ============================================================
 // TOAST
-// ------------------------------------------------------------
+// ============================================================
 export function toast(message, type = 'info', duration = 3200) {
   let wrap = document.getElementById('core-toasts');
   if (!wrap) {
@@ -255,11 +258,12 @@ export function toast(message, type = 'info', duration = 3200) {
   setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 350); }, duration);
 }
 
-// ------------------------------------------------------------
+// ============================================================
 // ДОСТИЖЕНИЯ
-// ------------------------------------------------------------
+// ============================================================
 export const ACHIEVEMENTS = [
   { id: 'first_move',   emoji: '🎲', name: 'Первый ход' },
+  { id: 'first_child',  emoji: '👶', name: 'Первый ребёнок' },
   { id: 'five_right',   emoji: '🌟', name: '5 правильных подряд' },
   { id: 'ten_right',    emoji: '💫', name: '10 правильных подряд' },
   { id: 'all_sounds',   emoji: '🔊', name: 'Все звуки' },
@@ -285,9 +289,162 @@ export function unlockAchievement(id) {
 
 export function getAchievements() { return state.achievements.slice(); }
 
-// ------------------------------------------------------------
+// ============================================================
+// ГOЛОС — выбор и прослушивание
+// ============================================================
+let allVoices = [];
+let voicesLoaded = false;
+
+function loadVoicesInternal() {
+  if (!('speechSynthesis' in window)) return;
+  const v = speechSynthesis.getVoices();
+  if (!v.length) return;
+  allVoices = v;
+  voicesLoaded = true;
+}
+
+if ('speechSynthesis' in window) {
+  loadVoicesInternal();
+  window.speechSynthesis.onvoiceschanged = loadVoicesInternal;
+}
+
+export function getRussianVoices() {
+  if (!voicesLoaded) loadVoicesInternal();
+  return allVoices.filter(v => v.lang && (v.lang === 'ru-RU' || v.lang === 'ru' || v.lang.startsWith('ru')));
+}
+
+export function getAllVoices() {
+  if (!voicesLoaded) loadVoicesInternal();
+  return allVoices;
+}
+
+export function getPreferredVoice() {
+  const russian = getRussianVoices();
+  if (russian.length === 0) return null;
+
+  // Сохранённый голос
+  if (state.preferredVoiceURI) {
+    const found = russian.find(v => v.voiceURI === state.preferredVoiceURI);
+    if (found) return found;
+  }
+
+  // Приоритет: Google → Microsoft (Irina/Svetlana) → Apple (Milena) → любой русский
+  const priorities = ['google', 'irina', 'svetlana', 'milena', 'yandex', 'katya', 'microsoft'];
+  for (const p of priorities) {
+    const found = russian.find(v => v.name.toLowerCase().includes(p));
+    if (found) return found;
+  }
+  return russian[0];
+}
+
+export function setPreferredVoice(voiceURI) {
+  state.preferredVoiceURI = voiceURI;
+  saveState();
+}
+
+export function speakTest(text = 'Привет! Так звучит этот голос. Раз, два, три.', voiceURI = null) {
+  if (!('speechSynthesis' in window)) return false;
+  speechSynthesis.cancel();
+  const voices = getRussianVoices();
+  const voice = voiceURI ? voices.find(v => v.voiceURI === voiceURI) : getPreferredVoice();
+  if (!voice) return false;
+  const u = new SpeechSynthesisUtterance(text);
+  u.voice = voice;
+  u.lang = 'ru-RU';
+  u.rate = 0.9;
+  u.pitch = 1.05;
+  u.volume = 1;
+  speechSynthesis.speak(u);
+  return true;
+}
+
+function openVoicePicker() {
+  let modal = document.getElementById('core-voice-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'core-voice-modal';
+    modal.className = 'core-modal';
+    document.body.appendChild(modal);
+  }
+
+  const voices = getRussianVoices();
+  const currentURI = state.preferredVoiceURI || (getPreferredVoice()?.voiceURI || '');
+
+  const voicesHtml = voices.length === 0
+    ? `<div style="padding:20px;text-align:center;color:var(--text-muted);">
+        <p style="font-size:2rem;margin-bottom:12px;">🔇</p>
+        <p><strong>Русские голоса не найдены на этом устройстве.</strong></p>
+        <p style="font-size:.85rem;margin-top:8px;">Установите Google TTS (Android) или скачайте голос в настройках системы.</p>
+        <p style="font-size:.85rem;margin-top:12px;">Подробная инструкция — в разделе «Скачать русский голос».</p>
+      </div>`
+    : voices.map(v => {
+        const isSelected = v.voiceURI === currentURI;
+        const isGoogle = v.name.toLowerCase().includes('google');
+        const isMicrosoft = v.name.toLowerCase().includes('microsoft') || v.name.toLowerCase().includes('irina') || v.name.toLowerCase().includes('svetlana');
+        const isApple = v.name.toLowerCase().includes('milena') || v.name.toLowerCase().includes('katya');
+        let badge = '';
+        if (isGoogle) badge = '<span style="background:rgba(16,185,129,.2);color:var(--green);padding:2px 10px;border-radius:30px;font-size:.7rem;font-weight:600;">Рекомендую</span>';
+        else if (isMicrosoft) badge = '<span style="background:rgba(124,58,237,.2);color:var(--purple-light);padding:2px 10px;border-radius:30px;font-size:.7rem;font-weight:600;">Хороший</span>';
+        else if (isApple) badge = '<span style="background:rgba(245,158,11,.2);color:var(--gold);padding:2px 10px;border-radius:30px;font-size:.7rem;font-weight:600;">Неплохой</span>';
+        return `
+          <div class="core-voice-item ${isSelected ? 'selected' : ''}" data-voice-uri="${v.voiceURI}">
+            <div style="flex:1;min-width:0;">
+              <div style="font-weight:600;font-size:.9rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${v.name}</div>
+              <div style="font-size:.75rem;color:var(--text-muted);margin-top:2px;">${v.lang} ${badge}</div>
+            </div>
+            <button class="core-btn voice-test-btn" data-test-uri="${v.voiceURI}" style="padding:6px 14px;font-size:.8rem;">▶ Прослушать</button>
+          </div>
+        `;
+      }).join('');
+
+  modal.innerHTML = `
+    <div class="core-modal-box">
+      <h3>🎙 Выбор голоса для озвучки</h3>
+      <p style="color:var(--text-secondary);font-size:.85rem;margin-bottom:14px;">
+        ${voices.length > 0 ? `Найдено русских голосов: <strong>${voices.length}</strong>. Нажмите ▶, чтобы услышать, как звучит голос.` : ''}
+      </p>
+      <div class="core-voice-list">${voicesHtml}</div>
+
+      <div style="margin-top:16px;padding:12px 14px;background:rgba(124,58,237,.08);border-left:3px solid var(--purple);border-radius:0 10px 10px 0;font-size:.8rem;color:var(--text-secondary);">
+        💡 <strong>Совет:</strong> лучший русский голос — <strong>Google TTS</strong> (Android). На iOS — <strong>Milena</strong>. На Windows — <strong>Irina Online</strong>. Если голос «противный», скорее всего стоит дефолтный — установите Google TTS.
+      </div>
+
+      <button class="core-btn primary" id="core-voice-close" style="margin-top:16px;">Готово</button>
+    </div>
+  `;
+
+  modal.classList.add('active');
+
+  // Клик по голосу — выбрать
+  modal.querySelectorAll('.core-voice-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+      if (e.target.classList.contains('voice-test-btn')) return;
+      const uri = item.dataset.voiceUri;
+      setPreferredVoice(uri);
+      modal.querySelectorAll('.core-voice-item').forEach(x => x.classList.remove('selected'));
+      item.classList.add('selected');
+      toast('Голос выбран', 'success', 2000);
+    });
+  });
+
+  // Прослушать
+  modal.querySelectorAll('.voice-test-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const uri = btn.dataset.testUri;
+      btn.textContent = '🔊 Звучит...';
+      speakTest('Раз, два, три. Так звучит этот голос.', uri);
+      setTimeout(() => { btn.textContent = '▶ Прослушать'; }, 3000);
+    });
+  });
+
+  modal.querySelector('#core-voice-close').onclick = () => modal.classList.remove('active');
+  modal.onclick = (e) => { if (e.target === modal) modal.classList.remove('active'); };
+}
+
+// ============================================================
 // BUG REPORT
-// ------------------------------------------------------------
+// ============================================================
 let actionLog = [];
 export function logAction(action) {
   actionLog.push({ t: new Date().toISOString(), a: action });
@@ -305,6 +462,7 @@ function collectDiagnostics() {
     highContrast: state.highContrast,
     dyslexiaFont: state.dyslexiaFont,
     reducedMotion: state.reducedMotion,
+    voiceURI: state.preferredVoiceURI || '(авто)',
     ua: navigator.userAgent,
     screen: `${screen.width}x${screen.height}`,
     viewport: `${innerWidth}x${innerHeight}`,
@@ -379,9 +537,9 @@ export function openBugReport() {
   modal.onclick = (e) => { if (e.target === modal) modal.classList.remove('active'); };
 }
 
-// ------------------------------------------------------------
+// ============================================================
 // БЭКАП
-// ------------------------------------------------------------
+// ============================================================
 export function exportAllData() {
   const dump = {};
   for (let i = 0; i < localStorage.length; i++) {
@@ -419,9 +577,9 @@ export function importAllData(file) {
   reader.readAsText(file);
 }
 
-// ------------------------------------------------------------
+// ============================================================
 // ПЛАВАЮЩИЕ КНОПКИ
-// ------------------------------------------------------------
+// ============================================================
 function buildFloatingButtons() {
   let wrap = document.getElementById('core-float-buttons');
   if (wrap) return wrap;
@@ -444,9 +602,9 @@ function buildFloatingButtons() {
   return wrap;
 }
 
-// ------------------------------------------------------------
+// ============================================================
 // ПАНЕЛЬ НАСТРОЕК
-// ------------------------------------------------------------
+// ============================================================
 export function toggleSettingsPanel() {
   let panel = document.getElementById('core-settings-panel');
   if (!panel) panel = buildSettingsPanel();
@@ -457,6 +615,7 @@ function buildSettingsPanel() {
   const panel = document.createElement('div');
   panel.id = 'core-settings-panel';
   panel.className = 'core-settings-panel';
+
   const themeOptions = THEMES.map(th => {
     const variants = th.variants || [];
     return `<div class="core-theme-card" data-theme="${th.id}">
@@ -467,6 +626,7 @@ function buildSettingsPanel() {
       </div>` : ''}
     </div>`;
   }).join('');
+
   const langOptions = LANGUAGES.map(l => `<option value="${l.code}">${l.label}</option>`).join('');
 
   panel.innerHTML = `
@@ -493,16 +653,19 @@ function buildSettingsPanel() {
     </div>
 
     <div class="core-setting core-switches">
-     <label class="core-switch"><input type="checkbox" id="core-hc"><span class="core-switch-label">${t('core.highContrast', 'Высокий контраст')}</span><span></span></label>
-     <label class="core-switch"><input type="checkbox" id="core-df"><span class="core-switch-label">${t('core.dyslexiaFont', 'Шрифт для дислексии')}</span><span></span></label>
-     <label class="core-switch"><input type="checkbox" id="core-hp"><span class="core-switch-label">${t('core.haptics', 'Вибрация')}</span><span></span></label>
-     <label class="core-switch"><input type="checkbox" id="core-se"><span class="core-switch-label">${t('core.soundEffects', 'Звуковые эффекты')}</span><span></span></label>
-     <label class="core-switch"><input type="checkbox" id="core-rm"><span class="core-switch-label">${t('core.reducedMotion', 'Меньше анимаций')}</span><span></span></label>
-   </div>
+      <label class="core-switch"><input type="checkbox" id="core-hc"><span class="core-switch-label">${t('core.highContrast', 'Высокий контраст')}</span><span></span></label>
+      <label class="core-switch"><input type="checkbox" id="core-df"><span class="core-switch-label">${t('core.dyslexiaFont', 'Шрифт для дислексии')}</span><span></span></label>
+      <label class="core-switch"><input type="checkbox" id="core-hp"><span class="core-switch-label">${t('core.haptics', 'Вибрация')}</span><span></span></label>
+      <label class="core-switch"><input type="checkbox" id="core-se"><span class="core-switch-label">${t('core.soundEffects', 'Звуковые эффекты')}</span><span></span></label>
+      <label class="core-switch"><input type="checkbox" id="core-rm"><span class="core-switch-label">${t('core.reducedMotion', 'Меньше анимаций')}</span><span></span></label>
+    </div>
 
     <div class="core-setting">
-      <label>🔊 ${t('core.voiceDownload', 'Скачать русский голос')}</label>
-      <div class="core-voice-hint">
+      <label>🎙 Голос для озвучки</label>
+      <div class="core-btn-row">
+        <button id="core-voice-picker" style="flex:1;">Выбрать голос и прослушать</button>
+      </div>
+      <div class="core-voice-hint" style="margin-top:8px;">
         ${t('core.voiceHint', 'Как установить русскую озвучку')}:<br>
         • Android: Настройки → Язык и ввод → Синтез речи → Google → Русский<br>
         • iOS: Настройки → Универсальный доступ → Речь → Голоса → Русский<br>
@@ -573,6 +736,9 @@ function buildSettingsPanel() {
   bind('#core-se', 'soundEffects');
   bind('#core-rm', 'reducedMotion');
 
+  // Голос
+  panel.querySelector('#core-voice-picker').onclick = openVoicePicker;
+
   // Бэкап
   panel.querySelector('#core-export').onclick = exportAllData;
   panel.querySelector('#core-import').onchange = (e) => {
@@ -583,9 +749,9 @@ function buildSettingsPanel() {
   return panel;
 }
 
-// ------------------------------------------------------------
+// ============================================================
 // ПАНЕЛЬ ДОСТИЖЕНИЙ
-// ------------------------------------------------------------
+// ============================================================
 export function openAchievementsPanel() {
   let p = document.getElementById('core-achievements-panel');
   if (!p) {
@@ -613,13 +779,12 @@ export function openAchievementsPanel() {
   p.onclick = (e) => { if (e.target === p) p.classList.remove('active'); };
 }
 
-// ------------------------------------------------------------
+// ============================================================
 // ИНИЦИАЛИЗАЦИЯ
-// ------------------------------------------------------------
+// ============================================================
 export async function initCore(options = {}) {
   loadState();
 
-  // Авто-определение тёмной темы
   if (options.autoDetectTheme && !localStorage.getItem('core_state_v5')) {
     const prefersDark = matchMedia('(prefers-color-scheme: dark)').matches;
     state.dayNight = prefersDark ? 'night' : 'day';
@@ -644,4 +809,6 @@ window.Core = {
   initCore, setTheme, setDayNight, setLanguage, t, toast,
   exportAllData, importAllData, openBugReport, unlockAchievement,
   getAchievements, logAction, haptic, state, loadLanguage,
+  getRussianVoices, getAllVoices, getPreferredVoice, setPreferredVoice,
+  speakTest, openVoicePicker,
 };
