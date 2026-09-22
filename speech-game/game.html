@@ -724,7 +724,7 @@ import {
   loadTasks, PRESETS, TYPE_LABELS,
   countTasksForSounds, countTasksForSound,
   getAvailableTypesWithCounts, getNextTaskByFilter,
-  resetUsedTasks, getReps
+  resetUsedTasks, getReps, getAllTasks
 } from './js/tasks.js';
 import {
   getResearchChildren, getResearchChild, getChildSounds, saveGameSession
@@ -1101,7 +1101,13 @@ function updateSummary() {
   }
 }
 
-function openSoundPicker(preCheckedSounds = [], childName = null) {
+async function openSoundPicker(preCheckedSounds = [], childName = null) {
+  // На всякий случай — если задания ещё не загружены
+  try {
+    const all = getAllTasks();
+    if (all.length === 0) await loadTasks();
+  } catch (e) { console.warn('reload tasks failed:', e); }
+
   // Сброс
   document.querySelectorAll('#soundCheckboxes input').forEach(cb => {
     cb.checked = false;
@@ -2271,12 +2277,34 @@ function resetGame() {
 // BOOT
 // ============================================================
 async function boot() {
-  await initCore({ autoDetectTheme: true });
+  try {
+    await initCore({ autoDetectTheme: true });
+  } catch (e) {
+    console.warn('initCore failed:', e);
+  }
+
+  // ✅ Загружаем задания ДО всего остального
+  try {
+    await loadTasks();
+    const count = getAllTasks().length;
+    console.log('✅ Задания загружены:', count);
+    if (count === 0) {
+      console.warn('⚠️ tasks_by_sound.json пустой или не загрузился');
+    }
+  } catch (e) {
+    console.error('❌ Не удалось загрузить tasks_by_sound.json:', e);
+  }
+
   loadAdminMode();
-  if (isAdminMode) document.getElementById('adminPanel')?.classList.add('active');
+
+  if (isAdminMode) {
+    document.getElementById('adminPanel')?.classList.add('active');
+  }
+
   if (window.AIAssistant && typeof window.AIAssistant.startIdleWatcher === 'function') {
     window.AIAssistant.startIdleWatcher();
   }
+
   logAction('game:boot');
   console.log('🎮 Game page v6 loaded');
 }
