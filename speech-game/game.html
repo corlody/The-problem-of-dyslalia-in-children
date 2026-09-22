@@ -386,6 +386,64 @@ button{cursor:pointer;border:none;background:none;}
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:.001ms !important;transition-duration:.001ms !important;}
 }
+/* ============================================================
+   ФИНАЛЬНЫЙ ФИКС КАРТЫ — перебивает всё выше
+   ============================================================ */
+.board-container {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 400px !important;
+  gap: 20px !important;
+  max-width: 1700px !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  align-items: start !important;
+  position: relative !important;
+}
+
+.game-map-area {
+  position: relative !important;   /* ← обязательно для overlay */
+  display: block !important;        /* ← убираем flex, который центрировал картинку */
+  width: 100% !important;
+  max-height: none !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  border-radius: var(--radius) !important;
+  border: 1px solid var(--glass-border) !important;
+  background: var(--bg-card) !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,.4) !important;
+  font-size: 0 !important;          /* ← убирает лишний пробел под картинкой */
+  line-height: 0 !important;
+}
+
+.game-map-area > .map-image {
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  max-height: none !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  user-select: none;
+}
+
+.game-map-area > .map-overlay {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  font-size: initial !important;
+  line-height: initial !important;
+  pointer-events: none;
+}
+
+.game-panel {
+  max-height: none !important;      /* ← панель растёт по контенту */
+  overflow-y: visible !important;
+  min-width: 0 !important;
+}
 </style>
 </head>
 <body>
