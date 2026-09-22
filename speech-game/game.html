@@ -48,8 +48,8 @@
 [data-theme="neon"]{--bg-primary:#000;--bg-card:rgba(10,10,20,0.85);--glass-border:rgba(0,255,255,0.35);--purple:#ff0080;--purple-dark:#cc0066;--gold:#00ffff;--text-primary:#fff;--text-secondary:#00ffff;--text-muted:#ff0080;--shadow-glow:0 0 60px rgba(255,0,128,0.5);--shadow-card:0 0 40px rgba(0,255,255,0.3),0 8px 32px rgba(0,0,0,0.5);}
 
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html{font-size:16px;}
-body{font-family:var(--font-family,'Inter',sans-serif);background:var(--bg-primary);color:var(--text-primary);min-height:100vh;min-height:100dvh;overflow-x:hidden;line-height:1.5;transition:background var(--transition-smooth),color var(--transition-smooth);}
+html{font-size:16px;overflow-x:hidden;}
+body{font-family:var(--font-family,'Inter',sans-serif);background:var(--bg-primary);color:var(--text-primary);min-height:100vh;min-height:100dvh;overflow-x:hidden;line-height:1.5;transition:background var(--transition-smooth),color var(--transition-smooth);max-width:100vw;}
 [data-theme^="hacker"] body,[data-theme="retro"] body{font-family:'Share Tech Mono',monospace;}
 button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit;}
 button{cursor:pointer;border:none;background:none;}
@@ -79,6 +79,26 @@ button{cursor:pointer;border:none;background:none;}
 .modal h2{font-family:'Playfair Display',serif;margin-bottom:18px;color:var(--gold);font-size:1.5rem;}
 
 /* ============================================================
+   СОХРАНЁННЫЕ ИГРЫ
+   ============================================================ */
+.session-item{display:flex;align-items:center;gap:12px;padding:14px 16px;background:rgba(255,255,255,.05);border:2px solid var(--glass-border);border-radius:14px;margin-bottom:10px;transition:var(--transition);}
+.session-item:hover{border-color:var(--purple);background:rgba(124,58,237,.08);}
+.session-item .session-info{flex:1;min-width:0;}
+.session-item .session-info .s-name{font-weight:600;font-size:1rem;margin-bottom:4px;word-break:break-word;}
+.session-item .session-info .s-meta{font-size:.8rem;color:var(--text-muted);word-break:break-word;line-height:1.4;}
+.session-item .session-actions{display:flex;gap:8px;flex-shrink:0;align-self:center;}
+.session-item .session-actions button{width:42px;height:42px;padding:0;border:none;border-radius:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--transition);font-family:inherit;font-size:1rem;color:#fff;flex-shrink:0;}
+.session-item .session-actions .btn-open{background:linear-gradient(135deg,var(--purple),var(--purple-dark));}
+.session-item .session-actions .btn-open:hover{filter:brightness(1.1);transform:translateY(-2px);}
+.session-item .session-actions .btn-delete{background:var(--red);}
+.session-item .session-actions .btn-delete:hover{filter:brightness(1.1);transform:translateY(-2px);}
+@media (max-width:500px){
+  .session-item{flex-direction:column;align-items:stretch;gap:10px;}
+  .session-item .session-actions{width:100%;}
+  .session-item .session-actions button{flex:1;width:auto;height:44px;}
+}
+
+/* ============================================================
    ВЕРСИЯ: ЦИФРОВАЯ / ФИЗИЧЕСКАЯ
    ============================================================ */
 .version-switch{display:flex;gap:10px;margin:14px 0 20px;padding:6px;background:rgba(0,0,0,.25);border-radius:60px;border:1px solid var(--glass-border);}
@@ -88,7 +108,6 @@ button{cursor:pointer;border:none;background:none;}
 .version-btn .v-desc{font-size:.7rem;opacity:.7;font-weight:400;}
 .version-btn:hover{background:rgba(255,255,255,.05);}
 .version-btn.active{background:linear-gradient(135deg,var(--purple),var(--purple-dark));color:#fff;box-shadow:0 4px 20px rgba(124,58,237,.35);}
-[data-theme="hacker"] .version-btn.active{background:#00ff41;color:#000;}
 
 /* ============================================================
    ПРЕСЕТЫ
@@ -102,46 +121,49 @@ button{cursor:pointer;border:none;background:none;}
 .preset-card .p-desc{font-size:.7rem;color:var(--text-secondary);line-height:1.3;}
 
 /* ============================================================
-   ТИПЫ ЗАДАНИЙ (чекбоксы с цифрами)
+   ТИПЫ ЗАДАНИЙ
    ============================================================ */
 .types-list{display:flex;flex-direction:column;gap:6px;margin:12px 0;}
 .type-checkbox{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;border-radius:12px;border:1px solid var(--glass-border);background:rgba(255,255,255,.03);cursor:pointer;font-size:.9rem;transition:var(--transition);}
 .type-checkbox:hover{background:rgba(255,255,255,.06);}
 .type-checkbox.checked{border-color:var(--purple);background:rgba(124,58,237,.1);}
 .type-checkbox input{width:18px;height:18px;cursor:pointer;accent-color:var(--purple);flex-shrink:0;}
-.type-checkbox .t-label{flex:1;display:flex;align-items:center;gap:8px;font-weight:500;}
+.type-checkbox .t-label{flex:1;display:flex;align-items:center;gap:8px;font-weight:500;min-width:0;word-break:break-word;}
 .type-checkbox .t-count{font-size:.75rem;color:var(--text-muted);background:rgba(124,58,237,.15);padding:2px 10px;border-radius:30px;font-weight:600;flex-shrink:0;}
 .type-checkbox .t-count.empty{background:rgba(239,68,68,.15);color:var(--red);}
 .type-checkbox .t-count.low{background:rgba(245,158,11,.15);color:var(--gold);}
 
 /* ============================================================
-   ЗВУКИ С БЕЙДЖАМИ
+   ЗВУКИ
    ============================================================ */
-.sound-checkboxes{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin:14px 0;}
-.sound-checkbox{display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(255,255,255,.04);border:2px solid var(--glass-border);border-radius:12px;cursor:pointer;user-select:none;transition:var(--transition);}
+.sound-checkboxes{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin:14px 0;}
+.sound-checkbox{display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(255,255,255,.04);border:2px solid var(--glass-border);border-radius:12px;cursor:pointer;user-select:none;transition:var(--transition);min-width:0;}
 .sound-checkbox:hover{border-color:var(--purple);}
 .sound-checkbox input{width:18px;height:18px;cursor:pointer;accent-color:var(--purple);flex-shrink:0;}
-.sound-checkbox label{cursor:pointer;font-weight:500;flex:1;}
+.sound-checkbox label{cursor:pointer;font-weight:500;flex:1;min-width:0;}
 .sound-checkbox.checked{border-color:var(--gold);background:rgba(245,158,11,.1);}
 .sound-checkbox .sound-count{margin-left:auto;font-size:.7rem;padding:2px 8px;border-radius:30px;background:rgba(124,58,237,.15);color:var(--purple-light);font-weight:600;flex-shrink:0;}
 .sound-checkbox .sound-count.empty{background:rgba(239,68,68,.15);color:var(--red);}
 .sound-checkbox .sound-count.low{background:rgba(245,158,11,.15);color:var(--gold);}
 
-/* Сводка перед стартом */
+.sound-hint{font-size:.85rem;color:var(--text-muted);margin:10px 0;padding:10px 14px;background:rgba(124,58,237,.08);border-radius:10px;border-left:3px solid var(--purple);}
+.sound-hint button{background:none;border:none;color:var(--purple);cursor:pointer;font-weight:600;text-decoration:underline;font-family:inherit;font-size:inherit;}
+
 .start-summary{background:linear-gradient(135deg,rgba(124,58,237,.12),rgba(245,158,11,.08));border:1px solid var(--glass-border);border-radius:16px;padding:14px 18px;margin:14px 0;display:flex;flex-direction:column;gap:6px;}
 .start-summary .ss-row{display:flex;justify-content:space-between;align-items:center;font-size:.9rem;}
 .start-summary .ss-value{font-weight:700;color:var(--gold);}
 .start-summary .ss-warn{color:var(--red);font-weight:700;}
 
 /* ============================================================
-   ФИЗИЧЕСКИЙ РЕЖИМ — ТОЛЬКО КАРТОЧКИ
+   ФИЗИЧЕСКАЯ ВЕРСИЯ
    ============================================================ */
 .physical-board{max-width:900px;margin:0 auto;padding:20px;position:relative;z-index:1;}
 .physical-card{background:var(--bg-card);backdrop-filter:blur(30px) saturate(180%);-webkit-backdrop-filter:blur(30px) saturate(180%);border:1px solid var(--glass-border);border-radius:24px;padding:28px;margin-bottom:20px;box-shadow:var(--shadow-card);}
 .physical-task-name{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,4vw,2.4rem);font-weight:900;color:var(--gold);margin-bottom:10px;word-break:break-word;}
-.physical-task-desc{font-size:clamp(1rem,2vw,1.2rem);color:var(--text-secondary);line-height:1.6;margin-bottom:16px;}
+.physical-task-desc{font-size:clamp(1rem,2vw,1.2rem);color:var(--text-secondary);line-height:1.6;margin-bottom:16px;word-break:break-word;}
 .physical-task-reps{display:inline-block;background:rgba(245,158,11,.15);color:var(--gold);padding:8px 18px;border-radius:980px;font-weight:700;border:1px solid rgba(245,158,11,.3);margin-bottom:16px;}
-.physical-task-img{max-width:100%;max-height:50vh;border-radius:16px;background:#fff;padding:12px;margin:12px 0;display:block;margin-left:auto;margin-right:auto;}
+.physical-task-img{max-width:100%;max-height:50vh;border-radius:16px;background:#fff;padding:12px;margin:12px auto;display:block;}
+.physical-task-img[src=""],.physical-task-img:not([src]){display:none !important;}
 .physical-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:20px;}
 .physical-actions .btn-action{padding:18px 10px;font-size:1rem;border-radius:16px;font-weight:700;color:#fff;border:none;cursor:pointer;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:4px;transition:var(--transition);}
 .physical-actions .btn-action:hover{transform:translateY(-2px);filter:brightness(1.08);}
@@ -154,11 +176,22 @@ button{cursor:pointer;border:none;background:none;}
 .physical-info .pi-value{font-size:1.3rem;font-weight:800;color:var(--gold);}
 
 /* ============================================================
-   ЦИФРОВАЯ ДОСКА
+   ЦИФРОВАЯ ДОСКА — с защитой от grid blowout
    ============================================================ */
-.board-container{display:grid;grid-template-columns:1fr 400px;gap:20px;max-width:1700px;margin:0 auto;position:relative;z-index:1;padding:15px;}
-.game-map-area{position:relative;border-radius:var(--radius);overflow:hidden;border:1px solid var(--glass-border);background:var(--bg-card);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);box-shadow:var(--shadow-card);max-height:calc(100vh - 60px);display:flex;align-items:center;justify-content:center;}
-.map-image{width:100%;height:auto;max-height:calc(100vh - 60px);object-fit:contain;display:block;user-select:none;}
+.board-container{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 400px;
+  gap:20px;
+  max-width:1700px;
+  margin:0 auto;
+  position:relative;
+  z-index:1;
+  padding:15px;
+  box-sizing:border-box;
+  width:100%;
+}
+.game-map-area{position:relative;border-radius:var(--radius);overflow:hidden;border:1px solid var(--glass-border);background:var(--bg-card);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);box-shadow:var(--shadow-card);max-height:calc(100vh - 60px);display:flex;align-items:center;justify-content:center;min-width:0;}
+.map-image{width:100%;height:auto;max-width:100%;max-height:calc(100vh - 60px);object-fit:contain;display:block;user-select:none;}
 .map-overlay{position:absolute;inset:0;pointer-events:none;}
 .map-marker{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;z-index:2;pointer-events:none;}
 .map-marker.admin-clickable{pointer-events:all;cursor:pointer;}
@@ -172,12 +205,12 @@ button{cursor:pointer;border:none;background:none;}
 .player-chip.active-player{border-color:var(--gold);box-shadow:0 0 30px rgba(245,158,11,.9);animation:chipBounce .7s ease-in-out infinite alternate;}
 @keyframes chipBounce{0%{transform:translate(-50%,-50%) scale(1);}100%{transform:translate(-50%,-60%) scale(1.1);}}
 
-.game-panel{background:var(--bg-card);backdrop-filter:blur(30px) saturate(180%);-webkit-backdrop-filter:blur(30px) saturate(180%);border-radius:var(--radius);border:1px solid var(--glass-border);padding:20px;display:flex;flex-direction:column;gap:14px;box-shadow:var(--shadow-card);max-height:calc(100vh - 30px);overflow-y:auto;scrollbar-width:thin;}
+.game-panel{background:var(--bg-card);backdrop-filter:blur(30px) saturate(180%);-webkit-backdrop-filter:blur(30px) saturate(180%);border-radius:var(--radius);border:1px solid var(--glass-border);padding:18px;display:flex;flex-direction:column;gap:12px;box-shadow:var(--shadow-card);max-height:calc(100vh - 30px);overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;min-width:0;box-sizing:border-box;}
 .panel-top{display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;border-bottom:1px solid var(--glass-border);gap:8px;flex-wrap:wrap;}
 .panel-top .btn-icon{background:transparent;border:none;color:var(--text-muted);cursor:pointer;font-size:1rem;padding:8px 12px;border-radius:10px;font-family:inherit;transition:var(--transition);}
 .panel-top .btn-icon:hover{color:var(--gold);background:rgba(245,158,11,.1);}
 
-.turn-indicator{background:rgba(255,255,255,.04);border:1px solid var(--glass-border);border-radius:var(--radius-sm);padding:12px;display:flex;align-items:center;gap:12px;}
+.turn-indicator{background:rgba(255,255,255,.04);border:1px solid var(--glass-border);border-radius:var(--radius-sm);padding:12px;display:flex;align-items:center;gap:12px;min-width:0;}
 .current-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:1.4rem;flex-shrink:0;transition:background .3s;}
 .turn-info{flex:1;min-width:0;}
 .turn-info .label{font-size:.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;}
@@ -198,12 +231,12 @@ button{cursor:pointer;border:none;background:none;}
 .pip-center{grid-area:2/2;}.pip-tl{grid-area:1/1;}.pip-tr{grid-area:1/3;}.pip-bl{grid-area:3/1;}.pip-br{grid-area:3/3;}.pip-ml{grid-area:2/1;}.pip-mr{grid-area:2/3;}
 .dice-result{font-size:.85rem;color:var(--text-secondary);text-align:center;}
 .dice-result strong{color:var(--gold);font-size:1.3rem;display:block;}
-.btn-roll{padding:12px 24px;border:none;border-radius:40px;background:linear-gradient(135deg,var(--purple),var(--purple-dark));color:#fff;font-weight:600;cursor:pointer;font-family:inherit;font-size:1rem;flex-shrink:0;transition:var(--transition);}
+.btn-roll{padding:12px 20px;border:none;border-radius:40px;background:linear-gradient(135deg,var(--purple),var(--purple-dark));color:#fff;font-weight:600;cursor:pointer;font-family:inherit;font-size:.95rem;flex-shrink:0;transition:var(--transition);white-space:nowrap;}
 .btn-roll:hover:not(:disabled){transform:translateY(-2px) scale(1.02);filter:brightness(1.08);}
 .btn-roll:active:not(:disabled){transform:scale(.96);}
 .btn-roll:disabled{opacity:.5;cursor:not-allowed;}
 
-.task-area{background:rgba(255,255,255,.04);border-radius:var(--radius-sm);padding:14px 16px;border:1px solid var(--glass-border);min-height:160px;overflow:visible;}
+.task-area{background:rgba(255,255,255,.04);border-radius:var(--radius-sm);padding:14px 16px;border:1px solid var(--glass-border);min-height:auto;overflow:visible;min-width:0;}
 .task-label{font-size:.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
 .task-card{background:rgba(0,0,0,.3);border-radius:var(--radius-sm);padding:14px 16px;border-left:4px solid var(--purple);margin-bottom:12px;}
 .task-name{font-weight:600;font-size:1.05rem;margin-bottom:6px;word-break:break-word;}
@@ -211,7 +244,7 @@ button{cursor:pointer;border:none;background:none;}
 .task-reps{color:var(--gold);font-size:.85rem;font-weight:500;margin-top:6px;}
 
 .task-image-buttons{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
-.btn-show-image,.btn-speak{padding:10px 22px;border:none;font-weight:600;cursor:pointer;font-family:inherit;font-size:.85rem;display:inline-flex;align-items:center;gap:8px;transition:var(--transition);}
+.btn-show-image,.btn-speak{padding:10px 18px;border:none;font-weight:600;cursor:pointer;font-family:inherit;font-size:.85rem;display:inline-flex;align-items:center;gap:8px;transition:var(--transition);}
 .btn-show-image{background:linear-gradient(135deg,var(--purple),var(--purple-dark));color:#fff;border-radius:980px;}
 .btn-speak{background:rgba(16,185,129,.15);color:var(--green);border:2px solid rgba(16,185,129,.3);border-radius:980px;}
 .btn-speak.speaking{animation:pulseSpeak 1s infinite;}
@@ -227,12 +260,7 @@ button{cursor:pointer;border:none;background:none;}
 .btn-action:disabled{opacity:.4;cursor:not-allowed;}
 .btn-action .label-short{display:none;}
 
-/* Лог убран из интерфейса — данные всё равно сохраняются в gameLog/sessionTasks */
-.game-log, .log-export-btn { display: none !important; }
-
-/* Панель игры — даём больше места контенту */
-.game-panel { gap: 12px; }
-.task-area { min-height: auto !important; }
+.game-log,.log-export-btn{display:none !important;}
 
 /* ============================================================
    РЕЖИМЫ
@@ -246,7 +274,7 @@ button{cursor:pointer;border:none;background:none;}
 .mode-card .mode-desc{font-size:.8rem;color:var(--text-secondary);}
 
 /* ============================================================
-   АДМИН-ПАНЕЛЬ
+   АДМИН
    ============================================================ */
 .admin-panel{display:none;background:rgba(245,158,11,.12);border:2px dashed var(--gold);border-radius:var(--radius-sm);padding:12px;margin-bottom:10px;}
 .admin-panel.active{display:block;}
@@ -260,12 +288,12 @@ button{cursor:pointer;border:none;background:none;}
    ГОЛОС
    ============================================================ */
 .voice-controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;padding:10px;background:rgba(6,182,212,.08);border-radius:12px;border:1px solid rgba(6,182,212,.2);}
-.voice-controls .btn-voice{padding:9px 16px;border-radius:980px;border:none;background:rgba(6,182,212,.2);color:var(--cyan);font-weight:600;cursor:pointer;font-family:inherit;font-size:.82rem;display:inline-flex;align-items:center;gap:6px;transition:var(--transition);}
+.voice-controls .btn-voice{padding:9px 14px;border-radius:980px;border:none;background:rgba(6,182,212,.2);color:var(--cyan);font-weight:600;cursor:pointer;font-family:inherit;font-size:.82rem;display:inline-flex;align-items:center;gap:6px;transition:var(--transition);max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .voice-controls .btn-voice:hover{background:rgba(6,182,212,.3);transform:scale(1.03);}
 .voice-controls .btn-voice.recording{background:var(--red);color:#fff;animation:recPulse 1.2s infinite;}
 .voice-controls .btn-voice.listening{background:var(--purple);color:#fff;animation:recPulse 1.5s infinite;}
 @keyframes recPulse{0%,100%{opacity:1;}50%{opacity:.6;}}
-.voice-result{margin-top:8px;font-size:.85rem;color:var(--text-secondary);}
+.voice-result{margin-top:8px;font-size:.85rem;color:var(--text-secondary);word-break:break-word;}
 .voice-result.matched{color:var(--green);font-weight:700;}
 .voice-result.not-matched{color:var(--red);font-weight:700;}
 
@@ -289,7 +317,7 @@ button{cursor:pointer;border:none;background:none;}
 .empty-research{padding:24px;text-align:center;color:var(--text-muted);background:rgba(255,255,255,.03);border-radius:14px;border:2px dashed var(--glass-border);}
 
 /* ============================================================
-   МОДАЛКА РЕЗУЛЬТАТА
+   ИТОГИ
    ============================================================ */
 .session-summary{text-align:center;padding:10px 0;}
 .session-summary .ss-emoji{font-size:4rem;margin-bottom:12px;}
@@ -300,7 +328,7 @@ button{cursor:pointer;border:none;background:none;}
 .session-summary .ss-tile .ss-v{font-size:2rem;font-weight:900;color:var(--gold);line-height:1;}
 
 /* ============================================================
-   ЗАДАНИЕ МОДАЛКА
+   TASK IMAGE MODAL
    ============================================================ */
 .task-image-modal{position:fixed;inset:0;z-index:1200;background:rgba(0,0,0,.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);display:none;align-items:center;justify-content:center;padding:20px;cursor:pointer;}
 .task-image-modal.active{display:flex;}
@@ -331,15 +359,27 @@ button{cursor:pointer;border:none;background:none;}
 /* ============================================================
    RESPONSIVE
    ============================================================ */
+@media (max-width:1400px){
+  .board-container{grid-template-columns:minmax(0,1fr) 380px;}
+}
+@media (max-width:1300px){
+  .board-container{grid-template-columns:minmax(0,1fr) 360px;gap:14px;padding:12px;}
+  .game-panel{padding:14px;}
+}
+@media (max-width:1100px){
+  .board-container{grid-template-columns:minmax(0,1fr) 340px;gap:12px;}
+  .game-panel{padding:12px;gap:10px;}
+  .voice-controls .btn-voice{font-size:.75rem;padding:8px 10px;}
+}
 @media (max-width:900px){
-  .board-container{grid-template-columns:1fr;gap:12px;padding:10px;}
+  .board-container{grid-template-columns:minmax(0,1fr);gap:12px;padding:10px;}
   .game-panel{max-height:none;padding:16px;}
   .game-map-area{max-height:60vh;}
   .map-image{max-height:60vh;}
   .marker-dot{width:14px;height:14px;font-size:.5rem;}
 }
 @media (max-width:600px){
-  body{padding:10px;font-size:17px;}
+  body{padding:0;font-size:17px;}
   .game-panel{padding:14px;gap:12px;}
   .dice-area{flex-direction:column;align-items:stretch;}
   .btn-roll{width:100%;padding:14px;font-size:1.05rem;}
@@ -363,9 +403,7 @@ button{cursor:pointer;border:none;background:none;}
 
 <canvas id="confetti-canvas"></canvas>
 
-<!-- ============================================================
-     ГЛАВНОЕ МЕНЮ
-     ============================================================ -->
+<!-- ГЛАВНОЕ МЕНЮ -->
 <div class="main-menu" id="mainMenu">
   <h1>🎲 <span data-i18n="header.title">Говорю правильно</span></h1>
   <p class="sub" data-i18n="header.subtitle">Путешествие к вулкану речи</p>
@@ -377,9 +415,7 @@ button{cursor:pointer;border:none;background:none;}
   </div>
 </div>
 
-<!-- ============================================================
-     МОДАЛКА: РЕЖИМЫ
-     ============================================================ -->
+<!-- РЕЖИМЫ -->
 <div class="modal" id="modesModal">
   <div class="modal-box">
     <h2>🎮 Выберите режим игры</h2>
@@ -388,9 +424,7 @@ button{cursor:pointer;border:none;background:none;}
   </div>
 </div>
 
-<!-- ============================================================
-     МОДАЛКА: ВЫБОР РЕБЁНКА
-     ============================================================ -->
+<!-- PLAYER PICKER -->
 <div class="modal" id="playerPickerModal">
   <div class="modal-box">
     <button onclick="promptAdminLogin()" title="Админ-режим" style="position:absolute;top:12px;right:12px;background:transparent;border:none;color:var(--text-muted);cursor:pointer;font-size:1.2rem;padding:6px;">🔧</button>
@@ -405,9 +439,7 @@ button{cursor:pointer;border:none;background:none;}
   </div>
 </div>
 
-<!-- ============================================================
-     МОДАЛКА: СВОЙ ИГРОК
-     ============================================================ -->
+<!-- СВОЙ ИГРОК -->
 <div class="modal" id="setupModal">
   <div class="modal-box">
     <h2>🎲 Настройка игрока</h2>
@@ -436,14 +468,11 @@ button{cursor:pointer;border:none;background:none;}
   </div>
 </div>
 
-<!-- ============================================================
-     МОДАЛКА: ЗВУКИ + ТИПЫ + ПРЕСЕТ + ВЕРСИЯ
-     ============================================================ -->
+<!-- SOUND PICKER -->
 <div class="modal" id="soundPickerModal">
   <div class="modal-box" style="max-width:640px;">
     <h2>🎯 Настройка игры</h2>
 
-    <!-- Версия -->
     <label style="display:block;font-size:.85rem;color:var(--text-secondary);font-weight:600;margin-bottom:6px;">Версия игры:</label>
     <div class="version-switch" id="versionSwitch">
       <button class="version-btn active" data-version="digital" type="button">
@@ -458,11 +487,9 @@ button{cursor:pointer;border:none;background:none;}
       </button>
     </div>
 
-    <!-- Пресет -->
     <label style="display:block;font-size:.85rem;color:var(--text-secondary);font-weight:600;margin:16px 0 6px;">Этап коррекции:</label>
     <div class="preset-grid" id="presetGrid"></div>
 
-    <!-- Звуки -->
     <label style="display:block;font-size:.85rem;color:var(--text-secondary);font-weight:600;margin:16px 0 6px;">Звуки:</label>
     <div class="sound-checkboxes" id="soundCheckboxes">
       <label class="sound-checkbox" data-sound="Л"><input type="checkbox" value="Л"><label>🔤 Звук Л</label><span class="sound-count" data-count-for="Л">—</span></label>
@@ -481,14 +508,11 @@ button{cursor:pointer;border:none;background:none;}
       <button type="button" onclick="selectChildSounds()">только звуки ребёнка</button>
     </div>
 
-    <!-- Типы заданий (раскрывается при выборе "Вручную" или всегда как доп.)
-         Показываем только когда выбран пресет "Вручную" -->
     <div id="typesBlock" style="display:none;">
       <label style="display:block;font-size:.85rem;color:var(--text-secondary);font-weight:600;margin:16px 0 6px;">Типы заданий:</label>
       <div class="types-list" id="typesList"></div>
     </div>
 
-    <!-- Сводка -->
     <div class="start-summary" id="startSummary">
       <div class="ss-row"><span>📊 Всего заданий:</span><span class="ss-value" id="ssTotal">0</span></div>
       <div class="ss-row"><span>🎯 Пресет:</span><span class="ss-value" id="ssPreset">—</span></div>
@@ -502,9 +526,7 @@ button{cursor:pointer;border:none;background:none;}
   </div>
 </div>
 
-<!-- ============================================================
-     МОДАЛКА: СОХРАНЁННЫЕ ИГРЫ
-     ============================================================ -->
+<!-- СОХРАНЁННЫЕ -->
 <div class="modal" id="continueModal">
   <div class="modal-box">
     <h2>📂 Сохранённые игры</h2>
@@ -513,9 +535,7 @@ button{cursor:pointer;border:none;background:none;}
   </div>
 </div>
 
-<!-- ============================================================
-     МОДАЛКА: ЧАСТИЧНОЕ
-     ============================================================ -->
+<!-- ЧАСТИЧНОЕ -->
 <div class="modal" id="partialModal">
   <div class="modal-box">
     <h2>✏️ Частичное выполнение</h2>
@@ -528,9 +548,7 @@ button{cursor:pointer;border:none;background:none;}
   </div>
 </div>
 
-<!-- ============================================================
-     TASK IMAGE MODAL
-     ============================================================ -->
+<!-- TASK IMAGE -->
 <div class="task-image-modal" id="taskImageModal" onclick="closeTaskImage(event)">
   <button class="task-image-close" onclick="closeTaskImage(event)">✕</button>
   <div class="task-image-content" onclick="event.stopPropagation()">
@@ -541,9 +559,7 @@ button{cursor:pointer;border:none;background:none;}
   </div>
 </div>
 
-<!-- ============================================================
-     МОДАЛКА: ИТОГИ СЕССИИ
-     ============================================================ -->
+<!-- ИТОГИ -->
 <div class="modal" id="summaryModal">
   <div class="modal-box">
     <div class="session-summary">
@@ -555,9 +571,7 @@ button{cursor:pointer;border:none;background:none;}
   </div>
 </div>
 
-<!-- ============================================================
-     ЦИФРОВАЯ ДОСКА
-     ============================================================ -->
+<!-- ЦИФРОВАЯ ДОСКА -->
 <div class="board-container" id="gameBoard" style="display:none;">
   <div class="game-map-area">
     <img src="images/map.png" alt="Карта" class="map-image" id="mapImage" onerror="this.style.opacity='0.3'">
@@ -641,14 +655,11 @@ button{cursor:pointer;border:none;background:none;}
       </div>
     </div>
 
-        <!-- Лог скрыт: данные сохраняются в gameLog, но не показываются -->
     <div class="game-log" id="gameLog" style="display:none;"></div>
   </div>
 </div>
 
-<!-- ============================================================
-     ФИЗИЧЕСКАЯ ДОСКА
-     ============================================================ -->
+<!-- ФИЗИЧЕСКАЯ ДОСКА -->
 <div class="physical-board" id="physicalBoard" style="display:none;">
   <div class="physical-info">
     <div class="pi-stat">
@@ -701,7 +712,7 @@ button{cursor:pointer;border:none;background:none;}
         🔊 Автоматически озвучивать задания
       </label>
     </div>
-    
+
     <button class="menu-btn primary" id="physNextBtn" style="margin-top:16px;width:100%;" onclick="physicalNextTask()">
       <i class="fas fa-play"></i> <span id="physNextLabel">Начать</span>
     </button>
@@ -717,28 +728,13 @@ button{cursor:pointer;border:none;background:none;}
   </button>
 </div>
 
-<!-- ============================================================
-     ПОДКЛЮЧЕНИЕ МОДУЛЕЙ
-     ============================================================ -->
 <script type="module">
-import {
-  initCore, t, toast, state, unlockAchievement, logAction, haptic
-} from './js/core.js';
-import {
-  loadTasks, PRESETS, TYPE_LABELS,
-  countTasksForSounds, countTasksForSound,
-  getAvailableTypesWithCounts, getNextTaskByFilter,
-  resetUsedTasks, getReps, getAllTasks
-} from './js/tasks.js';
-import {
-  getResearchChildren, getResearchChild, getChildSounds, saveGameSession
-} from './js/research_bridge.js';
+import { initCore, t, toast, state, unlockAchievement, logAction, haptic } from './js/core.js';
+import { loadTasks, PRESETS, TYPE_LABELS, countTasksForSounds, countTasksForSound, getAvailableTypesWithCounts, getNextTaskByFilter, resetUsedTasks, getReps, getAllTasks } from './js/tasks.js';
+import { getResearchChildren, getResearchChild, getChildSounds, saveGameSession } from './js/research_bridge.js';
 import './js/ai_assistant.js';
 import * as Speech from './js/speech.js';
 
-// ============================================================
-// ДАННЫЕ
-// ============================================================
 const AVATARS = ['🧙','🧝','🦊','🐺','🐉','🦄','⚔️','🛡️','🌟','🌈','🎯','🏹','🗡️','👑','🐱','🐶','🐼','🦁','🐯','🦅'];
 const PLAYER_COLORS = ['#ef4444','#3b82f6','#10b981','#f59e0b'];
 
@@ -786,9 +782,6 @@ const MODES = [
   { id:'endless', emoji:'♾️', name:'Бесконечный', desc:'Без финиша.' }
 ];
 
-// ============================================================
-// СОСТОЯНИЕ
-// ============================================================
 let players = [];
 let activePlayerIndex = 0;
 let selectedCount = 1;
@@ -801,9 +794,9 @@ let currentSessionId = null;
 let gameLog = [];
 let currentChildId = null;
 let selectedSounds = [];
-let selectedTypes = []; // пустой = все
+let selectedTypes = [];
 let currentPreset = 'post';
-let currentVersion = 'digital'; // digital | physical
+let currentVersion = 'digital';
 let sessionStartTime = null;
 let sessionTasks = [];
 let isAdminMode = false;
@@ -811,14 +804,9 @@ let currentMode = 'classic';
 let modeState = { timer: null, secondsLeft: 0, score: 0, marathonFailed: false, teamDragonHP: 10 };
 let recordingBlob = null;
 let isRecording = false;
-let voiceListening = false;
-let voiceRecognitionObj = null;
-let physicalAwaitingNext = true; // ждём нажатия "Начать / Следующее"
+let physicalAwaitingNext = true;
 const ADMIN_PASSWORD = 'admin2026';
 
-// ============================================================
-// АДМИН
-// ============================================================
 function promptAdminLogin() {
   const pwd = prompt('🔧 Введите пароль администратора:');
   if (pwd === null) return;
@@ -855,9 +843,6 @@ function adminJumpTo(cellNumber) {
   saveCurrentSession();
 }
 
-// ============================================================
-// РЕЖИМЫ
-// ============================================================
 function showModesMenu() {
   const grid = document.getElementById('modeGrid');
   grid.innerHTML = MODES.map(m => `
@@ -878,16 +863,12 @@ function showModesMenu() {
   });
   document.getElementById('modesModal').classList.add('active');
 }
-
 function updateModeLabel() {
   const m = MODES.find(x => x.id === currentMode);
   const el = document.getElementById('modeLabel');
   if (el && m) el.textContent = `${m.emoji} ${m.name}`;
 }
 
-// ============================================================
-// НАСТРОЙКА ИГРОКОВ
-// ============================================================
 function setPlayerCount(count) {
   selectedCount = count;
   document.querySelectorAll('.player-count-btns button').forEach((b, i) => {
@@ -921,39 +902,23 @@ function renderSetupInputs() {
     document.getElementById(`pAvatar${i}`).selectedIndex = i % AVATARS.length;
   }
 }
-
 function showSetup() { openPlayerPicker(); }
 function closeModal(id) { document.getElementById(id)?.classList.remove('active'); }
 
-// ============================================================
-// ВЫБОР РЕБЁНКА
-// ============================================================
 let pickedChildId = null;
-
 function openPlayerPicker() {
   const children = getResearchChildren();
   const list = document.getElementById('playerPickerList');
   list.innerHTML = '';
   if (children.length === 0) {
-    list.innerHTML = `<div class="empty-research">
-      <div style="font-size:2rem;margin-bottom:10px;">📋</div>
-      <div style="font-weight:600;margin-bottom:6px;">В исследовании пока нет детей</div>
-      <div style="font-size:.85rem;">Сначала заполните карточки на странице «Исследование»,<br>либо нажмите «Свой игрок» для ручного ввода.</div>
-    </div>`;
+    list.innerHTML = `<div class="empty-research"><div style="font-size:2rem;margin-bottom:10px;">📋</div><div style="font-weight:600;margin-bottom:6px;">В исследовании пока нет детей</div><div style="font-size:.85rem;">Сначала заполните карточки на странице «Исследование»,<br>либо нажмите «Свой игрок» для ручного ввода.</div></div>`;
   } else {
     children.forEach(child => {
       const sounds = getChildSounds(child);
       const div = document.createElement('div');
       div.className = 'player-picker-item';
       div.dataset.childId = child.id;
-      div.innerHTML = `
-        <div style="font-size:2rem;">${child.researchGroup === 'exp' ? '🧪' : '📊'}</div>
-        <div class="info">
-          <div class="name">${child.name}</div>
-          <div class="meta">${child.age} лет · ${child.group || '—'}</div>
-          ${sounds.length ? `<span class="sounds">Звуки: ${sounds.join(', ')}</span>` : ''}
-        </div>
-        <i class="fas fa-chevron-right" style="color:var(--text-muted);"></i>`;
+      div.innerHTML = `<div style="font-size:2rem;">${child.researchGroup === 'exp' ? '🧪' : '📊'}</div><div class="info"><div class="name">${child.name}</div><div class="meta">${child.age} лет · ${child.group || '—'}</div>${sounds.length ? `<span class="sounds">Звуки: ${sounds.join(', ')}</span>` : ''}</div><i class="fas fa-chevron-right" style="color:var(--text-muted);"></i>`;
       div.addEventListener('click', () => selectChildFromPicker(child.id));
       list.appendChild(div);
     });
@@ -961,7 +926,6 @@ function openPlayerPicker() {
   document.getElementById('confirmPlayerBtn').disabled = true;
   document.getElementById('playerPickerModal').classList.add('active');
 }
-
 function selectChildFromPicker(childId) {
   pickedChildId = childId;
   document.querySelectorAll('.player-picker-item').forEach(el => {
@@ -969,7 +933,6 @@ function selectChildFromPicker(childId) {
   });
   document.getElementById('confirmPlayerBtn').disabled = false;
 }
-
 function confirmPlayerPicker() {
   if (!pickedChildId) return;
   const child = getResearchChild(pickedChildId);
@@ -979,7 +942,6 @@ function confirmPlayerPicker() {
   closeModal('playerPickerModal');
   openSoundPicker(sounds, child.name);
 }
-
 function openCustomPlayerForm() {
   closeModal('playerPickerModal');
   currentChildId = null;
@@ -987,9 +949,6 @@ function openCustomPlayerForm() {
   renderSetupInputs();
 }
 
-// ============================================================
-// ВЫБОР ЗВУКОВ + ТИПОВ + ПРЕСЕТОВ
-// ============================================================
 function renderPresetGrid() {
   const grid = document.getElementById('presetGrid');
   if (!grid) return;
@@ -1005,11 +964,9 @@ function renderPresetGrid() {
       currentPreset = card.dataset.preset;
       grid.querySelectorAll('.preset-card').forEach(c => c.classList.remove('selected'));
       card.classList.add('selected');
-      // Если выбран пресет "Вручную" — показываем типы
       const typesBlock = document.getElementById('typesBlock');
       if (currentPreset === 'custom') {
         typesBlock.style.display = 'block';
-        // По умолчанию отмечаем все
         if (selectedTypes.length === 0) {
           selectedTypes = Object.keys(TYPE_LABELS);
           renderTypesList();
@@ -1022,7 +979,6 @@ function renderPresetGrid() {
     };
   });
 }
-
 function renderTypesList() {
   const list = document.getElementById('typesList');
   if (!list) return;
@@ -1034,13 +990,7 @@ function renderTypesList() {
     let countCls = 't-count';
     if (count === 0) countCls += ' empty';
     else if (count < 3) countCls += ' low';
-    return `
-      <label class="${cls}" data-type="${type}">
-        <input type="checkbox" ${checked ? 'checked' : ''} data-type-input="${type}">
-        <span class="t-label">${label}</span>
-        <span class="${countCls}">${count}</span>
-      </label>
-    `;
+    return `<label class="${cls}" data-type="${type}"><input type="checkbox" ${checked ? 'checked' : ''} data-type-input="${type}"><span class="t-label">${label}</span><span class="${countCls}">${count}</span></label>`;
   }).join('');
   list.querySelectorAll('.type-checkbox').forEach(el => {
     const input = el.querySelector('input');
@@ -1056,11 +1006,8 @@ function renderTypesList() {
     };
   });
 }
-
 function updateSoundCounts() {
-  const currentTypes = currentPreset === 'custom'
-    ? selectedTypes
-    : (PRESETS[currentPreset]?.types || []);
+  const currentTypes = currentPreset === 'custom' ? selectedTypes : (PRESETS[currentPreset]?.types || []);
   document.querySelectorAll('.sound-checkbox').forEach(el => {
     const sound = el.dataset.sound;
     const countEl = el.querySelector('.sound-count');
@@ -1072,12 +1019,10 @@ function updateSoundCounts() {
     else if (count < 3) countEl.classList.add('low');
   });
 }
-
 function getCurrentTypes() {
   if (currentPreset === 'custom') return selectedTypes;
   return PRESETS[currentPreset]?.types || [];
 }
-
 function updateSummary() {
   const types = getCurrentTypes();
   const total = countTasksForSounds(selectedSounds, types);
@@ -1091,8 +1036,6 @@ function updateSummary() {
   }
   if (ssPreset) ssPreset.textContent = PRESETS[currentPreset]?.name || '—';
   if (ssVersion) ssVersion.textContent = currentVersion === 'digital' ? 'Цифровая' : 'Физическая';
-
-  // Блокируем старт, если 0 заданий или 0 звуков
   const startBtn = document.getElementById('startGameBtn');
   if (startBtn) {
     if (total === 0 || selectedSounds.length === 0) {
@@ -1104,15 +1047,12 @@ function updateSummary() {
     }
   }
 }
-
 async function openSoundPicker(preCheckedSounds = [], childName = null) {
-  // На всякий случай — если задания ещё не загружены
   try {
     const all = getAllTasks();
     if (all.length === 0) await loadTasks();
   } catch (e) { console.warn('reload tasks failed:', e); }
 
-  // Сброс
   document.querySelectorAll('#soundCheckboxes input').forEach(cb => {
     cb.checked = false;
     cb.closest('.sound-checkbox').classList.remove('checked');
@@ -1122,13 +1062,11 @@ async function openSoundPicker(preCheckedSounds = [], childName = null) {
     if (cb) { cb.checked = true; cb.closest('.sound-checkbox').classList.add('checked'); }
   });
   selectedSounds = preCheckedSounds.slice();
-  // По умолчанию пресет «Постановка»
   currentPreset = 'post';
   selectedTypes = [];
   renderPresetGrid();
   renderTypesList();
 
-  const hint = document.getElementById('soundPickerHint');
   document.querySelectorAll('#soundCheckboxes input').forEach(cb => {
     cb.onchange = function() {
       const sound = this.value;
@@ -1144,7 +1082,6 @@ async function openSoundPicker(preCheckedSounds = [], childName = null) {
     };
   });
 
-  // Версия
   document.querySelectorAll('.version-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.version === currentVersion);
     b.onclick = () => {
@@ -1159,7 +1096,6 @@ async function openSoundPicker(preCheckedSounds = [], childName = null) {
   updateSummary();
   document.getElementById('soundPickerModal').classList.add('active');
 }
-
 function selectAllSounds() {
   document.querySelectorAll('#soundCheckboxes input').forEach(cb => {
     cb.checked = true;
@@ -1196,10 +1132,6 @@ function confirmSoundPicker() {
   closeModal('soundPickerModal');
   startGame();
 }
-
-// ============================================================
-// СТАРТ
-// ============================================================
 function startNewGameFromSetup() {
   currentChildId = null;
   const sameAge = document.getElementById('sameAgeCheckbox')?.checked || false;
@@ -1214,7 +1146,6 @@ function startNewGameFromSetup() {
   closeModal('setupModal');
   openSoundPicker([], null);
 }
-
 async function startGame() {
   if (currentChildId) {
     const child = getResearchChild(currentChildId);
@@ -1230,7 +1161,6 @@ async function startGame() {
   sessionStartTime = new Date().toISOString();
   currentSessionId = null;
   physicalAwaitingNext = true;
-
   modeState.score = 0;
   modeState.marathonFailed = false;
   modeState.teamDragonHP = 10;
@@ -1239,6 +1169,15 @@ async function startGame() {
 
   await loadTasks();
   resetUsedTasks();
+
+  // Настройка автоозвучки в физической версии
+  const autoSpeakEl = document.getElementById('physAutoSpeak');
+  if (autoSpeakEl) {
+    autoSpeakEl.checked = localStorage.getItem('phys_auto_speak') === '1';
+    autoSpeakEl.onchange = () => {
+      localStorage.setItem('phys_auto_speak', autoSpeakEl.checked ? '1' : '0');
+    };
+  }
 
   document.getElementById('mainMenu').classList.add('hidden');
 
@@ -1252,9 +1191,10 @@ async function startGame() {
     document.getElementById('physTaskImg').style.display = 'none';
     document.getElementById('physTaskReps').style.display = 'none';
     document.getElementById('physActions').style.display = 'none';
+    document.getElementById('physNextBtn').style.display = 'block';
+    document.getElementById('physAutoSpeak').parentElement.parentElement.style.display = 'flex';
     updatePhysicalCounters();
 
-    // Голосовое управление
     const physVoice = document.getElementById('physVoiceControls');
     if (Speech && typeof Speech.isRecognitionAvailable === 'function' && Speech.isRecognitionAvailable()) {
       physVoice.style.display = 'flex';
@@ -1307,12 +1247,8 @@ async function startGame() {
   saveCurrentSession();
 }
 
-// ============================================================
-// ФИЗИЧЕСКАЯ ВЕРСИЯ
-// ============================================================
 function physicalNextTask() {
   if (!physicalAwaitingNext) return;
-
   physicalAwaitingNext = false;
   document.getElementById('physNextBtn').style.display = 'none';
   document.getElementById('physActions').style.display = 'grid';
@@ -1337,30 +1273,23 @@ function physicalNextTask() {
   document.getElementById('physTaskReps').textContent = `👤 ${age} лет → повторить ${reps} раз`;
   document.getElementById('physTaskReps').style.display = 'inline-block';
 
-  // Картинка — если нет, полностью скрываем
   const img = document.getElementById('physTaskImg');
   img.onerror = null;
   img.src = '';
   if (task.img) {
     img.style.display = 'block';
-    img.onerror = function() {
-      this.style.display = 'none';
-      this.src = '';
-    };
+    img.onerror = function() { this.style.display = 'none'; this.src = ''; };
     img.src = task.img;
   } else {
     img.style.display = 'none';
   }
 
-  // Озвучка — ТОЛЬКО если включена галочка
   const autoSpeak = document.getElementById('physAutoSpeak')?.checked || false;
   if (autoSpeak && Speech && Speech.hasRussianVoice()) {
     Speech.speak(`${task.name}. ${task.desc || ''}. Повторить ${reps} раз.`);
   }
-
   logAction('physical_task_shown');
 }
-
 function updatePhysicalCounters() {
   const total = sessionTasks.length;
   const done = sessionTasks.filter(t => t.result === 'done').length;
@@ -1371,7 +1300,6 @@ function updatePhysicalCounters() {
   document.getElementById('physPartial').textContent = partial;
   document.getElementById('physFailed').textContent = failed;
 }
-
 function finishPhysicalSession() {
   if (sessionTasks.length === 0) {
     if (confirm('Заданий ещё не было. Выйти в меню?')) exitToMenu();
@@ -1380,13 +1308,6 @@ function finishPhysicalSession() {
   showSessionSummary();
 }
 
-// ============================================================
-// ВЫБОР ЗВУКОВ В ЦИФРОВОЙ ВЕРСИИ — та же логика
-// ============================================================
-
-// ============================================================
-// СТАРЫЕ ФУНКЦИИ ПРОДОЛЖЕНИЯ
-// ============================================================
 function showContinueMenu() {
   const list = document.getElementById('gameList');
   const sessions = getAllSessions();
@@ -1396,26 +1317,28 @@ function showContinueMenu() {
     list.innerHTML = '';
     sessions.forEach((session, index) => {
       const div = document.createElement('div');
-      div.className = 'player-picker-item';
-      const date = new Date(session.savedAt).toLocaleString();
+      div.className = 'session-item';
+      const date = new Date(session.savedAt).toLocaleString('ru-RU', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
       const playersInfo = session.players.map(p => `${p.name} (${p.age})`).join(', ');
+      const cell = (session.players[0]?.cell || 0) + 1;
+      const preset = session.preset ? ` · этап: ${session.preset}` : '';
       div.innerHTML = `
-        <div class="info">
-          <div class="name">${playersInfo}</div>
-          <div class="meta">${date} · Клетка ${(session.players[0]?.cell || 0) + 1}</div>
+        <div class="session-info">
+          <div class="s-name">${playersInfo}</div>
+          <div class="s-meta">📅 ${date}</div>
+          <div class="s-meta">🎯 Клетка ${cell}${preset}</div>
         </div>
-        <button class="menu-btn primary" style="padding:8px 16px;font-size:.85rem;" onclick="event.stopPropagation();loadSession(${index})"><i class="fas fa-play"></i></button>
-        <button class="menu-btn danger" style="padding:8px 16px;font-size:.85rem;" onclick="event.stopPropagation();deleteSession(${index})"><i class="fas fa-trash"></i></button>
-      `;
+        <div class="session-actions">
+          <button class="btn-open" onclick="event.stopPropagation();loadSession(${index})" title="Продолжить"><i class="fas fa-play"></i></button>
+          <button class="btn-delete" onclick="event.stopPropagation();deleteSession(${index})" title="Удалить"><i class="fas fa-trash"></i></button>
+        </div>`;
       list.appendChild(div);
     });
   }
   document.getElementById('continueModal').classList.add('active');
 }
-
 function getAllSessions() { try { return JSON.parse(localStorage.getItem('speech_sessions') || '[]'); } catch(e) { return []; } }
 function saveSessions(s) { try { localStorage.setItem('speech_sessions', JSON.stringify(s)); } catch(e) {} }
-
 async function loadSession(index) {
   const sessions = getAllSessions();
   if (index >= sessions.length) return;
@@ -1441,7 +1364,6 @@ async function loadSession(index) {
   renderLogFromArray();
   if (isAdminMode) { document.getElementById('adminPanel').classList.add('active'); renderStaticMap(); }
 }
-
 function deleteSession(index) {
   if (!confirm('Удалить эту игру?')) return;
   const sessions = getAllSessions();
@@ -1450,18 +1372,13 @@ function deleteSession(index) {
   showContinueMenu();
 }
 
-// ============================================================
-// КАРТА (ТОЛЬКО ЦИФРОВАЯ)
-// ============================================================
 function renderStaticMap() {
   const overlay = document.getElementById('mapOverlay');
   if (!overlay) return;
   overlay.innerHTML = '';
   const specialCells = {
-    0: { emoji: '🌿', cls: 'special' },
-    15: { emoji: '🧗', cls: 'special' },
-    17: { emoji: '🦛', cls: 'special' },
-    31: { emoji: '🔥', cls: 'fire' },
+    0: { emoji: '🌿', cls: 'special' }, 15: { emoji: '🧗', cls: 'special' },
+    17: { emoji: '🦛', cls: 'special' }, 31: { emoji: '🔥', cls: 'fire' },
     88: { emoji: '🏁', cls: 'finish' }
   };
   MAP_POINTS.forEach((pt, index) => {
@@ -1480,7 +1397,6 @@ function renderStaticMap() {
     overlay.appendChild(marker);
   });
 }
-
 function updateAllChips() {
   document.querySelectorAll('.player-chip').forEach(c => c.remove());
   const overlay = document.getElementById('mapOverlay');
@@ -1500,7 +1416,6 @@ function updateAllChips() {
     overlay.appendChild(chip);
   });
 }
-
 function updateTurnUI() {
   if (isGameFinished || players.length === 0) return;
   const p = players[activePlayerIndex];
@@ -1515,10 +1430,6 @@ function updateTurnUI() {
   if (cellEl) cellEl.textContent = p.cell + 1;
   updateAllChips();
 }
-
-// ============================================================
-// ДВИЖЕНИЕ
-// ============================================================
 function moveChipStepByStep(playerIndex, fromCell, toCell, callback) {
   if (fromCell === toCell) { if (callback) callback(); return; }
   const overlay = document.getElementById('mapOverlay');
@@ -1550,10 +1461,6 @@ function moveChipStepByStep(playerIndex, fromCell, toCell, callback) {
   }
   doStep();
 }
-
-// ============================================================
-// КУБИК
-// ============================================================
 function rollDice() {
   if (!canRoll || isGameFinished || isProcessing || isMoving || players.length === 0) return;
   if (currentVersion === 'physical') return;
@@ -1575,7 +1482,6 @@ function rollDice() {
   if (window.AIAssistant) window.AIAssistant.notifyAction('roll');
   setTimeout(() => moveCurrentPlayer(result), 1200);
 }
-
 function moveCurrentPlayer(steps) {
   const p = players[activePlayerIndex];
   const oldCell = p.cell;
@@ -1618,7 +1524,6 @@ function moveCurrentPlayer(steps) {
     updateAllChips(); updateTurnUI();
     if (extraMessage) addLog(`<span class="highlight">${extraMessage}</span>`);
     addLog(`🎲 ${p.name} выбросил ${steps} → клетка ${p.cell + 1}`);
-
     if (isCampfire) {
       addLog(`🔥 <span class="highlight">Костёр!</span> ${p.name} получает доп. ход!`);
       setTimeout(() => {
@@ -1637,10 +1542,6 @@ function moveCurrentPlayer(steps) {
     saveCurrentSession();
   });
 }
-
-// ============================================================
-// ЗАДАНИЯ
-// ============================================================
 function showTask() {
   const p = players[activePlayerIndex];
   const age = p.age;
@@ -1659,12 +1560,7 @@ function showTask() {
   }
 
   let task = getNextTaskByFilter(selectedSounds, types);
-
-  if (!task) {
-    resetUsedTasks();
-    task = getNextTaskByFilter(selectedSounds, types);
-  }
-
+  if (!task) { resetUsedTasks(); task = getNextTaskByFilter(selectedSounds, types); }
   if (!task) {
     document.getElementById('taskName').textContent = 'Нет заданий';
     document.getElementById('taskDesc').textContent = 'Проверьте, что файл data/tasks_by_sound.json загружается. Откройте консоль (F12).';
@@ -1709,27 +1605,20 @@ function showTask() {
   document.getElementById('rollBtn').disabled = true;
   canRoll = false;
   isProcessing = false;
-
   if (window.AIAssistant) window.AIAssistant.notifyAction('task_shown');
 }
-
 function showTaskImage(task, age, reps) {
   const modal = document.getElementById('taskImageModal');
-  document.getElementById('taskImageBig').src = task.img || 'images/tasks/_placeholder.svg';
+  document.getElementById('taskImageBig').src = task.img || '';
   document.getElementById('taskImageName').textContent = task.name;
   document.getElementById('taskImageDesc').textContent = task.desc || '';
   document.getElementById('taskImageReps').textContent = `Повторить ${reps} раз`;
   modal.classList.add('active');
 }
-
 function closeTaskImage(e) {
   if (e) e.stopPropagation();
   document.getElementById('taskImageModal').classList.remove('active');
 }
-
-// ============================================================
-// ОЗВУЧКА
-// ============================================================
 function speakTask(task, reps) {
   if (!Speech || typeof Speech.speak !== 'function') { alert('Озвучка не поддерживается'); return; }
   if (!Speech.hasRussianVoice()) {
@@ -1744,10 +1633,6 @@ function speakTask(task, reps) {
     onError: () => btn && btn.classList.remove('speaking')
   });
 }
-
-// ============================================================
-// ГОЛОСОВОЕ УПРАВЛЕНИЕ (да / нет / частично)
-// ============================================================
 async function startVoiceCommand() {
   if (!Speech || !Speech.isRecognitionAvailable()) { toast('Распознавание речи не поддерживается', 'error'); return; }
   const isPhysical = currentVersion === 'physical';
@@ -1756,12 +1641,10 @@ async function startVoiceCommand() {
   const btn = document.getElementById(btnId);
   const result = document.getElementById(resId);
   if (!btn || !result) return;
-
   btn.classList.add('listening');
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Слушаю...';
   result.textContent = '🎤 Скажите: «да», «нет» или «частично».';
   result.className = 'voice-result';
-
   try {
     const heard = await Speech.recognizeOnce({ lang: 'ru-RU', timeout: 6000 });
     const norm = String(heard).toLowerCase();
@@ -1788,10 +1671,6 @@ async function startVoiceCommand() {
     btn.innerHTML = '<i class="fas fa-assistive-listening-systems"></i> Слушать команды';
   }
 }
-
-// ============================================================
-// РАСПОЗНАВАНИЕ ПРОИЗНОШЕНИЯ
-// ============================================================
 async function startRecognition() {
   if (!Speech || !Speech.isRecognitionAvailable()) { toast('Распознавание речи не поддерживается', 'error'); return; }
   const btn = document.getElementById('btnRecognize');
@@ -1800,7 +1679,6 @@ async function startRecognition() {
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Слушаю...';
   result.textContent = '🎤 Говорите...';
   result.className = 'voice-result';
-
   try {
     const heard = await Speech.recognizeOnce({ lang: 'ru-RU', timeout: 8000 });
     result.textContent = `Услышано: «${heard}»`;
@@ -1828,12 +1706,10 @@ async function startRecognition() {
     btn.innerHTML = '<i class="fas fa-microphone"></i> Проверить произношение';
   }
 }
-
 async function toggleRecording() {
   if (!Speech) return;
   const btn = document.getElementById('btnRecord');
   const result = document.getElementById('voiceResult');
-
   if (!isRecording) {
     try {
       await Speech.startRecording();
@@ -1858,15 +1734,11 @@ async function toggleRecording() {
     }
   }
 }
-
 function playBackRecording() {
   if (!recordingBlob || !Speech) return;
   Speech.playRecording(recordingBlob);
 }
 
-// ============================================================
-// ЗАВЕРШЕНИЕ ЗАДАНИЯ
-// ============================================================
 function completeTask(success) {
   if (isProcessing || isGameFinished || !currentTask || isMoving) return;
   isProcessing = true;
@@ -1874,7 +1746,6 @@ function completeTask(success) {
   document.getElementById('btnWin').disabled = true;
   document.getElementById('btnPartial').disabled = true;
   document.getElementById('btnFail').disabled = true;
-
   const reps = getReps(currentTask, p.age);
   let soundForTask = '';
   if (currentTask.applies_to) {
@@ -1887,15 +1758,9 @@ function completeTask(success) {
     modeState.score += 10;
     addLog(`✅ <span class="success">${p.name} выполнил "${currentTask.name}" (${reps} раз)</span>`);
     sessionTasks.push({
-      taskId: currentTask.id || currentTask.name,
-      taskName: currentTask.name,
-      sound: soundForTask,
-      type: taskType,
-      result: 'done',
-      reps,
-      playerId: p.id,
-      playerName: p.name,
-      time: new Date().toISOString()
+      taskId: currentTask.id || currentTask.name, taskName: currentTask.name,
+      sound: soundForTask, type: taskType, result: 'done', reps,
+      playerId: p.id, playerName: p.name, time: new Date().toISOString()
     });
     haptic(20);
     logAction('task:done');
@@ -1918,16 +1783,6 @@ function completeTask(success) {
 
     saveCurrentSession();
 
-      // Настройка автоозвучки в физической версии
-  const autoSpeakEl = document.getElementById('physAutoSpeak');
-  if (autoSpeakEl) {
-    autoSpeakEl.checked = localStorage.getItem('phys_auto_speak') === '1';
-    autoSpeakEl.onchange = () => {
-      localStorage.setItem('phys_auto_speak', autoSpeakEl.checked ? '1' : '0');
-    };
-  }
-    
-    // Логика переходов
     if (currentVersion === 'physical') {
       updatePhysicalCounters();
       isProcessing = false;
@@ -1943,15 +1798,9 @@ function completeTask(success) {
   } else {
     addLog(`❌ <span class="fail">${p.name} не выполнил "${currentTask.name}"</span>`);
     sessionTasks.push({
-      taskId: currentTask.id || currentTask.name,
-      taskName: currentTask.name,
-      sound: soundForTask,
-      type: taskType,
-      result: 'failed',
-      reps: 0,
-      playerId: p.id,
-      playerName: p.name,
-      time: new Date().toISOString()
+      taskId: currentTask.id || currentTask.name, taskName: currentTask.name,
+      sound: soundForTask, type: taskType, result: 'failed', reps: 0,
+      playerId: p.id, playerName: p.name, time: new Date().toISOString()
     });
     haptic([30, 50, 30]);
     logAction('task:fail');
@@ -1997,13 +1846,11 @@ function completeTask(success) {
     return;
   }
 }
-
 function openPartial() {
   if (!currentTask || isProcessing || isGameFinished) return;
   document.getElementById('partialModal').classList.add('active');
   document.getElementById('partialCount').value = 1;
 }
-
 function confirmPartial() {
   const count = parseInt(document.getElementById('partialCount').value) || 1;
   const p = players[activePlayerIndex];
@@ -2014,16 +1861,10 @@ function confirmPartial() {
   }
   addLog(`✏️ <span class="partial">${p.name} частично выполнил "${currentTask.name}" (${count} из ${fullReps})</span>`);
   sessionTasks.push({
-    taskId: currentTask.id || currentTask.name,
-    taskName: currentTask.name,
-    sound: soundForTask,
-    type: currentTask._type || 'artic',
-    result: 'partial',
-    reps: count,
-    totalReps: fullReps,
-    playerId: p.id,
-    playerName: p.name,
-    time: new Date().toISOString()
+    taskId: currentTask.id || currentTask.name, taskName: currentTask.name,
+    sound: soundForTask, type: currentTask._type || 'artic', result: 'partial',
+    reps: count, totalReps: fullReps,
+    playerId: p.id, playerName: p.name, time: new Date().toISOString()
   });
   p.tasksCompleted++;
   modeState.score += Math.round(10 * count / fullReps);
@@ -2042,14 +1883,12 @@ function confirmPartial() {
     document.getElementById('physNextLabel').textContent = 'Следующее задание';
     return;
   }
-
   if (currentMode === 'training') {
     setTimeout(() => { isProcessing = false; nextTurn(); }, 400);
   } else {
     setTimeout(() => { nextTurn(); isProcessing = false; }, 500);
   }
 }
-
 function nextTurn() {
   if (isGameFinished) return;
   if (currentMode === 'training' || currentMode === 'marathon' || currentMode === 'timed') {
@@ -2088,7 +1927,6 @@ function nextTurn() {
   document.getElementById('voiceResult').textContent = '';
   saveCurrentSession();
 }
-
 function endTimedGame() {
   addLog(`⏱ <span class="highlight">Время вышло!</span>`);
   isGameFinished = true;
@@ -2099,19 +1937,14 @@ function endTimedGame() {
   setTimeout(() => showSessionSummary(), 800);
 }
 
-// ============================================================
-// ИТОГИ СЕССИИ
-// ============================================================
 function showSessionSummary() {
   const done = sessionTasks.filter(t => t.result === 'done').length;
   const partial = sessionTasks.filter(t => t.result === 'partial').length;
   const failed = sessionTasks.filter(t => t.result === 'failed').length;
   const total = sessionTasks.length;
   const rate = total > 0 ? Math.round((done / total) * 100) : 0;
-
   const emoji = rate >= 80 ? '🎉' : rate >= 60 ? '👍' : rate >= 40 ? '💪' : '🤝';
   const title = rate >= 80 ? 'Отличная работа!' : rate >= 60 ? 'Хорошо справились!' : rate >= 40 ? 'Есть над чем поработать' : 'Поддержка нужна';
-
   document.getElementById('ssEmoji').textContent = emoji;
   document.getElementById('ssTitle').textContent = title;
   document.getElementById('ssGrid').innerHTML = `
@@ -2121,19 +1954,13 @@ function showSessionSummary() {
     <div class="ss-tile"><div class="ss-l">❌ Нет</div><div class="ss-v" style="color:var(--red);">${failed}</div></div>
     <div class="ss-tile"><div class="ss-l">Успех</div><div class="ss-v">${rate}%</div></div>
   `;
-
   finalizeSession();
   document.getElementById('summaryModal').classList.add('active');
 }
-
 function closeSummaryAndExit() {
   closeModal('summaryModal');
   exitToMenu();
 }
-
-// ============================================================
-// КОНФЕТТИ
-// ============================================================
 function celebrateWin() {
   const canvas = document.getElementById('confetti-canvas');
   if (!canvas || state.reducedMotion) return;
@@ -2145,15 +1972,10 @@ function celebrateWin() {
   const particles = [];
   for (let i = 0; i < 180; i++) {
     particles.push({
-      x: Math.random() * canvas.width,
-      y: -20 - Math.random() * canvas.height * 0.5,
-      vx: (Math.random() - 0.5) * 4,
-      vy: 2 + Math.random() * 4,
-      size: 4 + Math.random() * 8,
-      color: colors[Math.floor(Math.random() * colors.length)],
-      rot: Math.random() * Math.PI * 2,
-      vr: (Math.random() - 0.5) * 0.2,
-      life: 1
+      x: Math.random() * canvas.width, y: -20 - Math.random() * canvas.height * 0.5,
+      vx: (Math.random() - 0.5) * 4, vy: 2 + Math.random() * 4,
+      size: 4 + Math.random() * 8, color: colors[Math.floor(Math.random() * colors.length)],
+      rot: Math.random() * Math.PI * 2, vr: (Math.random() - 0.5) * 0.2, life: 1
     });
   }
   let frames = 0;
@@ -2178,9 +2000,6 @@ function celebrateWin() {
   draw();
 }
 
-// ============================================================
-// ЛОГИ
-// ============================================================
 function addLog(html) {
   const logEl = document.getElementById('gameLog');
   if (!logEl) return;
@@ -2191,7 +2010,6 @@ function addLog(html) {
   logEl.scrollTop = logEl.scrollHeight;
   while (logEl.children.length > 100) logEl.removeChild(logEl.firstChild);
 }
-
 function renderLogFromArray() {
   const logEl = document.getElementById('gameLog');
   if (!logEl) return;
@@ -2203,7 +2021,6 @@ function renderLogFromArray() {
     logEl.appendChild(div);
   });
 }
-
 function exportLogs() {
   if (sessionTasks.length === 0 && gameLog.length === 0) { alert('Нет записей'); return; }
   const firstName = players.length > 0 ? players[0].name : 'игрок';
@@ -2221,44 +2038,27 @@ function exportLogs() {
   link.click();
   URL.revokeObjectURL(link.href);
 }
-
-// ============================================================
-// СОХРАНЕНИЕ
-// ============================================================
 function saveCurrentSession() {
   if (players.length === 0) return;
   const sessions = getAllSessions();
   const data = {
     players: players.map(p => ({ ...p })),
-    activePlayerIndex,
-    isGameFinished,
-    logs: gameLog,
-    tasks: sessionTasks,
-    sounds: selectedSounds,
-    types: getCurrentTypes(),
-    preset: currentPreset,
-    version: currentVersion,
-    childId: currentChildId,
-    startedAt: sessionStartTime,
-    savedAt: new Date().toISOString()
+    activePlayerIndex, isGameFinished, logs: gameLog, tasks: sessionTasks,
+    sounds: selectedSounds, types: getCurrentTypes(), preset: currentPreset,
+    version: currentVersion, childId: currentChildId,
+    startedAt: sessionStartTime, savedAt: new Date().toISOString()
   };
   if (currentSessionId !== null && currentSessionId < sessions.length) sessions[currentSessionId] = data;
   else { sessions.push(data); currentSessionId = sessions.length - 1; }
   saveSessions(sessions);
 }
-
 function finalizeSession() {
   if (!currentChildId) { saveCurrentSession(); return; }
   const session = {
-    sessionId: Date.now(),
-    childId: currentChildId,
+    sessionId: Date.now(), childId: currentChildId,
     date: (sessionStartTime || new Date().toISOString()).slice(0, 10),
-    startedAt: sessionStartTime,
-    endedAt: new Date().toISOString(),
-    sounds: selectedSounds,
-    types: getCurrentTypes(),
-    preset: currentPreset,
-    version: currentVersion,
+    startedAt: sessionStartTime, endedAt: new Date().toISOString(),
+    sounds: selectedSounds, types: getCurrentTypes(), preset: currentPreset, version: currentVersion,
     players: players.map(p => ({ name: p.name, age: p.age, tasksCompleted: p.tasksCompleted })),
     tasks: sessionTasks,
     stats: {
@@ -2273,10 +2073,6 @@ function finalizeSession() {
   addLog(`💾 Сессия сохранена в исследование`);
   saveCurrentSession();
 }
-
-// ============================================================
-// ВЫХОД
-// ============================================================
 function exitToMenu() {
   if (sessionTasks.length > 0) finalizeSession();
   if (modeState.timer) { clearInterval(modeState.timer); modeState.timer = null; }
@@ -2284,13 +2080,11 @@ function exitToMenu() {
   document.getElementById('physicalBoard').style.display = 'none';
   document.getElementById('mainMenu').classList.remove('hidden');
 }
-
 function exitToSite() {
   if (sessionTasks.length > 0) finalizeSession();
   if (modeState.timer) clearInterval(modeState.timer);
   window.location.href = 'index.html';
 }
-
 function resetGame() {
   if (confirm('Начать новую игру? Прогресс будет сохранён.')) {
     finalizeSession();
@@ -2299,43 +2093,23 @@ function resetGame() {
   }
 }
 
-// ============================================================
-// BOOT
-// ============================================================
 async function boot() {
-  try {
-    await initCore({ autoDetectTheme: true });
-  } catch (e) {
-    console.warn('initCore failed:', e);
-  }
-
-  // ✅ Загружаем задания ДО всего остального
+  try { await initCore({ autoDetectTheme: true }); } catch (e) { console.warn('initCore failed:', e); }
   try {
     await loadTasks();
     const count = getAllTasks().length;
     console.log('✅ Задания загружены:', count);
-    if (count === 0) {
-      console.warn('⚠️ tasks_by_sound.json пустой или не загрузился');
-    }
-  } catch (e) {
-    console.error('❌ Не удалось загрузить tasks_by_sound.json:', e);
-  }
-
+    if (count === 0) console.warn('⚠️ tasks_by_sound.json пустой или не загрузился');
+  } catch (e) { console.error('❌ Не удалось загрузить tasks_by_sound.json:', e); }
   loadAdminMode();
-
-  if (isAdminMode) {
-    document.getElementById('adminPanel')?.classList.add('active');
-  }
-
+  if (isAdminMode) document.getElementById('adminPanel')?.classList.add('active');
   if (window.AIAssistant && typeof window.AIAssistant.startIdleWatcher === 'function') {
     window.AIAssistant.startIdleWatcher();
   }
-
   logAction('game:boot');
   console.log('🎮 Game page v6 loaded');
 }
 
-// Экспорт
 window.showSetup = showSetup;
 window.setPlayerCount = setPlayerCount;
 window.toggleSameAge = toggleSameAge;
