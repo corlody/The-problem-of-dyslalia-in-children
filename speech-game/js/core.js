@@ -493,12 +493,12 @@ function buildSettingsPanel() {
     </div>
 
     <div class="core-setting core-switches">
-      <label class="core-switch"><input type="checkbox" id="core-hc"><span></span>${t('core.highContrast', 'Высокий контраст')}</label>
-      <label class="core-switch"><input type="checkbox" id="core-df"><span></span>${t('core.dyslexiaFont', 'Шрифт для дислексии')}</label>
-      <label class="core-switch"><input type="checkbox" id="core-hp"><span></span>${t('core.haptics', 'Вибрация')}</label>
-      <label class="core-switch"><input type="checkbox" id="core-se"><span></span>${t('core.soundEffects', 'Звуковые эффекты')}</label>
-      <label class="core-switch"><input type="checkbox" id="core-rm"><span></span>${t('core.reducedMotion', 'Меньше анимаций')}</label>
-    </div>
+     <label class="core-switch"><input type="checkbox" id="core-hc"><span class="core-switch-label">${t('core.highContrast', 'Высокий контраст')}</span><span></span></label>
+     <label class="core-switch"><input type="checkbox" id="core-df"><span class="core-switch-label">${t('core.dyslexiaFont', 'Шрифт для дислексии')}</span><span></span></label>
+     <label class="core-switch"><input type="checkbox" id="core-hp"><span class="core-switch-label">${t('core.haptics', 'Вибрация')}</span><span></span></label>
+     <label class="core-switch"><input type="checkbox" id="core-se"><span class="core-switch-label">${t('core.soundEffects', 'Звуковые эффекты')}</span><span></span></label>
+     <label class="core-switch"><input type="checkbox" id="core-rm"><span class="core-switch-label">${t('core.reducedMotion', 'Меньше анимаций')}</span><span></span></label>
+   </div>
 
     <div class="core-setting">
       <label>🔊 ${t('core.voiceDownload', 'Скачать русский голос')}</label>
