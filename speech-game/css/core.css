@@ -1,16 +1,20 @@
 /* ============================================================
-   core.css — общие стили для "Говорю правильно" v5.0
-   Кнопки, панель настроек, модалки, тосты, ИИ-чат, достижения
+   core.css — общие стили для "Говорю правильно" v5.2
+   Кнопки, панель настроек, модалки, тосты, ИИ-чат, достижения,
+   выбор голоса. Эппловский стиль.
    ============================================================ */
 
 :root {
   --core-radius: 980px;
   --core-transition: 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+  --core-transition-smooth: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   --core-safe-bottom: max(20px, env(safe-area-inset-bottom));
   --core-safe-right: max(20px, env(safe-area-inset-right));
 }
 
-/* ---------- Шрифт для дислексии ---------- */
+/* ============================================================
+   ШРИФТ ДЛЯ ДИСЛЕКСИИ
+   ============================================================ */
 .dyslexia-font,
 .dyslexia-font * {
   font-family: 'Comic Sans MS', 'Verdana', 'Trebuchet MS', sans-serif !important;
@@ -19,13 +23,17 @@
   line-height: 1.7 !important;
 }
 
-/* ---------- Размер шрифта ---------- */
+/* ============================================================
+   РАЗМЕР ШРИФТА
+   ============================================================ */
 html.font-small  { font-size: 14px; }
 html.font-normal { font-size: 16px; }
 html.font-large  { font-size: 19px; }
 html.font-huge   { font-size: 22px; }
 
-/* ---------- Высокий контраст ---------- */
+/* ============================================================
+   ВЫСОКИЙ КОНТРАСТ
+   ============================================================ */
 html.high-contrast {
   filter: contrast(1.25) saturate(1.1);
 }
@@ -39,7 +47,9 @@ html.high-contrast a {
   outline-offset: 2px;
 }
 
-/* ---------- Меньше анимаций ---------- */
+/* ============================================================
+   МЕНЬШЕ АНИМАЦИЙ
+   ============================================================ */
 html.reduce-motion *,
 html.reduce-motion *::before,
 html.reduce-motion *::after {
@@ -59,6 +69,10 @@ html.reduce-motion *::after {
   gap: 12px;
   z-index: 99990;
   align-items: flex-end;
+  pointer-events: none;
+}
+#core-float-buttons > * {
+  pointer-events: auto;
 }
 .core-fab {
   width: 56px;
@@ -77,18 +91,32 @@ html.reduce-motion *::after {
   box-shadow: 0 8px 28px rgba(0,0,0,.35);
   transition: transform var(--core-transition), box-shadow .3s, background .3s;
   font-family: inherit;
+  padding: 0;
+  line-height: 1;
 }
 .core-fab:hover {
   transform: scale(1.08) translateY(-2px);
   border-color: var(--purple, #7c3aed);
   box-shadow: 0 12px 36px rgba(124,58,237,.4);
 }
-.core-fab:active { transform: scale(.94); }
-.core-fab.bug { background: linear-gradient(135deg, rgba(239,68,68,.85), rgba(190,24,93,.85)); color: #fff; }
-.core-fab.bug:hover { box-shadow: 0 12px 36px rgba(239,68,68,.5); }
+.core-fab:active {
+  transform: scale(.94);
+  transition-duration: .1s;
+}
+.core-fab.bug {
+  background: linear-gradient(135deg, rgba(239,68,68,.9), rgba(190,24,93,.9));
+  color: #fff;
+}
+.core-fab.bug:hover {
+  box-shadow: 0 12px 36px rgba(239,68,68,.5);
+}
 
 @media (max-width: 600px) {
-  .core-fab { width: 48px; height: 48px; font-size: 1.25rem; }
+  .core-fab {
+    width: 48px;
+    height: 48px;
+    font-size: 1.25rem;
+  }
   #core-float-buttons { gap: 10px; }
 }
 
@@ -99,9 +127,9 @@ html.reduce-motion *::after {
   position: fixed;
   bottom: calc(var(--core-safe-bottom) + 70px);
   right: var(--core-safe-right);
-  width: 400px;
+  width: 440px;
   max-width: calc(100vw - 32px);
-  max-height: min(80vh, 720px);
+  max-height: min(82vh, 760px);
   overflow-y: auto;
   overflow-x: visible;
   background: var(--bg-card, rgba(26,30,60,.95));
@@ -115,9 +143,10 @@ html.reduce-motion *::after {
   transform-origin: bottom right;
   opacity: 0;
   transition: transform var(--core-transition), opacity .25s;
-  z-index: 99995;
+  z-index: 100000;
   color: var(--text-primary, #f1f5f9);
   pointer-events: none;
+  scrollbar-width: thin;
 }
 .core-settings-panel.open {
   transform: scale(1);
@@ -130,18 +159,20 @@ html.reduce-motion *::after {
   display: flex;
   align-items: center;
   gap: 10px;
+  font-family: inherit;
+  font-weight: 700;
 }
 .core-setting {
   margin-bottom: 20px;
 }
 .core-setting > label {
   display: block;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: var(--text-secondary, #cbd5e1);
-  font-weight: 600;
+  font-weight: 700;
   margin-bottom: 8px;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
 }
 .core-setting select,
 .core-setting input[type="text"],
@@ -154,10 +185,23 @@ html.reduce-motion *::after {
   color: var(--text-primary, #f1f5f9);
   font-family: inherit;
   font-size: 0.95rem;
+  -webkit-appearance: none;
+  appearance: none;
 }
-.core-setting select option { background: #1e293b; color: #fff; }
+.core-setting select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23cbd5e1' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 40px;
+}
+.core-setting select option {
+  background: #1e293b;
+  color: #fff;
+}
 
-/* ---------- Темы ---------- */
+/* ============================================================
+   СЕТКА ТЕМ
+   ============================================================ */
 .core-theme-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -177,6 +221,7 @@ html.reduce-motion *::after {
 .core-theme-card:hover {
   border-color: var(--purple, #7c3aed);
   background: rgba(124,58,237,.08);
+  transform: translateY(-1px);
 }
 .core-theme-card.active {
   border-color: var(--gold, #f59e0b);
@@ -186,6 +231,9 @@ html.reduce-motion *::after {
   font-size: 0.85rem;
   font-weight: 600;
   user-select: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .core-daynight {
   display: flex;
@@ -209,7 +257,9 @@ html.reduce-motion *::after {
   border-color: var(--purple, #7c3aed);
 }
 
-/* ---------- Кнопки-строи ---------- */
+/* ============================================================
+   КНОПКИ-СТРОКИ
+   ============================================================ */
 .core-btn-row {
   display: flex;
   gap: 8px;
@@ -235,18 +285,25 @@ html.reduce-motion *::after {
 .core-btn-row > label.core-btn:hover {
   background: rgba(124,58,237,.15);
   border-color: var(--purple, #7c3aed);
+  transform: translateY(-1px);
 }
 .core-btn-row > button.active {
   background: var(--purple, #7c3aed);
   color: #fff;
   border-color: var(--purple, #7c3aed);
 }
+.core-btn-row > button:active,
+.core-btn-row > label.core-btn:active {
+  transform: scale(.96);
+}
 
-/* ---------- Свитчи ---------- */
+/* ============================================================
+   СВИТЧИ (правильная разметка: текст слева, тумблер справа)
+   ============================================================ */
 .core-switches {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 .core-switch {
   display: flex;
@@ -257,10 +314,14 @@ html.reduce-motion *::after {
   font-size: 0.9rem;
   color: var(--text-secondary, #cbd5e1);
   user-select: none;
-  padding: 8px 0;
+  padding: 10px 0;
   width: 100%;
   min-width: 0;
-  overflow: visible;
+  border-radius: 10px;
+  transition: background .2s;
+}
+.core-switch:hover {
+  background: rgba(255,255,255,.03);
 }
 .core-switch input {
   display: none;
@@ -271,22 +332,21 @@ html.reduce-motion *::after {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-weight: 500;
 }
-.core-switch span:not(.core-switch-label) {
+.core-switch > span:not(.core-switch-label) {
   position: relative;
   display: inline-block;
   flex-shrink: 0;
-  width: 44px !important;
-  height: 26px !important;
-  min-width: 44px !important;
-  max-width: 44px !important;
-  min-height: 26px !important;
-  max-height: 26px !important;
-  border-radius: 980px !important;
-  background: rgba(120, 120, 128, 0.35);
-  transition: background 0.3s;
+  width: 44px;
+  height: 26px;
+  min-width: 44px;
+  max-width: 44px;
+  border-radius: 980px;
+  background: rgba(120,120,128,.35);
+  transition: background .3s;
 }
-.core-switch span:not(.core-switch-label)::before {
+.core-switch > span:not(.core-switch-label)::before {
   content: '';
   position: absolute;
   width: 22px;
@@ -298,20 +358,24 @@ html.reduce-motion *::after {
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
-.core-switch input:checked + span:not(.core-switch-label) {
+.core-switch input:checked + .core-switch-label + span {
   background: #34c759;
 }
-.core-switch input:checked + span:not(.core-switch-label)::before {
+.core-switch input:checked + .core-switch-label + span::before {
   transform: translateX(18px);
 }
 
-/* Чуть шире панель настроек */
-.core-settings-panel {
-  width: 440px !important;
-  max-width: calc(100vw - 32px);
+/* Fallback для старой разметки (без .core-switch-label) */
+.core-switch > input:checked + span {
+  background: #34c759;
+}
+.core-switch > input:checked + span::before {
+  transform: translateX(18px);
 }
 
-/* ---------- Кнопка основной ---------- */
+/* ============================================================
+   ОСНОВНАЯ КНОПКА
+   ============================================================ */
 .core-btn {
   padding: 11px 18px;
   border-radius: var(--core-radius);
@@ -332,7 +396,10 @@ html.reduce-motion *::after {
   transform: translateY(-2px) scale(1.02);
   filter: brightness(1.1);
 }
-.core-btn:active { transform: scale(.97); }
+.core-btn:active {
+  transform: scale(.97);
+  transition-duration: .1s;
+}
 .core-btn.primary {
   background: linear-gradient(135deg, var(--purple, #7c3aed), var(--purple-dark, #5b21b6));
   color: #fff;
@@ -342,35 +409,110 @@ html.reduce-motion *::after {
   font-size: 1rem;
   margin-top: 8px;
 }
+.core-btn.primary:hover {
+  box-shadow: 0 8px 25px rgba(124,58,237,.4);
+}
 
-/* ---------- Подсказка про голос ---------- */
+/* ============================================================
+   ПОДСКАЗКА ПРО ГОЛОС
+   ============================================================ */
 .core-voice-hint {
-  font-size: 0.8rem;
-  line-height: 1.5;
-  padding: 10px 14px;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  padding: 12px 14px;
   border-radius: 12px;
   background: rgba(124,58,237,.08);
   border-left: 3px solid var(--purple, #7c3aed);
   color: var(--text-secondary, #cbd5e1);
 }
-.core-voice-hint a { color: var(--purple, #7c3aed); }
+.core-voice-hint a {
+  color: var(--purple, #7c3aed);
+  font-weight: 600;
+  text-decoration: underline;
+}
 
 /* ============================================================
-   МОДАЛКИ (баг-репорт, достижения, ИИ-чат)
+   ВЫБОР ГОЛОСА — список голосов
+   ============================================================ */
+.core-voice-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 340px;
+  overflow-y: auto;
+  padding-right: 4px;
+  margin-top: 8px;
+  scrollbar-width: thin;
+}
+.core-voice-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 2px solid var(--glass-border, rgba(255,255,255,.15));
+  background: rgba(255,255,255,.03);
+  cursor: pointer;
+  transition: var(--core-transition);
+}
+.core-voice-item:hover {
+  border-color: var(--purple, #7c3aed);
+  background: rgba(124,58,237,.08);
+  transform: translateY(-1px);
+}
+.core-voice-item.selected {
+  border-color: var(--gold, #f59e0b);
+  background: rgba(245,158,11,.1);
+}
+.core-voice-item.selected::after {
+  content: '✓';
+  color: var(--gold, #f59e0b);
+  font-weight: 900;
+  font-size: 1.1rem;
+  margin-left: 4px;
+  flex-shrink: 0;
+}
+.voice-test-btn {
+  padding: 7px 14px;
+  border-radius: var(--core-radius);
+  border: 1px solid var(--glass-border, rgba(255,255,255,.15));
+  background: rgba(255,255,255,.06);
+  color: var(--text-primary, #f1f5f9);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  transition: var(--core-transition);
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.voice-test-btn:hover {
+  background: rgba(124,58,237,.2);
+  border-color: var(--purple, #7c3aed);
+}
+.voice-test-btn:active {
+  transform: scale(.95);
+}
+
+/* ============================================================
+   МОДАЛКИ (баг-репорт, достижения, выбор голоса)
    ============================================================ */
 .core-modal {
   position: fixed;
   inset: 0;
   z-index: 99998;
-  background: rgba(0,0,0,.7);
+  background: rgba(0,0,0,.72);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   display: none;
   align-items: center;
   justify-content: center;
   padding: 20px;
+  overflow-y: auto;
 }
-.core-modal.active { display: flex; }
+.core-modal.active {
+  display: flex;
+}
 .core-modal-box {
   background: var(--bg-card, rgba(26,30,60,.98));
   border: 1px solid var(--glass-border, rgba(255,255,255,.15));
@@ -382,14 +524,18 @@ html.reduce-motion *::after {
   overflow-y: auto;
   color: var(--text-primary, #f1f5f9);
   box-shadow: 0 24px 60px rgba(0,0,0,.5);
+  margin: auto;
+  scrollbar-width: thin;
 }
 .core-modal-box h3 {
   margin-bottom: 18px;
   font-size: 1.25rem;
+  font-family: inherit;
+  font-weight: 700;
 }
 .core-modal-box label {
   display: block;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   color: var(--text-secondary, #cbd5e1);
   font-weight: 600;
   margin: 12px 0 6px;
@@ -405,6 +551,8 @@ html.reduce-motion *::after {
   font-family: inherit;
   font-size: 0.95rem;
   resize: vertical;
+  -webkit-appearance: none;
+  appearance: none;
 }
 .core-modal-box input:focus,
 .core-modal-box textarea:focus {
@@ -418,7 +566,10 @@ html.reduce-motion *::after {
   margin-top: 20px;
   flex-wrap: wrap;
 }
-.core-modal-actions .core-btn { flex: 1; min-width: 120px; }
+.core-modal-actions .core-btn {
+  flex: 1;
+  min-width: 120px;
+}
 
 /* ============================================================
    ДОСТИЖЕНИЯ
@@ -444,9 +595,18 @@ html.reduce-motion *::after {
   background: linear-gradient(135deg, rgba(245,158,11,.15), rgba(124,58,237,.12));
   border-color: var(--gold, #f59e0b);
 }
-.core-ach-emoji { font-size: 2rem; margin-bottom: 6px; }
-.core-ach-name { font-size: 0.85rem; font-weight: 600; }
-.core-ach-status { font-size: 1.1rem; margin-top: 4px; }
+.core-ach-emoji {
+  font-size: 2rem;
+  margin-bottom: 6px;
+}
+.core-ach-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.core-ach-status {
+  font-size: 1.1rem;
+  margin-top: 4px;
+}
 
 /* ============================================================
    TOAST
@@ -469,6 +629,7 @@ html.reduce-motion *::after {
   background: rgba(26,30,60,.95);
   border: 1px solid var(--glass-border, rgba(255,255,255,.15));
   backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   color: #fff;
   font-size: 0.9rem;
   font-weight: 600;
@@ -477,11 +638,24 @@ html.reduce-motion *::after {
   transition: all .35s cubic-bezier(.34,1.56,.64,1);
   box-shadow: 0 12px 36px rgba(0,0,0,.35);
   pointer-events: auto;
+  text-align: center;
 }
-.core-toast.show { opacity: 1; transform: translateY(0) scale(1); }
-.core-toast-success { background: linear-gradient(135deg, #10b981, #059669); border: none; }
-.core-toast-error { background: linear-gradient(135deg, #ef4444, #b91c1c); border: none; }
-.core-toast-info { background: linear-gradient(135deg, #7c3aed, #5b21b6); border: none; }
+.core-toast.show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+.core-toast-success {
+  background: linear-gradient(135deg, #10b981, #059669);
+  border: none;
+}
+.core-toast-error {
+  background: linear-gradient(135deg, #ef4444, #b91c1c);
+  border: none;
+}
+.core-toast-info {
+  background: linear-gradient(135deg, #7c3aed, #5b21b6);
+  border: none;
+}
 
 /* ============================================================
    ИИ-ПОМОЩНИК
@@ -523,6 +697,7 @@ html.reduce-motion *::after {
   align-items: center;
   justify-content: space-between;
   background: linear-gradient(135deg, rgba(124,58,237,.15), rgba(6,182,212,.1));
+  flex-shrink: 0;
 }
 .ai-header-title {
   display: flex;
@@ -532,14 +707,15 @@ html.reduce-motion *::after {
   font-size: 1rem;
 }
 .ai-header-title .ai-dot {
-  width: 8px; height: 8px;
+  width: 8px;
+  height: 8px;
   background: #10b981;
   border-radius: 50%;
   box-shadow: 0 0 10px #10b981;
   animation: aiPulse 1.6s infinite;
 }
 @keyframes aiPulse {
-  0%,100% { opacity: 1; transform: scale(1); }
+  0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.5; transform: scale(0.85); }
 }
 .ai-close {
@@ -550,8 +726,13 @@ html.reduce-motion *::after {
   cursor: pointer;
   padding: 4px 8px;
   border-radius: 8px;
+  line-height: 1;
+  transition: .2s;
 }
-.ai-close:hover { background: rgba(255,255,255,.08); color: #fff; }
+.ai-close:hover {
+  background: rgba(255,255,255,.08);
+  color: #fff;
+}
 
 .ai-messages {
   flex: 1;
@@ -594,7 +775,8 @@ html.reduce-motion *::after {
   padding: 14px 18px;
 }
 .ai-msg.bot.typing span {
-  width: 7px; height: 7px;
+  width: 7px;
+  height: 7px;
   background: var(--text-secondary, #cbd5e1);
   border-radius: 50%;
   animation: aiTyping 1.2s infinite;
@@ -602,7 +784,7 @@ html.reduce-motion *::after {
 .ai-msg.bot.typing span:nth-child(2) { animation-delay: .2s; }
 .ai-msg.bot.typing span:nth-child(3) { animation-delay: .4s; }
 @keyframes aiTyping {
-  0%,60%,100% { opacity: .3; transform: translateY(0); }
+  0%, 60%, 100% { opacity: .3; transform: translateY(0); }
   30% { opacity: 1; transform: translateY(-4px); }
 }
 
@@ -613,6 +795,7 @@ html.reduce-motion *::after {
   overflow-x: auto;
   scrollbar-width: none;
   border-top: 1px solid var(--glass-border, rgba(255,255,255,.08));
+  flex-shrink: 0;
 }
 .ai-quick::-webkit-scrollbar { display: none; }
 .ai-quick button {
@@ -641,6 +824,7 @@ html.reduce-motion *::after {
   padding: 12px 14px;
   border-top: 1px solid var(--glass-border, rgba(255,255,255,.1));
   background: rgba(0,0,0,.15);
+  flex-shrink: 0;
 }
 .ai-input-row input {
   flex: 1;
@@ -651,6 +835,7 @@ html.reduce-motion *::after {
   color: var(--text-primary, #f1f5f9);
   font-family: inherit;
   font-size: 0.9rem;
+  min-width: 0;
 }
 .ai-input-row input:focus {
   outline: none;
@@ -670,11 +855,12 @@ html.reduce-motion *::after {
   align-items: center;
   justify-content: center;
   transition: var(--core-transition);
+  flex-shrink: 0;
 }
 .ai-send:hover { transform: scale(1.08); }
 .ai-send:active { transform: scale(.92); }
 
-/* Проактивные подсказки — всплывающие облачка */
+/* Проактивные подсказки */
 .ai-proactive {
   position: fixed;
   right: calc(var(--core-safe-right) + 66px);
@@ -705,7 +891,18 @@ html.reduce-motion *::after {
   border-left-color: var(--purple, #7c3aed);
 }
 
-/* Мобильная адаптация */
+/* ============================================================
+   ФИКС: выпадающие списки внутри панели настроек открываются ВВЕРХ
+   ============================================================ */
+.core-settings-panel .ios-select-menu {
+  top: auto;
+  bottom: calc(100% + 6px);
+  transform-origin: bottom;
+}
+
+/* ============================================================
+   МОБИЛЬНАЯ АДАПТАЦИЯ
+   ============================================================ */
 @media (max-width: 600px) {
   #ai-panel {
     width: calc(100vw - 20px);
@@ -716,5 +913,42 @@ html.reduce-motion *::after {
   .core-settings-panel {
     width: calc(100vw - 32px);
     right: 16px;
+    padding: 20px;
   }
+  .core-theme-grid {
+    grid-template-columns: 1fr;
+  }
+  .core-voice-list {
+    max-height: 260px;
+  }
+  .core-voice-item {
+    padding: 10px 12px;
+  }
+  .voice-test-btn {
+    padding: 6px 10px;
+    font-size: 0.72rem;
+  }
+  .core-modal-box {
+    padding: 20px;
+    border-radius: 20px;
+  }
+}
+
+/* ============================================================
+   REDUCE MOTION
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ============================================================
+   АДАПТАЦИЯ ПОД ВЫСОКИЙ КОНТРАСТ
+   ============================================================ */
+html.high-contrast .core-fab,
+html.high-contrast .core-btn,
+html.high-contrast .ai-send {
+  border: 2px solid currentColor !important;
 }
