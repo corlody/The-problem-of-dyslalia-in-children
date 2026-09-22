@@ -147,7 +147,6 @@ export function t(key, fallbackValue) {
 
   return fallbackValue !== undefined ? fallbackValue : key;
 }
-
 export function applyTranslations() {
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.dataset.i18n;
