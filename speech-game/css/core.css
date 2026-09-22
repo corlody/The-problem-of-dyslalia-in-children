@@ -246,28 +246,47 @@ html.reduce-motion *::after {
 .core-switches {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
 }
 .core-switch {
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: space-between;
+  gap: 12px;
   cursor: pointer;
   font-size: 0.9rem;
   color: var(--text-secondary, #cbd5e1);
   user-select: none;
+  padding: 8px 0;
+  width: 100%;
+  min-width: 0;
+  overflow: visible;
 }
-.core-switch input { display: none; }
-.core-switch span {
+.core-switch input {
+  display: none;
+}
+.core-switch .core-switch-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.core-switch span:not(.core-switch-label) {
   position: relative;
-  width: 44px;
-  height: 26px;
-  border-radius: 980px;
-  background: rgba(120,120,128,.35);
+  display: inline-block;
   flex-shrink: 0;
-  transition: .3s;
+  width: 44px !important;
+  height: 26px !important;
+  min-width: 44px !important;
+  max-width: 44px !important;
+  min-height: 26px !important;
+  max-height: 26px !important;
+  border-radius: 980px !important;
+  background: rgba(120, 120, 128, 0.35);
+  transition: background 0.3s;
 }
-.core-switch span::before {
+.core-switch span:not(.core-switch-label)::before {
   content: '';
   position: absolute;
   width: 22px;
@@ -276,14 +295,20 @@ html.reduce-motion *::after {
   background: #fff;
   top: 2px;
   left: 2px;
-  transition: transform var(--core-transition);
-  box-shadow: 0 2px 6px rgba(0,0,0,.2);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
-.core-switch input:checked + span {
+.core-switch input:checked + span:not(.core-switch-label) {
   background: #34c759;
 }
-.core-switch input:checked + span::before {
+.core-switch input:checked + span:not(.core-switch-label)::before {
   transform: translateX(18px);
+}
+
+/* Чуть шире панель настроек */
+.core-settings-panel {
+  width: 440px !important;
+  max-width: calc(100vw - 32px);
 }
 
 /* ---------- Кнопка основной ---------- */
