@@ -444,6 +444,15 @@ button{cursor:pointer;border:none;background:none;}
   overflow-y: visible !important;
   min-width: 0 !important;
 }
+/* Страховка: контейнер карты не сжимается в 0, если картинка ещё грузится */
+.game-map-area {
+  min-height: 400px !important;
+}
+@media (max-width: 900px) {
+  .game-map-area {
+    min-height: 50vh !important;
+  }
+}
 </style>
 </head>
 <body>
