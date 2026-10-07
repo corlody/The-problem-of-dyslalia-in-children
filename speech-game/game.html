@@ -1320,7 +1320,10 @@ async function startGame() {
   saveResearchSession(false);
 }
 
-function physicalNextTask() {
+/* ============================================================
+   ПАТЧ 2.2: physicalNextTask → асинхронная + WAV-озвучка
+   ============================================================ */
+async function physicalNextTask() {
   if (!physicalAwaitingNext) return;
   physicalAwaitingNext = false;
   document.getElementById('physNextBtn').style.display = 'none';
@@ -1358,8 +1361,19 @@ function physicalNextTask() {
   }
 
   const autoSpeak = document.getElementById('physAutoSpeak')?.checked || false;
-  if (autoSpeak && Speech && Speech.hasRussianVoice()) {
-    Speech.speak(`${task.name}. ${task.desc || ''}. Повторить ${reps} раз.`);
+  if (autoSpeak) {
+    const taskId = task.id || task.name;
+    const hasWav = await hasWavForTask(taskId);
+    if (hasWav) {
+      const audio = new Audio(`audio/tasks/${encodeURIComponent(taskId)}.wav`);
+      audio.play().catch(() => {
+        if (Speech && Speech.hasRussianVoice()) {
+          Speech.speak(`${task.name}. ${task.desc || ''}. Повторить ${reps} раз.`);
+        }
+      });
+    } else if (Speech && Speech.hasRussianVoice()) {
+      Speech.speak(`${task.name}. ${task.desc || ''}. Повторить ${reps} раз.`);
+    }
   }
   logAction('physical_task_shown');
 }
@@ -1696,20 +1710,68 @@ function closeTaskImage(e) {
   if (e) e.stopPropagation();
   document.getElementById('taskImageModal').classList.remove('active');
 }
-function speakTask(task, reps) {
-  if (!Speech || typeof Speech.speak !== 'function') { alert('Озвучка не поддерживается'); return; }
+
+/* ============================================================
+   ПАТЧ 2.1: speakTask + WAV-кэш + hasWavForTask + _speakWithTTS
+   ============================================================ */
+const _wavCache = {};
+
+async function hasWavForTask(taskId) {
+  if (!taskId) return false;
+  if (_wavCache[taskId] !== undefined) return _wavCache[taskId];
+  const url = `audio/tasks/${encodeURIComponent(taskId)}.wav`;
+  try {
+    const r = await fetch(url, { method: 'HEAD' });
+    _wavCache[taskId] = r.ok;
+    return r.ok;
+  } catch (e) {
+    _wavCache[taskId] = false;
+    return false;
+  }
+}
+
+async function speakTask(task, reps) {
+  const btn = document.getElementById('btnSpeak');
+  if (btn) btn.classList.add('speaking');
+
+  const taskId = task.id || task.name;
+  const hasWav = await hasWavForTask(taskId);
+
+  if (hasWav) {
+    const audio = new Audio(`audio/tasks/${encodeURIComponent(taskId)}.wav`);
+    audio.onended = () => btn && btn.classList.remove('speaking');
+    audio.onerror = () => {
+      console.warn('[speakTask] WAV error, fallback to TTS');
+      _speakWithTTS(task, reps, btn);
+    };
+    try {
+      await audio.play();
+      return;
+    } catch (e) {
+      console.warn('[speakTask] WAV play blocked, fallback to TTS:', e);
+    }
+  }
+  _speakWithTTS(task, reps, btn);
+}
+
+function _speakWithTTS(task, reps, btn) {
+  if (!Speech || typeof Speech.speak !== 'function') {
+    if (btn) btn.classList.remove('speaking');
+    alert('Озвучка не поддерживается');
+    return;
+  }
   if (!Speech.hasRussianVoice()) {
+    if (btn) btn.classList.remove('speaking');
     alert('🔇 Русский голос не установлен.\n\n' + Speech.getVoiceInstallGuide());
     return;
   }
   const text = `${task.name}. ${task.desc || ''}. Повторить ${reps} раз.`;
-  const btn = document.getElementById('btnSpeak');
-  if (btn) btn.classList.add('speaking');
   Speech.speak(text, {
     onEnd: () => btn && btn.classList.remove('speaking'),
     onError: () => btn && btn.classList.remove('speaking')
   });
 }
+
 async function startVoiceCommand() {
   if (!Speech || !Speech.isRecognitionAvailable()) { toast('Распознавание речи не поддерживается', 'error'); return; }
   const isPhysical = currentVersion === 'physical';
@@ -1816,145 +1878,124 @@ function playBackRecording() {
   Speech.playRecording(recordingBlob);
 }
 
+/* ============================================================
+   ПАТЧ 1.1: completeTask → защищённая версия + forceUnlockRoll
+   ============================================================ */
 function completeTask(success) {
-  if (isProcessing || isGameFinished || !currentTask || isMoving) return;
-  isProcessing = true;
-  const p = players[activePlayerIndex];
-  document.getElementById('btnWin').disabled = true;
-  document.getElementById('btnPartial').disabled = true;
-  document.getElementById('btnFail').disabled = true;
-  const reps = getReps(currentTask, p.age);
-  let soundForTask = '';
-  if (currentTask.applies_to) {
-    soundForTask = currentTask.applies_to.find(s => selectedSounds.includes(s)) || currentTask.applies_to[0];
-  }
-  const taskType = currentTask._type || 'artic';
-
-  if (success) {
-    p.tasksCompleted++;
-    modeState.score += 10;
-    addLog(`✅ <span class="success">${p.name} выполнил "${currentTask.name}" (${reps} раз)</span>`);
-    const endedAt = new Date().toISOString();
-    const durationMs = Date.now() - (currentTaskStartedAt || Date.now());
-    sessionTasks.push({
-      index: sessionTasks.length + 1,
-      startedAt: new Date(currentTaskStartedAt || Date.now()).toISOString(),
-      endedAt: endedAt,
-      durationMs: durationMs,
-      durationSeconds: Math.round(durationMs / 1000),
-      playerId: p.id, playerName: p.name, playerAge: p.age,
-      cellBefore: currentCellBeforeTask, cellAfter: p.cell,
-      moveNumber: currentMoveNumber, rollResult: currentRollResult,
-      taskId: currentTask.id || currentTask.name,
-      taskName: currentTask.name,
-      taskDesc: currentTask.desc || '',
-      taskType: taskType,
-      sound: soundForTask,
-      appliesTo: currentTask.applies_to || [],
-      result: 'done', reps: reps, fullReps: reps,
-      preset: currentPreset, mode: currentMode, version: currentVersion
-    });
-    saveResearchSession(false);
-    haptic(20);
-    logAction('task:done');
-    if (window.AIAssistant) window.AIAssistant.notifyAction('task_done');
-
-    const recent = sessionTasks.slice(-5);
-    if (recent.length === 5 && recent.every(t => t.result === 'done')) unlockAchievement('five_right');
-    const recent10 = sessionTasks.slice(-10);
-    if (recent10.length === 10 && recent10.every(t => t.result === 'done')) unlockAchievement('ten_right');
-
-    if (currentMode === 'team') {
-      modeState.teamDragonHP = Math.max(0, modeState.teamDragonHP - 1);
-      addLog(`🐉 Урон дракону! HP: <span class="highlight">${modeState.teamDragonHP}</span>`);
-      if (modeState.teamDragonHP <= 0) {
-        addLog(`🏆 <span class="highlight">Дракон побеждён!</span>`);
-        isGameFinished = true;
-        celebrateWin();
-      }
-    }
-
-    saveCurrentSession();
-
-    if (currentVersion === 'physical') {
-      updatePhysicalCounters();
-      isProcessing = false;
-      physicalAwaitingNext = true;
-      document.getElementById('physActions').style.display = 'none';
-      document.getElementById('physNextBtn').style.display = 'block';
-      document.getElementById('physNextLabel').textContent = 'Следующее задание';
-    } else if (currentMode === 'training' || currentMode === 'marathon' || currentMode === 'endless') {
-      setTimeout(() => { isProcessing = false; nextTurn(); }, 400);
-    } else {
-      setTimeout(() => { nextTurn(); isProcessing = false; }, 500);
-    }
-  } else {
-    addLog(`❌ <span class="fail">${p.name} не выполнил "${currentTask.name}"</span>`);
-    const endedAt = new Date().toISOString();
-    const durationMs = Date.now() - (currentTaskStartedAt || Date.now());
-    sessionTasks.push({
-      index: sessionTasks.length + 1,
-      startedAt: new Date(currentTaskStartedAt || Date.now()).toISOString(),
-      endedAt: endedAt,
-      durationMs: durationMs,
-      durationSeconds: Math.round(durationMs / 1000),
-      playerId: p.id, playerName: p.name, playerAge: p.age,
-      cellBefore: currentCellBeforeTask, cellAfter: p.cell,
-      moveNumber: currentMoveNumber, rollResult: currentRollResult,
-      taskId: currentTask.id || currentTask.name,
-      taskName: currentTask.name,
-      taskDesc: currentTask.desc || '',
-      taskType: taskType,
-      sound: soundForTask,
-      appliesTo: currentTask.applies_to || [],
-      result: 'failed', reps: 0, fullReps: reps,
-      preset: currentPreset, mode: currentMode, version: currentVersion
-    });
-    saveResearchSession(false);
-    haptic([30, 50, 30]);
-    logAction('task:fail');
-
-    if (currentMode === 'marathon') {
-      addLog(`🏁 <span class="fail">Марафон окончен!</span>`);
-      isGameFinished = true;
-      saveCurrentSession();
-      finalizeSession();
-      isProcessing = false;
-      return;
-    }
-
-    saveCurrentSession();
-
-    if (currentVersion === 'physical') {
-      updatePhysicalCounters();
-      isProcessing = false;
-      physicalAwaitingNext = true;
-      document.getElementById('physActions').style.display = 'none';
-      document.getElementById('physNextBtn').style.display = 'block';
-      document.getElementById('physNextLabel').textContent = 'Следующее задание';
-      return;
-    }
-
-    if (currentMode === 'training') {
-      setTimeout(() => { isProcessing = false; nextTurn(); }, 400);
-      return;
-    }
-
-    const oldCell = p.cell;
-    const newCell = Math.max(0, p.cell - 2);
-    p.cell = newCell;
-    isMoving = true;
-    moveChipStepByStep(activePlayerIndex, oldCell, newCell, () => {
-      updateAllChips(); updateTurnUI();
-      addLog(`↩️ ${p.name} перешёл на клетку ${p.cell + 1}`);
-      saveCurrentSession();
-      nextTurn();
-      isMoving = false;
-      isProcessing = false;
-    });
+  if (isProcessing || isGameFinished || !currentTask || isMoving) {
+    console.log('[completeTask] blocked');
     return;
   }
+  isProcessing = true;
+  const p = players[activePlayerIndex];
+  ['btnWin','btnPartial','btnFail'].forEach(id => { const el = document.getElementById(id); if (el) el.disabled = true; });
+
+  try {
+    const reps = getReps(currentTask, p.age);
+    let soundForTask = '';
+    if (currentTask.applies_to) {
+      soundForTask = currentTask.applies_to.find(s => selectedSounds.includes(s)) || currentTask.applies_to[0];
+    }
+    const taskType = currentTask._type || 'artic';
+
+    if (success) {
+      p.tasksCompleted++;
+      modeState.score += 10;
+      addLog(`✅ <span class="success">${p.name} выполнил "${currentTask.name}" (${reps} раз)</span>`);
+      sessionTasks.push({ taskId: currentTask.id || currentTask.name, taskName: currentTask.name, sound: soundForTask, type: taskType, result: 'done', reps, playerId: p.id, playerName: p.name, time: new Date().toISOString() });
+      haptic(20);
+      logAction('task:done');
+      try { if (window.AIAssistant) window.AIAssistant.notifyAction('task_done'); } catch (e) {}
+
+      try {
+        const recent = sessionTasks.slice(-5);
+        if (recent.length === 5 && recent.every(t => t.result === 'done')) unlockAchievement('five_right');
+        const recent10 = sessionTasks.slice(-10);
+        if (recent10.length === 10 && recent10.every(t => t.result === 'done')) unlockAchievement('ten_right');
+      } catch (e) { console.warn(e); }
+
+      if (currentMode === 'team') {
+        modeState.teamDragonHP = Math.max(0, modeState.teamDragonHP - 1);
+        addLog(`🐉 Урон дракону! HP: <span class="highlight">${modeState.teamDragonHP}</span>`);
+        if (modeState.teamDragonHP <= 0) { addLog(`🏆 <span class="highlight">Дракон побеждён!</span>`); isGameFinished = true; try { celebrateWin(); } catch (e) {} }
+      }
+
+      try { saveCurrentSession(); } catch (e) { console.warn('save failed:', e); }
+
+      if (currentVersion === 'physical') {
+        updatePhysicalCounters();
+        isProcessing = false;
+        physicalAwaitingNext = true;
+        document.getElementById('physActions').style.display = 'none';
+        document.getElementById('physNextBtn').style.display = 'block';
+        document.getElementById('physNextLabel').textContent = 'Следующее задание';
+      } else {
+        setTimeout(() => { isProcessing = false; try { nextTurn(); } catch (e) { console.error(e); forceUnlockRoll(); } }, 400);
+      }
+    } else {
+      addLog(`❌ <span class="fail">${p.name} не выполнил "${currentTask.name}"</span>`);
+      sessionTasks.push({ taskId: currentTask.id || currentTask.name, taskName: currentTask.name, sound: soundForTask, type: taskType, result: 'failed', reps: 0, playerId: p.id, playerName: p.name, time: new Date().toISOString() });
+      haptic([30, 50, 30]);
+      logAction('task:fail');
+
+      if (currentMode === 'marathon') {
+        addLog(`🏁 <span class="fail">Марафон окончен!</span>`);
+        isGameFinished = true;
+        try { saveCurrentSession(); } catch (e) {}
+        try { finalizeSession(); } catch (e) {}
+        isProcessing = false;
+        return;
+      }
+
+      try { saveCurrentSession(); } catch (e) {}
+
+      if (currentVersion === 'physical') {
+        updatePhysicalCounters();
+        isProcessing = false;
+        physicalAwaitingNext = true;
+        document.getElementById('physActions').style.display = 'none';
+        document.getElementById('physNextBtn').style.display = 'block';
+        document.getElementById('physNextLabel').textContent = 'Следующее задание';
+        return;
+      }
+
+      if (currentMode === 'training') {
+        setTimeout(() => { isProcessing = false; try { nextTurn(); } catch (e) { forceUnlockRoll(); } }, 400);
+        return;
+      }
+
+      const oldCell = p.cell;
+      const newCell = Math.max(0, p.cell - 2);
+      p.cell = newCell;
+      isMoving = true;
+      moveChipStepByStep(activePlayerIndex, oldCell, newCell, () => {
+        updateAllChips(); updateTurnUI();
+        addLog(`↩️ ${p.name} перешёл на клетку ${p.cell + 1}`);
+        try { saveCurrentSession(); } catch (e) {}
+        isMoving = false;
+        isProcessing = false;
+        try { nextTurn(); } catch (e) { forceUnlockRoll(); }
+      });
+      return;
+    }
+  } catch (e) {
+    console.error('[completeTask] ERROR:', e);
+    isProcessing = false;
+    isMoving = false;
+    forceUnlockRoll();
+  }
 }
+
+// Аварийная разблокировка — если что-то пошло не так
+function forceUnlockRoll() {
+  isProcessing = false;
+  isMoving = false;
+  canRoll = true;
+  const rollBtn = document.getElementById('rollBtn');
+  if (rollBtn && !isGameFinished) rollBtn.disabled = false;
+  ['btnWin','btnPartial','btnFail'].forEach(id => { const el = document.getElementById(id); if (el) el.disabled = true; });
+}
+
 function openPartial() {
   if (!currentTask || isProcessing || isGameFinished) return;
   document.getElementById('partialModal').classList.add('active');
@@ -2013,43 +2054,48 @@ function confirmPartial() {
     setTimeout(() => { nextTurn(); isProcessing = false; }, 500);
   }
 }
+
+/* ============================================================
+   ПАТЧ 1.2: nextTurn → защищённая версия
+   ============================================================ */
 function nextTurn() {
   if (isGameFinished) return;
+  isProcessing = false;
+  isMoving = false;
+  canRoll = true;
+
   if (currentMode === 'training' || currentMode === 'marathon' || currentMode === 'timed') {
     if (currentMode === 'training' || currentMode === 'timed') {
       updateTurnUI();
-      canRoll = true;
-      document.getElementById('rollBtn').disabled = currentMode === 'training';
+      const rollBtn = document.getElementById('rollBtn');
+      if (rollBtn) rollBtn.disabled = currentMode === 'training';
       document.getElementById('taskName').textContent = 'Бросьте кубик';
       document.getElementById('taskDesc').textContent = 'Сделайте ход, чтобы получить задание.';
       document.getElementById('taskReps').textContent = '';
       document.getElementById('diceValue').textContent = '—';
-      document.getElementById('btnWin').disabled = true;
-      document.getElementById('btnPartial').disabled = true;
-      document.getElementById('btnFail').disabled = true;
+      ['btnWin','btnPartial','btnFail'].forEach(id => { const el = document.getElementById(id); if (el) el.disabled = true; });
       document.getElementById('btnShowImage').style.display = 'none';
       document.getElementById('voiceControls').style.display = 'none';
       document.getElementById('voiceResult').textContent = '';
-      saveCurrentSession();
-      if (currentMode === 'training') setTimeout(() => showTask(), 300);
+      try { saveCurrentSession(); } catch (e) {}
+      if (currentMode === 'training') setTimeout(() => { try { showTask(); } catch (e) { console.error(e); } }, 300);
       return;
     }
   }
+
   activePlayerIndex = (activePlayerIndex + 1) % players.length;
   updateTurnUI();
-  canRoll = true;
-  document.getElementById('rollBtn').disabled = false;
+  const rollBtn = document.getElementById('rollBtn');
+  if (rollBtn) rollBtn.disabled = false;
   document.getElementById('taskName').textContent = 'Бросьте кубик';
   document.getElementById('taskDesc').textContent = 'Сделайте ход, чтобы получить задание.';
   document.getElementById('taskReps').textContent = '';
   document.getElementById('diceValue').textContent = '—';
-  document.getElementById('btnWin').disabled = true;
-  document.getElementById('btnPartial').disabled = true;
-  document.getElementById('btnFail').disabled = true;
+  ['btnWin','btnPartial','btnFail'].forEach(id => { const el = document.getElementById(id); if (el) el.disabled = true; });
   document.getElementById('btnShowImage').style.display = 'none';
   document.getElementById('voiceControls').style.display = 'none';
   document.getElementById('voiceResult').textContent = '';
-  saveCurrentSession();
+  try { saveCurrentSession(); } catch (e) {}
 }
 function endTimedGame() {
   addLog(`⏱ <span class="highlight">Время вышло!</span>`);
@@ -2162,24 +2208,54 @@ function exportLogs() {
   link.click();
   URL.revokeObjectURL(link.href);
 }
+
+/* ============================================================
+   ПАТЧ 1.3: saveCurrentSession → защищённая версия
+   ============================================================ */
 function saveCurrentSession() {
-  if (players.length === 0) return;
-  const sessions = getAllSessions();
-  const data = {
-    players: players.map(p => ({ ...p })),
-    activePlayerIndex, isGameFinished, logs: gameLog, tasks: sessionTasks,
-    sounds: selectedSounds, types: getCurrentTypes(), preset: currentPreset,
-    version: currentVersion, childId: currentChildId,
-    startedAt: sessionStartTime, savedAt: new Date().toISOString()
-  };
-  if (currentSessionId !== null && currentSessionId < sessions.length) sessions[currentSessionId] = data;
-  else { sessions.push(data); currentSessionId = sessions.length - 1; }
-  saveSessions(sessions);
+  if (!players || players.length === 0) return;
+  try {
+    const sessions = getAllSessions();
+    let types = [];
+    try { types = getCurrentTypes(); } catch (e) { types = []; }
+    const data = {
+      players: players.map(p => ({ id: p.id, name: p.name, avatar: p.avatar, age: p.age, cell: p.cell, tasksCompleted: p.tasksCompleted })),
+      activePlayerIndex, isGameFinished, logs: gameLog, tasks: sessionTasks,
+      sounds: selectedSounds, types: types, preset: currentPreset,
+      version: currentVersion, childId: currentChildId,
+      startedAt: sessionStartTime, savedAt: new Date().toISOString()
+    };
+    if (currentSessionId !== null && currentSessionId < sessions.length) sessions[currentSessionId] = data;
+    else { sessions.push(data); currentSessionId = sessions.length - 1; }
+    saveSessions(sessions);
+  } catch (e) { console.warn('[saveCurrentSession] failed:', e); }
 }
+
+/* ============================================================
+   ПАТЧ 1.4: finalizeSession → защищённая версия
+   ============================================================ */
 function finalizeSession() {
-  if (!BRIDGE_API) { saveCurrentSession(); return; }
-  saveResearchSession(true);
-  addLog(`💾 Сессия сохранена в исследование`);
+  try {
+    if (!currentChildId) { saveCurrentSession(); return; }
+    const session = {
+      sessionId: Date.now(), childId: currentChildId,
+      date: (sessionStartTime || new Date().toISOString()).slice(0, 10),
+      startedAt: sessionStartTime, endedAt: new Date().toISOString(),
+      sounds: selectedSounds, types: (() => { try { return getCurrentTypes(); } catch (e) { return []; } })(),
+      preset: currentPreset, version: currentVersion,
+      players: players.map(p => ({ name: p.name, age: p.age, tasksCompleted: p.tasksCompleted })),
+      tasks: sessionTasks,
+      stats: {
+        total: sessionTasks.length,
+        done: sessionTasks.filter(t => t.result === 'done').length,
+        partial: sessionTasks.filter(t => t.result === 'partial').length,
+        failed: sessionTasks.filter(t => t.result === 'failed').length
+      },
+      mode: currentMode
+    };
+    saveGameSession(session);
+    addLog(`💾 Сессия сохранена в исследование`);
+  } catch (e) { console.error('[finalizeSession] error:', e); }
   saveCurrentSession();
 }
 
@@ -2219,24 +2295,36 @@ function saveResearchSession(finalize = false) {
     },
     isFinished: finalize
   };
-  BRIDGE_API.saveGameSession(session);
+  if (typeof BRIDGE_API !== 'undefined' && BRIDGE_API && BRIDGE_API.saveGameSession) {
+    BRIDGE_API.saveGameSession(session);
+  }
 }
+
+/* ============================================================
+   ПАТЧ 1.5: exitToMenu → защищённая версия
+   ============================================================ */
 function exitToMenu() {
-  if (sessionTasks.length > 0) finalizeSession();
-  if (modeState.timer) { clearInterval(modeState.timer); modeState.timer = null; }
-  document.getElementById('gameBoard').style.display = 'none';
-  document.getElementById('physicalBoard').style.display = 'none';
-  document.getElementById('mainMenu').classList.remove('hidden');
+  console.log('[exitToMenu]');
+  try { if (sessionTasks.length > 0) finalizeSession(); } catch (e) { console.error(e); }
+  try { if (modeState.timer) { clearInterval(modeState.timer); modeState.timer = null; } } catch (e) {}
+  const gb = document.getElementById('gameBoard'); if (gb) gb.style.display = 'none';
+  const pb = document.getElementById('physicalBoard'); if (pb) pb.style.display = 'none';
+  const mm = document.getElementById('mainMenu'); if (mm) mm.classList.remove('hidden');
+  isProcessing = false; isMoving = false; canRoll = true;
 }
 function exitToSite() {
   if (sessionTasks.length > 0) finalizeSession();
   if (modeState.timer) clearInterval(modeState.timer);
   window.location.href = 'index.html';
 }
+
+/* ============================================================
+   ПАТЧ 1.6: resetGame → защищённая версия
+   ============================================================ */
 function resetGame() {
-  if (confirm('Начать новую игру? Прогресс будет сохранён.')) {
-    finalizeSession();
-    if (modeState.timer) clearInterval(modeState.timer);
+  if (confirm('Начать новую игру? Текущий прогресс будет сохранён.')) {
+    try { finalizeSession(); } catch (e) { console.error(e); }
+    if (modeState.timer) { clearInterval(modeState.timer); modeState.timer = null; }
     location.reload();
   }
 }
