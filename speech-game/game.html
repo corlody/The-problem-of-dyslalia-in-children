@@ -630,7 +630,7 @@ button{cursor:pointer;border:none;background:none;}
 <!-- ЦИФРОВАЯ ДОСКА -->
 <div class="board-container" id="gameBoard" style="display:none;">
   <div class="game-map-area">
-    <img src="images/map.png" alt="Карта" class="map-image" id="mapImage" onerror="this.style.opacity='0.3'">
+    <img src="images/map.png" alt="Карта" class="map-image" id="mapImage" width="1200" height="800" onerror="this.style.opacity='0.3'">
     <div class="map-overlay" id="mapOverlay"></div>
   </div>
 
@@ -862,6 +862,14 @@ let recordingBlob = null;
 let isRecording = false;
 let physicalAwaitingNext = true;
 const ADMIN_PASSWORD = 'admin2026';
+
+// === Трекинг для протоколов ===
+let currentMoveNumber = 0;
+let currentRollResult = 0;
+let currentCellBeforeTask = 0;
+let currentTaskStartedAt = 0;
+let currentSessionStartMs = 0;
+let currentResearchSessionId = null;
 
 function promptAdminLogin() {
   const pwd = prompt('🔧 Введите пароль администратора:');
@@ -1217,6 +1225,14 @@ async function startGame() {
   sessionStartTime = new Date().toISOString();
   currentSessionId = null;
   physicalAwaitingNext = true;
+
+  // Трекинг сессии для исследования
+  currentMoveNumber = 0;
+  currentRollResult = 0;
+  currentCellBeforeTask = 0;
+  currentTaskStartedAt = 0;
+  currentSessionStartMs = Date.now();
+  currentResearchSessionId = Date.now();
   modeState.score = 0;
   modeState.marathonFailed = false;
   modeState.teamDragonHP = 10;
@@ -1301,6 +1317,7 @@ async function startGame() {
   addLog(`👤 Игрок: <strong>${players[0].name}</strong> (${players[0].age} лет)`);
 
   saveCurrentSession();
+  saveResearchSession(false);
 }
 
 function physicalNextTask() {
@@ -1541,6 +1558,9 @@ function rollDice() {
 function moveCurrentPlayer(steps) {
   const p = players[activePlayerIndex];
   const oldCell = p.cell;
+  currentRollResult = steps;
+  currentMoveNumber++;
+  currentCellBeforeTask = oldCell;
   let newCell = oldCell + steps;
   let extraMessage = '';
 
@@ -1599,10 +1619,11 @@ function moveCurrentPlayer(steps) {
   });
 }
 function showTask() {
+  currentTaskStartedAt = Date.now();
   const p = players[activePlayerIndex];
   const age = p.age;
   const types = getCurrentTypes();
-
+  
   if (selectedSounds.length === 0) {
     document.getElementById('taskName').textContent = '⚠️ Звуки не выбраны';
     document.getElementById('taskDesc').textContent = 'Перезапустите игру и отметьте хотя бы один звук.';
@@ -1813,11 +1834,27 @@ function completeTask(success) {
     p.tasksCompleted++;
     modeState.score += 10;
     addLog(`✅ <span class="success">${p.name} выполнил "${currentTask.name}" (${reps} раз)</span>`);
+    const endedAt = new Date().toISOString();
+    const durationMs = Date.now() - (currentTaskStartedAt || Date.now());
     sessionTasks.push({
-      taskId: currentTask.id || currentTask.name, taskName: currentTask.name,
-      sound: soundForTask, type: taskType, result: 'done', reps,
-      playerId: p.id, playerName: p.name, time: new Date().toISOString()
+      index: sessionTasks.length + 1,
+      startedAt: new Date(currentTaskStartedAt || Date.now()).toISOString(),
+      endedAt: endedAt,
+      durationMs: durationMs,
+      durationSeconds: Math.round(durationMs / 1000),
+      playerId: p.id, playerName: p.name, playerAge: p.age,
+      cellBefore: currentCellBeforeTask, cellAfter: p.cell,
+      moveNumber: currentMoveNumber, rollResult: currentRollResult,
+      taskId: currentTask.id || currentTask.name,
+      taskName: currentTask.name,
+      taskDesc: currentTask.desc || '',
+      taskType: taskType,
+      sound: soundForTask,
+      appliesTo: currentTask.applies_to || [],
+      result: 'done', reps: reps, fullReps: reps,
+      preset: currentPreset, mode: currentMode, version: currentVersion
     });
+    saveResearchSession(false);
     haptic(20);
     logAction('task:done');
     if (window.AIAssistant) window.AIAssistant.notifyAction('task_done');
@@ -1853,11 +1890,27 @@ function completeTask(success) {
     }
   } else {
     addLog(`❌ <span class="fail">${p.name} не выполнил "${currentTask.name}"</span>`);
+    const endedAt = new Date().toISOString();
+    const durationMs = Date.now() - (currentTaskStartedAt || Date.now());
     sessionTasks.push({
-      taskId: currentTask.id || currentTask.name, taskName: currentTask.name,
-      sound: soundForTask, type: taskType, result: 'failed', reps: 0,
-      playerId: p.id, playerName: p.name, time: new Date().toISOString()
+      index: sessionTasks.length + 1,
+      startedAt: new Date(currentTaskStartedAt || Date.now()).toISOString(),
+      endedAt: endedAt,
+      durationMs: durationMs,
+      durationSeconds: Math.round(durationMs / 1000),
+      playerId: p.id, playerName: p.name, playerAge: p.age,
+      cellBefore: currentCellBeforeTask, cellAfter: p.cell,
+      moveNumber: currentMoveNumber, rollResult: currentRollResult,
+      taskId: currentTask.id || currentTask.name,
+      taskName: currentTask.name,
+      taskDesc: currentTask.desc || '',
+      taskType: taskType,
+      sound: soundForTask,
+      appliesTo: currentTask.applies_to || [],
+      result: 'failed', reps: 0, fullReps: reps,
+      preset: currentPreset, mode: currentMode, version: currentVersion
     });
+    saveResearchSession(false);
     haptic([30, 50, 30]);
     logAction('task:fail');
 
@@ -1916,12 +1969,27 @@ function confirmPartial() {
     soundForTask = currentTask.applies_to.find(s => selectedSounds.includes(s)) || currentTask.applies_to[0];
   }
   addLog(`✏️ <span class="partial">${p.name} частично выполнил "${currentTask.name}" (${count} из ${fullReps})</span>`);
+  const endedAt = new Date().toISOString();
+  const durationMs = Date.now() - (currentTaskStartedAt || Date.now());
   sessionTasks.push({
-    taskId: currentTask.id || currentTask.name, taskName: currentTask.name,
-    sound: soundForTask, type: currentTask._type || 'artic', result: 'partial',
-    reps: count, totalReps: fullReps,
-    playerId: p.id, playerName: p.name, time: new Date().toISOString()
+    index: sessionTasks.length + 1,
+    startedAt: new Date(currentTaskStartedAt || Date.now()).toISOString(),
+    endedAt: endedAt,
+    durationMs: durationMs,
+    durationSeconds: Math.round(durationMs / 1000),
+    playerId: p.id, playerName: p.name, playerAge: p.age,
+    cellBefore: currentCellBeforeTask, cellAfter: p.cell,
+    moveNumber: currentMoveNumber, rollResult: currentRollResult,
+    taskId: currentTask.id || currentTask.name,
+    taskName: currentTask.name,
+    taskDesc: currentTask.desc || '',
+    taskType: currentTask._type || 'artic',
+    sound: soundForTask,
+    appliesTo: currentTask.applies_to || [],
+    result: 'partial', reps: count, fullReps: fullReps,
+    preset: currentPreset, mode: currentMode, version: currentVersion
   });
+  saveResearchSession(false);
   p.tasksCompleted++;
   modeState.score += Math.round(10 * count / fullReps);
   saveCurrentSession();
@@ -2109,25 +2177,49 @@ function saveCurrentSession() {
   saveSessions(sessions);
 }
 function finalizeSession() {
-  if (!currentChildId) { saveCurrentSession(); return; }
+  if (!BRIDGE_API) { saveCurrentSession(); return; }
+  saveResearchSession(true);
+  addLog(`💾 Сессия сохранена в исследование`);
+  saveCurrentSession();
+}
+
+function saveResearchSession(finalize = false) {
+  if (!BRIDGE_API) return;
+  if (sessionTasks.length === 0 && !finalize) return;
+
+  const now = new Date();
+  const startDate = sessionStartTime ? new Date(sessionStartTime) : now;
+  const firstPlayer = players[0] || { name: 'Игрок', age: 0, cell: 0 };
+
   const session = {
-    sessionId: Date.now(), childId: currentChildId,
-    date: (sessionStartTime || new Date().toISOString()).slice(0, 10),
-    startedAt: sessionStartTime, endedAt: new Date().toISOString(),
-    sounds: selectedSounds, types: getCurrentTypes(), preset: currentPreset, version: currentVersion,
-    players: players.map(p => ({ name: p.name, age: p.age, tasksCompleted: p.tasksCompleted })),
-    tasks: sessionTasks,
+    sessionId: currentResearchSessionId,
+    childId: currentChildId || null,
+    childName: firstPlayer.name,
+    childAge: firstPlayer.age,
+    date: startDate.toISOString().slice(0, 10),
+    startedAt: sessionStartTime,
+    endedAt: finalize ? now.toISOString() : null,
+    durationMs: Date.now() - currentSessionStartMs,
+    durationSeconds: Math.round((Date.now() - currentSessionStartMs) / 1000),
+    version: currentVersion,
+    preset: currentPreset,
+    mode: currentMode,
+    sounds: selectedSounds.slice(),
+    types: getCurrentTypes(),
+    players: players.map(p => ({ name: p.name, age: p.age, tasksCompleted: p.tasksCompleted, cell: p.cell })),
+    tasks: sessionTasks.slice(),
+    gameLog: gameLog.slice(),
     stats: {
       total: sessionTasks.length,
       done: sessionTasks.filter(t => t.result === 'done').length,
       partial: sessionTasks.filter(t => t.result === 'partial').length,
-      failed: sessionTasks.filter(t => t.result === 'failed').length
+      failed: sessionTasks.filter(t => t.result === 'failed').length,
+      totalDurationSeconds: sessionTasks.reduce((sum, t) => sum + (t.durationSeconds || 0), 0),
+      moves: currentMoveNumber
     },
-    mode: currentMode
+    isFinished: finalize
   };
-  saveGameSession(session);
-  addLog(`💾 Сессия сохранена в исследование`);
-  saveCurrentSession();
+  BRIDGE_API.saveGameSession(session);
 }
 function exitToMenu() {
   if (sessionTasks.length > 0) finalizeSession();
