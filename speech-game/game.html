@@ -401,8 +401,8 @@ button{cursor:pointer;border:none;background:none;}
 }
 
 .game-map-area {
-  position: relative !important;   /* ← обязательно для overlay */
-  display: block !important;        /* ← убираем flex, который центрировал картинку */
+  position: relative !important;
+  display: block !important;
   width: 100% !important;
   max-height: none !important;
   min-height: 0 !important;
@@ -411,7 +411,7 @@ button{cursor:pointer;border:none;background:none;}
   border: 1px solid var(--glass-border) !important;
   background: var(--bg-card) !important;
   box-shadow: 0 8px 32px rgba(0,0,0,.4) !important;
-  font-size: 0 !important;          /* ← убирает лишний пробел под картинкой */
+  font-size: 0 !important;
   line-height: 0 !important;
 }
 
@@ -440,11 +440,10 @@ button{cursor:pointer;border:none;background:none;}
 }
 
 .game-panel {
-  max-height: none !important;      /* ← панель растёт по контенту */
+  max-height: none !important;
   overflow-y: visible !important;
   min-width: 0 !important;
 }
-/* Страховка: контейнер карты не сжимается в 0, если картинка ещё грузится */
 .game-map-area {
   min-height: 400px !important;
 }
@@ -1426,6 +1425,10 @@ function showContinueMenu() {
 }
 function getAllSessions() { try { return JSON.parse(localStorage.getItem('speech_sessions') || '[]'); } catch(e) { return []; } }
 function saveSessions(s) { try { localStorage.setItem('speech_sessions', JSON.stringify(s)); } catch(e) {} }
+
+/* ============================================================
+   ПАТЧ 2: loadSession — восстанавливаем счётчики ходов
+   ============================================================ */
 async function loadSession(index) {
   const sessions = getAllSessions();
   if (index >= sessions.length) return;
@@ -1439,6 +1442,12 @@ async function loadSession(index) {
   currentSessionId = index;
   sessionTasks = session.tasks || [];
   sessionStartTime = session.startedAt || new Date().toISOString();
+
+  // ВОССТАНОВИТЬ счётчики ходов и research-сессии
+  currentMoveNumber = session.moves || (session.stats && session.stats.moves) || 0;
+  currentResearchSessionId = session.researchSessionId || Date.now();
+  currentSessionStartMs = session.startedAt ? new Date(session.startedAt).getTime() : Date.now();
+
   closeModal('continueModal');
   document.getElementById('mainMenu').classList.add('hidden');
   document.getElementById('gameBoard').style.display = 'grid';
@@ -1569,11 +1578,15 @@ function rollDice() {
   if (window.AIAssistant) window.AIAssistant.notifyAction('roll');
   setTimeout(() => moveCurrentPlayer(result), 1200);
 }
+
+/* ============================================================
+   ПАТЧ 3: moveCurrentPlayer — счётчики + saveResearchSession
+   ============================================================ */
 function moveCurrentPlayer(steps) {
   const p = players[activePlayerIndex];
   const oldCell = p.cell;
-  currentRollResult = steps;
   currentMoveNumber++;
+  currentRollResult = steps;
   currentCellBeforeTask = oldCell;
   let newCell = oldCell + steps;
   let extraMessage = '';
@@ -1625,10 +1638,12 @@ function moveCurrentPlayer(steps) {
         isMoving = false;
         isProcessing = false;
       }, 500);
+      try { saveResearchSession(false); } catch (e) { console.warn(e); }
       saveCurrentSession();
       return;
     }
     setTimeout(() => { showTask(); isMoving = false; }, 300);
+    try { saveResearchSession(false); } catch (e) { console.warn(e); }
     saveCurrentSession();
   });
 }
@@ -1902,7 +1917,26 @@ function completeTask(success) {
       p.tasksCompleted++;
       modeState.score += 10;
       addLog(`✅ <span class="success">${p.name} выполнил "${currentTask.name}" (${reps} раз)</span>`);
-      sessionTasks.push({ taskId: currentTask.id || currentTask.name, taskName: currentTask.name, sound: soundForTask, type: taskType, result: 'done', reps, playerId: p.id, playerName: p.name, time: new Date().toISOString() });
+      const endedAt = new Date().toISOString();
+      const durationMs = Date.now() - (currentTaskStartedAt || Date.now());
+      sessionTasks.push({
+        index: sessionTasks.length + 1,
+        startedAt: new Date(currentTaskStartedAt || Date.now()).toISOString(),
+        endedAt: endedAt,
+        durationMs: durationMs,
+        durationSeconds: Math.round(durationMs / 1000),
+        playerId: p.id, playerName: p.name, playerAge: p.age,
+        cellBefore: currentCellBeforeTask, cellAfter: p.cell,
+        moveNumber: currentMoveNumber, rollResult: currentRollResult,
+        taskId: currentTask.id || currentTask.name,
+        taskName: currentTask.name,
+        taskDesc: currentTask.desc || '',
+        taskType: taskType,
+        sound: soundForTask,
+        appliesTo: currentTask.applies_to || [],
+        result: 'done', reps: reps, fullReps: reps,
+        preset: currentPreset, mode: currentMode, version: currentVersion
+      });
       haptic(20);
       logAction('task:done');
       try { if (window.AIAssistant) window.AIAssistant.notifyAction('task_done'); } catch (e) {}
@@ -1921,6 +1955,7 @@ function completeTask(success) {
       }
 
       try { saveCurrentSession(); } catch (e) { console.warn('save failed:', e); }
+      try { saveResearchSession(false); } catch (e) { console.warn('research save failed:', e); }
 
       if (currentVersion === 'physical') {
         updatePhysicalCounters();
@@ -1934,7 +1969,26 @@ function completeTask(success) {
       }
     } else {
       addLog(`❌ <span class="fail">${p.name} не выполнил "${currentTask.name}"</span>`);
-      sessionTasks.push({ taskId: currentTask.id || currentTask.name, taskName: currentTask.name, sound: soundForTask, type: taskType, result: 'failed', reps: 0, playerId: p.id, playerName: p.name, time: new Date().toISOString() });
+      const endedAt = new Date().toISOString();
+      const durationMs = Date.now() - (currentTaskStartedAt || Date.now());
+      sessionTasks.push({
+        index: sessionTasks.length + 1,
+        startedAt: new Date(currentTaskStartedAt || Date.now()).toISOString(),
+        endedAt: endedAt,
+        durationMs: durationMs,
+        durationSeconds: Math.round(durationMs / 1000),
+        playerId: p.id, playerName: p.name, playerAge: p.age,
+        cellBefore: currentCellBeforeTask, cellAfter: p.cell,
+        moveNumber: currentMoveNumber, rollResult: currentRollResult,
+        taskId: currentTask.id || currentTask.name,
+        taskName: currentTask.name,
+        taskDesc: currentTask.desc || '',
+        taskType: taskType,
+        sound: soundForTask,
+        appliesTo: currentTask.applies_to || [],
+        result: 'failed', reps: 0, fullReps: reps,
+        preset: currentPreset, mode: currentMode, version: currentVersion
+      });
       haptic([30, 50, 30]);
       logAction('task:fail');
 
@@ -1948,6 +2002,7 @@ function completeTask(success) {
       }
 
       try { saveCurrentSession(); } catch (e) {}
+      try { saveResearchSession(false); } catch (e) {}
 
       if (currentVersion === 'physical') {
         updatePhysicalCounters();
@@ -1997,61 +2052,87 @@ function forceUnlockRoll() {
 }
 
 function openPartial() {
-  if (!currentTask || isProcessing || isGameFinished) return;
+  if (!currentTask || isProcessing || isGameFinished || isMoving) return;
   document.getElementById('partialModal').classList.add('active');
   document.getElementById('partialCount').value = 1;
 }
+
+/* ============================================================
+   ПАТЧ 1 (новый): confirmPartial с защитой от дубликатов
+   ============================================================ */
 function confirmPartial() {
+  // ЗАЩИТА: если уже обрабатываем — выходим
+  if (isProcessing || isGameFinished || !currentTask || isMoving) return;
+  isProcessing = true;
+
   const count = parseInt(document.getElementById('partialCount').value) || 1;
   const p = players[activePlayerIndex];
-  const fullReps = getReps(currentTask, p.age);
-  let soundForTask = '';
-  if (currentTask.applies_to) {
-    soundForTask = currentTask.applies_to.find(s => selectedSounds.includes(s)) || currentTask.applies_to[0];
-  }
-  addLog(`✏️ <span class="partial">${p.name} частично выполнил "${currentTask.name}" (${count} из ${fullReps})</span>`);
-  const endedAt = new Date().toISOString();
-  const durationMs = Date.now() - (currentTaskStartedAt || Date.now());
-  sessionTasks.push({
-    index: sessionTasks.length + 1,
-    startedAt: new Date(currentTaskStartedAt || Date.now()).toISOString(),
-    endedAt: endedAt,
-    durationMs: durationMs,
-    durationSeconds: Math.round(durationMs / 1000),
-    playerId: p.id, playerName: p.name, playerAge: p.age,
-    cellBefore: currentCellBeforeTask, cellAfter: p.cell,
-    moveNumber: currentMoveNumber, rollResult: currentRollResult,
-    taskId: currentTask.id || currentTask.name,
-    taskName: currentTask.name,
-    taskDesc: currentTask.desc || '',
-    taskType: currentTask._type || 'artic',
-    sound: soundForTask,
-    appliesTo: currentTask.applies_to || [],
-    result: 'partial', reps: count, fullReps: fullReps,
-    preset: currentPreset, mode: currentMode, version: currentVersion
-  });
-  saveResearchSession(false);
-  p.tasksCompleted++;
-  modeState.score += Math.round(10 * count / fullReps);
-  saveCurrentSession();
-  closeModal('partialModal');
-  document.getElementById('btnWin').disabled = true;
-  document.getElementById('btnPartial').disabled = true;
-  document.getElementById('btnFail').disabled = true;
 
-  if (currentVersion === 'physical') {
-    updatePhysicalCounters();
+  // Закрываем модалку СРАЗУ, до всего остального
+  closeModal('partialModal');
+
+  // Блокируем кнопки
+  ['btnWin','btnPartial','btnFail'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.disabled = true;
+  });
+
+  try {
+    const fullReps = getReps(currentTask, p.age);
+    let soundForTask = '';
+    if (currentTask.applies_to && currentTask.applies_to.length > 0) {
+      soundForTask = currentTask.applies_to.find(s => selectedSounds.includes(s)) || currentTask.applies_to[0];
+    }
+    const taskType = currentTask._type || 'artic';
+
+    addLog(`✏️ <span class="partial">${p.name} частично выполнил "${currentTask.name}" (${count} из ${fullReps})</span>`);
+
+    const endedAt = new Date().toISOString();
+    const durationMs = Date.now() - (currentTaskStartedAt || Date.now());
+    sessionTasks.push({
+      index: sessionTasks.length + 1,
+      startedAt: new Date(currentTaskStartedAt || Date.now()).toISOString(),
+      endedAt: endedAt,
+      durationMs: durationMs,
+      durationSeconds: Math.round(durationMs / 1000),
+      playerId: p.id, playerName: p.name, playerAge: p.age,
+      cellBefore: currentCellBeforeTask, cellAfter: p.cell,
+      moveNumber: currentMoveNumber, rollResult: currentRollResult,
+      taskId: currentTask.id || currentTask.name,
+      taskName: currentTask.name,
+      taskDesc: currentTask.desc || '',
+      taskType: taskType,
+      sound: soundForTask,
+      appliesTo: currentTask.applies_to || [],
+      result: 'partial', reps: count, totalReps: fullReps, fullReps: fullReps,
+      preset: currentPreset, mode: currentMode, version: currentVersion
+    });
+    p.tasksCompleted++;
+    modeState.score += Math.round(10 * count / fullReps);
+
+    try { saveCurrentSession(); } catch (e) { console.warn(e); }
+    try { saveResearchSession(false); } catch (e) { console.warn(e); }
+
+    if (currentVersion === 'physical') {
+      updatePhysicalCounters();
+      isProcessing = false;
+      physicalAwaitingNext = true;
+      document.getElementById('physActions').style.display = 'none';
+      document.getElementById('physNextBtn').style.display = 'block';
+      document.getElementById('physNextLabel').textContent = 'Следующее задание';
+      return;
+    }
+
+    if (currentMode === 'training') {
+      setTimeout(() => { isProcessing = false; try { nextTurn(); } catch (e) { forceUnlockRoll(); } }, 400);
+    } else {
+      setTimeout(() => { isProcessing = false; try { nextTurn(); } catch (e) { forceUnlockRoll(); } }, 500);
+    }
+  } catch (e) {
+    console.error('[confirmPartial] ERROR:', e);
     isProcessing = false;
-    physicalAwaitingNext = true;
-    document.getElementById('physActions').style.display = 'none';
-    document.getElementById('physNextBtn').style.display = 'block';
-    document.getElementById('physNextLabel').textContent = 'Следующее задание';
-    return;
-  }
-  if (currentMode === 'training') {
-    setTimeout(() => { isProcessing = false; nextTurn(); }, 400);
-  } else {
-    setTimeout(() => { nextTurn(); isProcessing = false; }, 500);
+    isMoving = false;
+    forceUnlockRoll();
   }
 }
 
@@ -2210,7 +2291,7 @@ function exportLogs() {
 }
 
 /* ============================================================
-   ПАТЧ 1.3: saveCurrentSession → защищённая версия
+   ПАТЧ 1.3 + 2: saveCurrentSession → защищённая + moves + researchSessionId
    ============================================================ */
 function saveCurrentSession() {
   if (!players || players.length === 0) return;
@@ -2223,7 +2304,9 @@ function saveCurrentSession() {
       activePlayerIndex, isGameFinished, logs: gameLog, tasks: sessionTasks,
       sounds: selectedSounds, types: types, preset: currentPreset,
       version: currentVersion, childId: currentChildId,
-      startedAt: sessionStartTime, savedAt: new Date().toISOString()
+      startedAt: sessionStartTime, savedAt: new Date().toISOString(),
+      moves: currentMoveNumber,
+      researchSessionId: currentResearchSessionId
     };
     if (currentSessionId !== null && currentSessionId < sessions.length) sessions[currentSessionId] = data;
     else { sessions.push(data); currentSessionId = sessions.length - 1; }
@@ -2238,7 +2321,9 @@ function finalizeSession() {
   try {
     if (!currentChildId) { saveCurrentSession(); return; }
     const session = {
-      sessionId: Date.now(), childId: currentChildId,
+      sessionId: currentResearchSessionId || Date.now(),
+      researchSessionId: currentResearchSessionId || Date.now(),
+      childId: currentChildId,
       date: (sessionStartTime || new Date().toISOString()).slice(0, 10),
       startedAt: sessionStartTime, endedAt: new Date().toISOString(),
       sounds: selectedSounds, types: (() => { try { return getCurrentTypes(); } catch (e) { return []; } })(),
@@ -2249,7 +2334,8 @@ function finalizeSession() {
         total: sessionTasks.length,
         done: sessionTasks.filter(t => t.result === 'done').length,
         partial: sessionTasks.filter(t => t.result === 'partial').length,
-        failed: sessionTasks.filter(t => t.result === 'failed').length
+        failed: sessionTasks.filter(t => t.result === 'failed').length,
+        moves: currentMoveNumber
       },
       mode: currentMode
     };
@@ -2259,44 +2345,57 @@ function finalizeSession() {
   saveCurrentSession();
 }
 
+/* ============================================================
+   ПАТЧ 4: saveResearchSession — единый sessionId + уникальные ходы
+   ============================================================ */
 function saveResearchSession(finalize = false) {
-  if (!BRIDGE_API) return;
   if (sessionTasks.length === 0 && !finalize) return;
+  if (typeof saveGameSession !== 'function') return;
 
-  const now = new Date();
-  const startDate = sessionStartTime ? new Date(sessionStartTime) : now;
-  const firstPlayer = players[0] || { name: 'Игрок', age: 0, cell: 0 };
+  try {
+    const now = new Date();
+    const startDate = sessionStartTime ? new Date(sessionStartTime) : now;
+    const firstPlayer = players[0] || { name: 'Игрок', age: 0 };
 
-  const session = {
-    sessionId: currentResearchSessionId,
-    childId: currentChildId || null,
-    childName: firstPlayer.name,
-    childAge: firstPlayer.age,
-    date: startDate.toISOString().slice(0, 10),
-    startedAt: sessionStartTime,
-    endedAt: finalize ? now.toISOString() : null,
-    durationMs: Date.now() - currentSessionStartMs,
-    durationSeconds: Math.round((Date.now() - currentSessionStartMs) / 1000),
-    version: currentVersion,
-    preset: currentPreset,
-    mode: currentMode,
-    sounds: selectedSounds.slice(),
-    types: getCurrentTypes(),
-    players: players.map(p => ({ name: p.name, age: p.age, tasksCompleted: p.tasksCompleted, cell: p.cell })),
-    tasks: sessionTasks.slice(),
-    gameLog: gameLog.slice(),
-    stats: {
-      total: sessionTasks.length,
-      done: sessionTasks.filter(t => t.result === 'done').length,
-      partial: sessionTasks.filter(t => t.result === 'partial').length,
-      failed: sessionTasks.filter(t => t.result === 'failed').length,
-      totalDurationSeconds: sessionTasks.reduce((sum, t) => sum + (t.durationSeconds || 0), 0),
-      moves: currentMoveNumber
-    },
-    isFinished: finalize
-  };
-  if (typeof BRIDGE_API !== 'undefined' && BRIDGE_API && BRIDGE_API.saveGameSession) {
-    BRIDGE_API.saveGameSession(session);
+    // Считаем ТОЛЬКО уникальные ходы (по moveNumber)
+    const uniqueMoves = new Set();
+    sessionTasks.forEach(t => {
+      if (t.moveNumber && t.moveNumber > 0) uniqueMoves.add(t.moveNumber);
+    });
+
+    const session = {
+      sessionId: currentResearchSessionId || Date.now(),
+      researchSessionId: currentResearchSessionId || Date.now(),
+      childId: currentChildId || null,
+      childName: firstPlayer.name,
+      childAge: firstPlayer.age,
+      date: startDate.toISOString().slice(0, 10),
+      startedAt: sessionStartTime,
+      endedAt: finalize ? now.toISOString() : null,
+      durationMs: Date.now() - (currentSessionStartMs || now.getTime()),
+      durationSeconds: Math.round((Date.now() - (currentSessionStartMs || now.getTime())) / 1000),
+      version: currentVersion,
+      preset: currentPreset,
+      mode: currentMode,
+      sounds: selectedSounds.slice(),
+      types: (() => { try { return getCurrentTypes(); } catch (e) { return []; } })(),
+      players: players.map(p => ({ name: p.name, age: p.age, tasksCompleted: p.tasksCompleted, cell: p.cell })),
+      tasks: sessionTasks.slice(),
+      gameLog: gameLog.slice(),
+      stats: {
+        total: sessionTasks.length,
+        done: sessionTasks.filter(t => t.result === 'done').length,
+        partial: sessionTasks.filter(t => t.result === 'partial').length,
+        failed: sessionTasks.filter(t => t.result === 'failed').length,
+        moves: currentMoveNumber || uniqueMoves.size,
+        totalDurationSeconds: sessionTasks.reduce((sum, t) => sum + (t.durationSeconds || 0), 0),
+        uniqueMoves: uniqueMoves.size
+      },
+      isFinished: finalize
+    };
+    saveGameSession(session);
+  } catch (e) {
+    console.error('[saveResearchSession] ERROR:', e);
   }
 }
 
@@ -2343,7 +2442,7 @@ async function boot() {
     window.AIAssistant.startIdleWatcher();
   }
   logAction('game:boot');
-  console.log('🎮 Game page v6 loaded');
+  console.log('🎮 Game page v7 loaded');
 }
 
 window.showSetup = showSetup;

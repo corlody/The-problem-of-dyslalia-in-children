@@ -1091,7 +1091,8 @@ function populateSessionSelect() {
   sel.innerHTML = sessions.map(s => {
     const date = s.startedAt ? new Date(s.startedAt).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '—';
     const st = s.stats || {};
-    return `<option value="${s.sessionId}">${date} · ${st.total || 0} заданий · ✅${st.done || 0} ✏️${st.partial || 0} ❌${st.failed || 0}</option>`;
+    const moves = st.moves || st.uniqueMoves || 0;
+    return `<option value="${s.sessionId}">${date} · 🎲${moves} ходов · ✅${st.done || 0} ✏️${st.partial || 0} ❌${st.failed || 0}</option>`;
   }).join('');
 
   // Автовыбор свежей сессии
@@ -1116,11 +1117,19 @@ function showSessionPreview(session) {
   const modeName = session.mode || '—';
   const presetName = session.preset || '—';
 
+  // Ходы = реальные броски кубика (уникальные)
+  const moveNumbers = new Set();
+  (session.tasks || []).forEach(t => {
+    if (t.moveNumber && t.moveNumber > 0) moveNumbers.add(t.moveNumber);
+  });
+  const moves = stats.moves || stats.uniqueMoves || moveNumbers.size || 0;
+
   preview.innerHTML = `
     <div style="padding:12px;background:rgba(124,58,237,.08);border-radius:12px;border-left:3px solid var(--purple);font-size:.85rem;line-height:1.6;">
       <div style="font-weight:700;margin-bottom:6px;">📊 Сводка сессии</div>
       <div>🎯 Режим: <strong>${modeName}</strong> · Этап: <strong>${presetName}</strong></div>
-      <div>🎲 Ходов: <strong>${stats.moves || 0}</strong> · Заданий: <strong>${stats.total || 0}</strong></div>
+      <div>🎲 Бросков кубика: <strong>${moves}</strong></div>
+      <div>📋 Заданий: <strong>${stats.total || 0}</strong></div>
       <div>✅ Полностью: <strong>${stats.done || 0}</strong> · ✏️ Частично: <strong>${stats.partial || 0}</strong> · ❌ Не выполнено: <strong>${stats.failed || 0}</strong></div>
       <div>⏱ Длительность: <strong>${duration}</strong></div>
       <div>🔊 Звуки: <strong>${(session.sounds || []).join(', ') || '—'}</strong></div>
@@ -1141,6 +1150,7 @@ function formatDuration(sec) {
 
 /**
  * Подставить данные выбранной сессии в поля протокола.
+ * Патч 5 — правильный подсчёт ходов и полный отчёт.
  */
 window.applySessionToProtocol = function() {
   const sel = document.getElementById('protocolSessionSelect');
@@ -1157,13 +1167,20 @@ window.applySessionToProtocol = function() {
   const durationSec = session.durationSeconds || stats.totalDurationSeconds || 0;
   const durationMin = Math.round(durationSec / 60);
 
-  // Длительность: 20/30/60 — ближайшее
+  // Ходы = реальные броски кубика (уникальные)
+  const moveNumbers = new Set();
+  (session.tasks || []).forEach(t => {
+    if (t.moveNumber && t.moveNumber > 0) moveNumbers.add(t.moveNumber);
+  });
+  const moves = stats.moves || stats.uniqueMoves || moveNumbers.size;
+
+  // Длительность — ближайший вариант
   const durSel = document.getElementById('protocolDuration');
   if (durationMin <= 25) durSel.value = '20';
   else if (durationMin <= 45) durSel.value = '30';
   else durSel.value = '60';
 
-  document.getElementById('protocolMoves').value = stats.moves || (session.tasks || []).length;
+  document.getElementById('protocolMoves').value = moves || (session.tasks || []).length;
   document.getElementById('protocolComplete').value = stats.done || 0;
   document.getElementById('protocolPartial').value = stats.partial || 0;
   document.getElementById('protocolFailed').value = stats.failed || 0;
@@ -1171,15 +1188,20 @@ window.applySessionToProtocol = function() {
 
   if (session.date) document.getElementById('protocolDate').value = session.date;
 
-  // Полный отчёт в заметки
+  // Формируем читаемый отчёт
   const detail = (session.tasks || []).map((t, i) => {
     const icon = t.result === 'done' ? '✅' : t.result === 'partial' ? '✏️' : '❌';
     const cell = t.cellAfter !== undefined ? `клетка ${t.cellAfter + 1}` : '';
-    const dur = t.durationSeconds ? `${t.durationSeconds}с` : '';
     const move = t.moveNumber ? `ход №${t.moveNumber}` : '';
     const roll = t.rollResult ? `кубик: ${t.rollResult}` : '';
-    const parts = [t.taskType || '', t.sound || '', cell, move, roll, dur].filter(Boolean).join(', ');
-    return `  ${i+1}. ${icon} ${t.taskName} (${parts}) — ${t.reps} повторов`;
+    const sound = t.sound ? `звук ${t.sound}` : '';
+    const type = t.taskType || '';
+    const dur = t.durationSeconds ? `${t.durationSeconds}с` : '';
+    const parts = [type, sound, cell, move, roll, dur].filter(Boolean).join(', ');
+    const resultText = t.result === 'done' ? 'выполнено полностью'
+      : t.result === 'partial' ? `частично (${t.reps}/${t.fullReps || t.totalReps || '?'})`
+      : 'не выполнено';
+    return `  ${i+1}. ${icon} ${t.taskName} — ${resultText}${parts ? ` [${parts}]` : ''}`;
   }).join('\n');
 
   const sessionDate = session.startedAt ? new Date(session.startedAt).toLocaleString('ru-RU') : '—';
@@ -1188,9 +1210,10 @@ window.applySessionToProtocol = function() {
     `[Из игры] ${sessionDate}\n` +
     `Режим: ${session.mode || '—'} · Этап: ${session.preset || '—'} · Версия: ${session.version || '—'}\n` +
     `Длительность: ${formatDuration(durationSec)}\n` +
-    `Всего ходов: ${stats.moves || 0} · Заданий: ${stats.total || 0}\n` +
-    `Результат: ✅${stats.done || 0} / ✏️${stats.partial || 0} / ❌${stats.failed || 0}\n\n` +
-    `--- Ходы ---\n${detail}`;
+    `Всего бросков кубика: ${moves}\n` +
+    `Заданий выполнено: ✅${stats.done || 0} / ✏️${stats.partial || 0} / ❌${stats.failed || 0}\n` +
+    `Звуки: ${(session.sounds || []).join(', ') || '—'}\n\n` +
+    `--- Задания ---\n${detail}`;
 
   if (typeof toast === 'function') toast('Данные из сессии подставлены', 'success');
   else alert('Данные из сессии подставлены');
@@ -1329,9 +1352,40 @@ window.exportProtocolsTXT = function() {
 // ============================================================
 // ИГРОВЫЕ СЕССИИ
 // ============================================================
+
+/**
+ * Патч 6 — дедупликация при загрузке.
+ * Одна сессия = один sessionId. Оставляем самую свежую версию.
+ * Автоматически чистит localStorage от старых дубликатов.
+ */
 function getAllGameSessions() {
-  try { return JSON.parse(localStorage.getItem(GAME_SESSIONS_KEY) || '[]'); }
-  catch(e) { return []; }
+  try {
+    let sessions = JSON.parse(localStorage.getItem(GAME_SESSIONS_KEY) || '[]');
+
+    // Дедупликация: одна сессия = один sessionId. Оставляем самую свежую версию.
+    const byId = {};
+    sessions.forEach(s => {
+      const id = s.sessionId || s.researchSessionId || s.startedAt;
+      if (!id) return;
+      const existing = byId[id];
+      if (!existing) { byId[id] = s; return; }
+      // Если у новой версии больше заданий — она свежее
+      const newLen = (s.tasks || []).length;
+      const oldLen = (existing.tasks || []).length;
+      if (newLen >= oldLen) byId[id] = s;
+    });
+
+    const cleaned = Object.values(byId);
+    // Сортируем: свежие сверху
+    cleaned.sort((a, b) => (b.startedAt || '').localeCompare(a.startedAt || ''));
+
+    // Если что-то почистили — сохраняем
+    if (cleaned.length !== sessions.length) {
+      localStorage.setItem(GAME_SESSIONS_KEY, JSON.stringify(cleaned));
+    }
+
+    return cleaned;
+  } catch (e) { return []; }
 }
 
 function getFilteredGameSessions() {
@@ -1367,8 +1421,10 @@ window.renderGameSessions = function() {
   const sessions = getFilteredGameSessions();
   const total = sessions.length;
   let totalTasks = 0, doneTasks = 0, partialTasks = 0, failedTasks = 0;
+  let totalMoves = 0;
   const soundCount = {};
   sessions.forEach(s => {
+    totalMoves += (s.stats?.moves || s.stats?.uniqueMoves || 0);
     (s.tasks || []).forEach(t => {
       totalTasks++;
       if (t.result === 'done') doneTasks++;
@@ -1381,6 +1437,7 @@ window.renderGameSessions = function() {
   stats.innerHTML = `
     <div class="stats-grid">
       <div class="stat-tile"><div class="stat-label">Сессий</div><div class="stat-value">${total}</div></div>
+      <div class="stat-tile"><div class="stat-label">Бросков кубика</div><div class="stat-value">${totalMoves}</div></div>
       <div class="stat-tile"><div class="stat-label">Всего заданий</div><div class="stat-value">${totalTasks}</div></div>
       <div class="stat-tile"><div class="stat-label">Успешность</div><div class="stat-value">${successRate}%</div><div class="stat-sub">✅ ${doneTasks} · ✏️ ${partialTasks} · ❌ ${failedTasks}</div></div>
     </div>
@@ -1395,6 +1452,18 @@ window.renderGameSessions = function() {
     const endTime = s.endedAt ? new Date(s.endedAt).toLocaleTimeString('ru-RU') : '—';
     const sStat = s.stats || { total: 0, done: 0, partial: 0, failed: 0 };
     const mode = s.mode || 'classic';
+
+    // Ходы = реальные броски кубика
+    const moveNumbers = new Set();
+    (s.tasks || []).forEach(t => {
+      if (t.moveNumber && t.moveNumber > 0) moveNumbers.add(t.moveNumber);
+    });
+    const moves = sStat.moves || sStat.uniqueMoves || moveNumbers.size || 0;
+
+    const duration = s.durationSeconds
+      ? formatDuration(s.durationSeconds)
+      : (sStat.totalDurationSeconds ? formatDuration(sStat.totalDurationSeconds) : '—');
+
     const div = document.createElement('div');
     div.className = 'child-card';
     div.style.marginBottom = '12px';
@@ -1403,8 +1472,9 @@ window.renderGameSessions = function() {
         <div style="flex:1;min-width:200px;">
           <div class="child-name">🎮 ${childName}</div>
           <div class="child-info">📅 ${startTime} → ${endTime} <span style="opacity:.6;">· режим: ${mode}</span></div>
+          <div class="child-info">🎲 Бросков кубика: <strong>${moves}</strong> · ⏱ ${duration}</div>
           <div class="child-info">🔊 Звуки: <strong>${(s.sounds||[]).join(', ') || '—'}</strong></div>
-          <div class="child-info">✅ ${sStat.done||0} · ✏️ ${sStat.partial||0} · ❌ ${sStat.failed||0} (всего ${sStat.total||0})</div>
+          <div class="child-info">✅ ${sStat.done||0} · ✏️ ${sStat.partial||0} · ❌ ${sStat.failed||0} (всего заданий ${sStat.total||0})</div>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
           <button class="btn btn-success" onclick="importSessionToProtocol(${s.sessionId})" style="padding:8px 16px;font-size:.85rem;"><i class="fas fa-file-medical"></i> В протокол</button>
@@ -1484,14 +1554,15 @@ window.importSessionToProtocol = function(sessionId) {
 window.exportGameSessions = function() {
   const sessions = getFilteredGameSessions();
   if (sessions.length === 0) { alert('Нет данных'); return; }
-  const rows = [['Дата','Ребёнок','Режим','Звуки','Заданий','Выполнено','Частично','Не выполнено','Успешность %','Начало','Конец']];
+  const rows = [['Дата','Ребёнок','Режим','Звуки','Бросков кубика','Заданий','Выполнено','Частично','Не выполнено','Успешность %','Начало','Конец']];
   sessions.forEach(s => {
     const child = data.children.find(c => c.id === s.childId);
     const name = child ? child.name : (s.players?.[0]?.name || '—');
     const total = s.stats?.total || 0;
     const done = s.stats?.done || 0;
     const rate = total > 0 ? Math.round((done / total) * 100) : 0;
-    rows.push([s.date||'', name, s.mode||'classic', (s.sounds||[]).join('; '), total, done, s.stats?.partial||0, s.stats?.failed||0, rate, s.startedAt ? new Date(s.startedAt).toLocaleString('ru-RU') : '', s.endedAt ? new Date(s.endedAt).toLocaleString('ru-RU') : '']);
+    const moves = s.stats?.moves || s.stats?.uniqueMoves || 0;
+    rows.push([s.date||'', name, s.mode||'classic', (s.sounds||[]).join('; '), moves, total, done, s.stats?.partial||0, s.stats?.failed||0, rate, s.startedAt ? new Date(s.startedAt).toLocaleString('ru-RU') : '', s.endedAt ? new Date(s.endedAt).toLocaleString('ru-RU') : '']);
   });
   let csv = '\uFEFF';
   rows.forEach(r => csv += r.map(c => `"${String(c||'').replace(/"/g,'""')}"`).join(',') + '\n');
@@ -1505,11 +1576,13 @@ window.exportGameSessionsTXT = function() {
   sessions.forEach((s, i) => {
     const child = data.children.find(c => c.id === s.childId);
     const name = child ? child.name : (s.players?.[0]?.name || '—');
+    const moves = s.stats?.moves || s.stats?.uniqueMoves || 0;
     lines.push(`--- Сессия #${i+1} ---`);
     lines.push(`Ребёнок: ${name}`);
     lines.push(`Дата: ${s.date||'—'}`);
     lines.push(`Режим: ${s.mode||'classic'}`);
     lines.push(`Звуки: ${(s.sounds||[]).join(', ')||'—'}`);
+    lines.push(`Бросков кубика: ${moves}`);
     lines.push(`Заданий: ${s.stats?.total||0} (✅ ${s.stats?.done||0} / ✏️ ${s.stats?.partial||0} / ❌ ${s.stats?.failed||0})`);
     lines.push('');
     (s.tasks || []).forEach((t, j) => {
@@ -1534,8 +1607,10 @@ function renderSummary() {
   const videos = data.protocols.filter(p => p.video).length;
   const sessions = getAllGameSessions();
   let totalTasks = 0, doneTasks = 0, partialTasks = 0, failedTasks = 0;
+  let totalMoves = 0;
   const soundCount = {};
   sessions.forEach(s => {
+    totalMoves += (s.stats?.moves || s.stats?.uniqueMoves || 0);
     (s.tasks || []).forEach(t => {
       totalTasks++;
       if (t.result === 'done') doneTasks++;
@@ -1550,7 +1625,7 @@ function renderSummary() {
     <div class="stats-grid">
       <div class="stat-tile"><div class="stat-label">Детей</div><div class="stat-value">${total}</div><div class="stat-sub">Эксп: ${exp} · Контр: ${ctrl}</div></div>
       <div class="stat-tile"><div class="stat-label">Протоколов</div><div class="stat-value">${protocols}</div><div class="stat-sub">Видео: ${videos}</div></div>
-      <div class="stat-tile"><div class="stat-label">Игровых сессий</div><div class="stat-value">${sessions.length}</div><div class="stat-sub">Заданий: ${totalTasks}</div></div>
+      <div class="stat-tile"><div class="stat-label">Игровых сессий</div><div class="stat-value">${sessions.length}</div><div class="stat-sub">Бросков: ${totalMoves} · Заданий: ${totalTasks}</div></div>
       <div class="stat-tile"><div class="stat-label">Успешность</div><div class="stat-value">${successRate}%</div><div class="stat-sub">✅ ${doneTasks} · ✏️ ${partialTasks} · ❌ ${failedTasks}</div></div>
     </div>
   `;
@@ -1664,7 +1739,7 @@ window.saveAllData = function() {
   if (data.children.length === 0 && data.protocols.length === 0 && !data.feedback) { alert('Нет данных для сохранения'); return; }
   const exportData = {
     exportedAt: new Date().toISOString(),
-    version: '4.0',
+    version: '4.1',
     children: data.children,
     protocols: data.protocols,
     feedback: data.feedback,
@@ -1689,14 +1764,15 @@ window.saveAllDataCSV = function() {
     csv += `"${p.date}","${child?child.name:''}",${child?child.age:''},${p.duration},${p.moves},${p.complete},${p.partial},${p.failed},"${MOOD_LABELS[p.mood]||''}","${ENGAGEMENT_LABELS[p.engagement]||''}","${p.sounds||''}","${p.video||''}","${p.notes||''}"\n`;
   });
   csv += '\n=== ИГРОВЫЕ СЕССИИ ===\n';
-  csv += 'Дата,Ребёнок,Режим,Звуки,Заданий,Выполнено,Частично,Не выполнено,Успешность %\n';
+  csv += 'Дата,Ребёнок,Режим,Звуки,Бросков кубика,Заданий,Выполнено,Частично,Не выполнено,Успешность %\n';
   getAllGameSessions().forEach(s => {
     const child = data.children.find(c => c.id === s.childId);
     const name = child ? child.name : (s.players?.[0]?.name || '—');
     const total = s.stats?.total || 0;
     const done = s.stats?.done || 0;
     const rate = total > 0 ? Math.round((done / total) * 100) : 0;
-    csv += `"${s.date||''}","${name}","${s.mode||'classic'}","${(s.sounds||[]).join('; ')}",${total},${done},${s.stats?.partial||0},${s.stats?.failed||0},${rate}\n`;
+    const moves = s.stats?.moves || s.stats?.uniqueMoves || 0;
+    csv += `"${s.date||''}","${name}","${s.mode||'classic'}","${(s.sounds||[]).join('; ')}",${moves},${total},${done},${s.stats?.partial||0},${s.stats?.failed||0},${rate}\n`;
   });
   csv += '\n';
   if (data.feedback) {
@@ -1728,7 +1804,7 @@ async function boot() {
   loadData();
   logAction('research:boot');
   unlockAchievement('explorer');
-  console.log('📊 Research page loaded v4.0');
+  console.log('📊 Research page loaded v4.1 (patches 5,6,8 applied)');
 }
 
 if (document.readyState === 'loading') {
