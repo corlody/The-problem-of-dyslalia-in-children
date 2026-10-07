@@ -473,6 +473,60 @@ function collectDiagnostics() {
   };
 }
 
+function formatDiagHuman(d) {
+  const lines = [];
+  lines.push('═══════════════════════════════════════');
+  lines.push('   ОТЧЁТ ОБ ОШИБКЕ — ГОВОРЮ ПРАВИЛЬНО');
+  lines.push('═══════════════════════════════════════');
+  lines.push('');
+  lines.push('📄 Страница:      ' + d.page);
+  lines.push('🔢 Версия:        ' + d.version);
+  lines.push('🕐 Время:         ' + new Date(d.time).toLocaleString('ru-RU'));
+  lines.push('');
+  lines.push('─── УСТРОЙСТВО ───');
+  lines.push('🖥 Экран:         ' + d.screen);
+  lines.push('📐 Окно:          ' + d.viewport);
+  lines.push('📏 Плотность:     ' + d.dpr);
+  let browser = 'Неизвестно';
+  if (d.ua.includes('Edg/')) browser = 'Edge';
+  else if (d.ua.includes('OPR/') || d.ua.includes('Opera')) browser = 'Opera';
+  else if (d.ua.includes('YaBrowser')) browser = 'Яндекс.Браузер';
+  else if (d.ua.includes('Firefox/')) browser = 'Firefox';
+  else if (d.ua.includes('Chrome/') && !d.ua.includes('Edg/')) browser = 'Chrome';
+  else if (d.ua.includes('Safari/') && !d.ua.includes('Chrome')) browser = 'Safari';
+  lines.push('🌐 Браузер:       ' + browser);
+  lines.push('');
+  lines.push('─── НАСТРОЙКИ ───');
+  lines.push('🎨 Тема:          ' + d.theme + (d.dayNight === 'night' ? ' (ночь)' : ' (день)'));
+  lines.push('🌍 Язык:          ' + d.language);
+  lines.push('🔤 Шрифт:         ' + d.fontSize);
+  lines.push('🔳 Контраст:      ' + (d.highContrast ? 'включён' : 'выкл'));
+  lines.push('📖 Дислексия:     ' + (d.dyslexiaFont ? 'включён' : 'выкл'));
+  lines.push('🎬 Анимации:      ' + (d.reducedMotion ? 'уменьшены' : 'обычные'));
+  lines.push('🎙 Голос:         ' + d.voiceURI);
+  lines.push('');
+  lines.push('─── ПОСЛЕДНИЕ 20 ДЕЙСТВИЙ ───');
+  const acts = d.actions || [];
+  if (acts.length === 0) {
+    lines.push('  (нет записанных действий)');
+  } else {
+    acts.forEach((a, i) => {
+      const t = new Date(a.t).toLocaleTimeString('ru-RU');
+      lines.push(`  ${String(i+1).padStart(2,' ')}. [${t}] ${a.a || '(клик)'}`);
+    });
+  }
+  lines.push('');
+  lines.push('─── КЛЮЧИ В ХРАНИЛИЩЕ ───');
+  (d.storageKeys || []).forEach(k => lines.push('  • ' + k));
+  lines.push('');
+  lines.push('───────────────────────────────────────');
+  lines.push('Как отправить разработчику:');
+  lines.push('  1. Скопируйте весь текст');
+  lines.push('  2. Отправьте в Telegram/WhatsApp');
+  lines.push('───────────────────────────────────────');
+  return lines.join('\n');
+}
+
 export function openBugReport() {
   let modal = document.getElementById('core-bug-modal');
   if (!modal) {
@@ -509,13 +563,18 @@ export function openBugReport() {
     const problem = document.getElementById('bugProblem').value.trim() || '—';
     const steps = document.getElementById('bugSteps').value.trim() || '—';
     return [
-      '=== ОТЧЁТ О ПРОБЛЕМЕ ===',
-      `Имя: ${name}`,
-      `Проблема: ${problem}`,
-      `Что делал: ${steps}`,
+      '═══════════════════════════════════════',
+      '   ЧТО СЛУЧИЛОСЬ',
+      '═══════════════════════════════════════',
+      '👤 Имя:      ' + name,
       '',
-      '=== ДИАГНОСТИКА ===',
-      JSON.stringify(diag, null, 2),
+      '❌ Проблема:',
+      problem,
+      '',
+      '👣 Что делал:',
+      steps,
+      '',
+      formatDiagHuman(diag)
     ].join('\n');
   };
 
