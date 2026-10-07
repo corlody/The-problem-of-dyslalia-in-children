@@ -21,11 +21,7 @@ export function getChildSounds(child) {
   return child.sounds.split(/[,\s]+/).filter(s => s.trim().length > 0);
 }
 
-/**
- * Сохранить или ОБНОВИТЬ игровую сессию по sessionId.
- * Если сессия с таким ID уже есть — обновляется.
- * Если нет — добавляется в начало (новые сверху).
- */
+// ОБНОВЛЕНИЕ сессии по sessionId (не создаёт дубликат)
 export function saveGameSession(session) {
   try {
     const sessions = JSON.parse(localStorage.getItem(GAME_SESSIONS_KEY) || '[]');
