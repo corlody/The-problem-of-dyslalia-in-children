@@ -176,7 +176,7 @@ button{cursor:pointer;border:none;background:none;}
 .physical-info .pi-value{font-size:1.3rem;font-weight:800;color:var(--gold);}
 
 /* ============================================================
-   ЦИФРОВАЯ ДОСКА — с защитой от grid blowout
+   ЦИФРОВАЯ ДОСКА
    ============================================================ */
 .board-container{display:grid;grid-template-columns:1fr 400px;gap:20px;max-width:1700px;margin:0 auto;position:relative;z-index:1;padding:0;}
 .game-map-area{position:relative;border-radius:var(--radius);overflow:hidden;border:1px solid var(--glass-border);background:var(--bg-card);box-shadow:0 8px 32px rgba(0,0,0,.4);}
@@ -387,7 +387,7 @@ button{cursor:pointer;border:none;background:none;}
   *,*::before,*::after{animation-duration:.001ms !important;transition-duration:.001ms !important;}
 }
 /* ============================================================
-   ФИНАЛЬНЫЙ ФИКС КАРТЫ — перебивает всё выше
+   ФИНАЛЬНЫЙ ФИКС КАРТЫ
    ============================================================ */
 .board-container {
   display: grid !important;
@@ -1361,7 +1361,7 @@ async function startGame() {
 }
 
 /* ============================================================
-   ПАТЧ 2.2: physicalNextTask → асинхронная + WAV-озвучка
+   physicalNextTask → асинхронная + WAV-озвучка из папки saund
    ============================================================ */
 async function physicalNextTask() {
   if (!physicalAwaitingNext) return;
@@ -1405,14 +1405,12 @@ async function physicalNextTask() {
     const taskId = task.id || task.name;
     const hasWav = await hasWavForTask(taskId);
     if (hasWav) {
-      const audio = new Audio(`audio/tasks/${encodeURIComponent(taskId)}.wav`);
+      const audio = new Audio(`saund/${encodeURIComponent(taskId)}.wav`);
       audio.play().catch(() => {
-        if (Speech && Speech.hasRussianVoice()) {
-          Speech.speak(`${task.name}. ${task.desc || ''}. Повторить ${reps} раз.`);
-        }
+        _speakWithTTS(task, reps, null);
       });
-    } else if (Speech && Speech.hasRussianVoice()) {
-      Speech.speak(`${task.name}. ${task.desc || ''}. Повторить ${reps} раз.`);
+    } else {
+      _speakWithTTS(task, reps, null);
     }
   }
   logAction('physical_task_shown');
@@ -1467,9 +1465,6 @@ function showContinueMenu() {
 function getAllSessions() { try { return JSON.parse(localStorage.getItem('speech_sessions') || '[]'); } catch(e) { return []; } }
 function saveSessions(s) { try { localStorage.setItem('speech_sessions', JSON.stringify(s)); } catch(e) {} }
 
-/* ============================================================
-   ПАТЧ 2: loadSession — восстанавливаем счётчики ходов
-   ============================================================ */
 async function loadSession(index) {
   const sessions = getAllSessions();
   if (index >= sessions.length) return;
@@ -1621,9 +1616,6 @@ function rollDice() {
   setTimeout(() => moveCurrentPlayer(result), 1200);
 }
 
-/* ============================================================
-   ПАТЧ 3: moveCurrentPlayer — счётчики + saveResearchSession
-   ============================================================ */
 function moveCurrentPlayer(steps) {
   const p = players[activePlayerIndex];
   const oldCell = p.cell;
@@ -1769,14 +1761,14 @@ function closeTaskImage(e) {
 }
 
 /* ============================================================
-   ПАТЧ 2.1: speakTask + WAV-кэш + hasWavForTask + _speakWithTTS
+   speakTask + WAV-кэш из папки saund
    ============================================================ */
 const _wavCache = {};
 
 async function hasWavForTask(taskId) {
   if (!taskId) return false;
   if (_wavCache[taskId] !== undefined) return _wavCache[taskId];
-  const url = `audio/tasks/${encodeURIComponent(taskId)}.wav`;
+  const url = `saund/${encodeURIComponent(taskId)}.wav`;
   try {
     const r = await fetch(url, { method: 'HEAD' });
     _wavCache[taskId] = r.ok;
@@ -1795,7 +1787,7 @@ async function speakTask(task, reps) {
   const hasWav = await hasWavForTask(taskId);
 
   if (hasWav) {
-    const audio = new Audio(`audio/tasks/${encodeURIComponent(taskId)}.wav`);
+    const audio = new Audio(`saund/${encodeURIComponent(taskId)}.wav`);
     audio.onended = () => btn && btn.classList.remove('speaking');
     audio.onerror = () => {
       console.warn('[speakTask] WAV error, fallback to TTS');
@@ -1812,21 +1804,26 @@ async function speakTask(task, reps) {
 }
 
 function _speakWithTTS(task, reps, btn) {
-  if (!Speech || typeof Speech.speak !== 'function') {
+  if (!('speechSynthesis' in window)) {
     if (btn) btn.classList.remove('speaking');
-    alert('Озвучка не поддерживается');
+    alert('Озвучка не поддерживается браузером');
     return;
   }
-  if (!Speech.hasRussianVoice()) {
-    if (btn) btn.classList.remove('speaking');
-    alert('🔇 Русский голос не установлен.\n\n' + Speech.getVoiceInstallGuide());
-    return;
-  }
+  window.speechSynthesis.cancel();
   const text = `${task.name}. ${task.desc || ''}. Повторить ${reps} раз.`;
-  Speech.speak(text, {
-    onEnd: () => btn && btn.classList.remove('speaking'),
-    onError: () => btn && btn.classList.remove('speaking')
-  });
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'ru-RU';
+  u.rate = 0.9;
+  
+  const voices = window.speechSynthesis.getVoices();
+  const ruVoice = voices.find(v => v.lang.startsWith('ru') || v.name.includes('Russian'));
+  if (ruVoice) u.voice = ruVoice;
+
+  if (btn) btn.classList.add('speaking');
+  u.onend = () => { if (btn) btn.classList.remove('speaking'); };
+  u.onerror = () => { if (btn) btn.classList.remove('speaking'); };
+  
+  window.speechSynthesis.speak(u);
 }
 
 async function startVoiceCommand() {
@@ -1935,9 +1932,6 @@ function playBackRecording() {
   Speech.playRecording(recordingBlob);
 }
 
-/* ============================================================
-   ПАТЧ 1.1: completeTask → защищённая версия + forceUnlockRoll
-   ============================================================ */
 function completeTask(success) {
   if (isProcessing || isGameFinished || !currentTask || isMoving) {
     console.log('[completeTask] blocked');
@@ -2101,25 +2095,15 @@ function openPartial() {
   document.getElementById('partialCount').value = 1;
 }
 
-/* ============================================================
-   ПАТЧ 1 (новый): confirmPartial с защитой от дубликатов
-   ============================================================ */
 function confirmPartial() {
-  // ЗАЩИТА: если уже обрабатываем — выходим
   if (isProcessing || isGameFinished || !currentTask || isMoving) return;
   isProcessing = true;
 
   const count = parseInt(document.getElementById('partialCount').value) || 1;
   const p = players[activePlayerIndex];
 
-  // Закрываем модалку СРАЗУ, до всего остального
   closeModal('partialModal');
-
-  // Блокируем кнопки
-  ['btnWin','btnPartial','btnFail'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.disabled = true;
-  });
+  ['btnWin','btnPartial','btnFail'].forEach(id => { const el = document.getElementById(id); if (el) el.disabled = true; });
 
   try {
     const fullReps = getReps(currentTask, p.age);
@@ -2180,9 +2164,6 @@ function confirmPartial() {
   }
 }
 
-/* ============================================================
-   ПАТЧ 1.2: nextTurn → защищённая версия
-   ============================================================ */
 function nextTurn() {
   if (isGameFinished) return;
   isProcessing = false;
@@ -2334,9 +2315,6 @@ function exportLogs() {
   URL.revokeObjectURL(link.href);
 }
 
-/* ============================================================
-   ПАТЧ 1.3 + 2: saveCurrentSession → защищённая + moves + researchSessionId
-   ============================================================ */
 function saveCurrentSession() {
   if (!players || players.length === 0) return;
   try {
@@ -2358,9 +2336,6 @@ function saveCurrentSession() {
   } catch (e) { console.warn('[saveCurrentSession] failed:', e); }
 }
 
-/* ============================================================
-   ПАТЧ 1.4: finalizeSession → защищённая версия
-   ============================================================ */
 function finalizeSession() {
   try {
     if (!currentChildId) { saveCurrentSession(); return; }
@@ -2389,9 +2364,6 @@ function finalizeSession() {
   saveCurrentSession();
 }
 
-/* ============================================================
-   ПАТЧ 4: saveResearchSession — единый sessionId + уникальные ходы
-   ============================================================ */
 function saveResearchSession(finalize = false) {
   if (sessionTasks.length === 0 && !finalize) return;
   if (typeof saveGameSession !== 'function') return;
@@ -2443,9 +2415,6 @@ function saveResearchSession(finalize = false) {
   }
 }
 
-/* ============================================================
-   ПАТЧ 1.5: exitToMenu → защищённая версия
-   ============================================================ */
 function exitToMenu() {
   console.log('[exitToMenu]');
   try { if (sessionTasks.length > 0) finalizeSession(); } catch (e) { console.error(e); }
@@ -2461,9 +2430,6 @@ function exitToSite() {
   window.location.href = 'index.html';
 }
 
-/* ============================================================
-   ПАТЧ 1.6: resetGame → защищённая версия
-   ============================================================ */
 function resetGame() {
   if (confirm('Начать новую игру? Текущий прогресс будет сохранён.')) {
     try { finalizeSession(); } catch (e) { console.error(e); }
