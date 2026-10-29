@@ -1662,6 +1662,7 @@ function moveCurrentPlayer(steps) {
     if (extraMessage) addLog(`<span class="highlight">${extraMessage}</span>`);
     addLog(`🎲 ${p.name} выбросил ${steps} → клетка ${p.cell + 1}`);
     if (isCampfire) {
+      playSound('fire');
       addLog(`🔥 <span class="highlight">Костёр!</span> ${p.name} получает доп. ход!`);
       setTimeout(() => {
         canRoll = true;
