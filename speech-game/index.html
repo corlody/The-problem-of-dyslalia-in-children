@@ -2916,8 +2916,6 @@ import {
   initCore, t, toast, state, unlockAchievement, logAction
 } from './js/core.js';
 import './js/ai_assistant.js';
-import * as Speech from './js/speech.js';
-import './js/speech.js';
 
 // ============================================================
 // ЗАГРУЗКА КАРТОЧЕК ИЗ tasks_by_sound.json
@@ -3296,7 +3294,7 @@ async function boot() {
     });
   });
 
-  console.log('🎮 Главная страница загружена v5.1');
+  console.log('🎮 Главная страница загружена v5.2');
 }
 
 function spawnOceanBubbles() {
@@ -3379,7 +3377,7 @@ window.playCardAudio = async function(taskId, taskName, taskDesc) {
   ];
 
   const uniqueCandidates = [...new Set(candidates)];
-  const basePath = 'sound/'; // Твоя папка
+  const basePath = 'saund/'; // ВНИМАНИЕ: Твоя папка называется saund!
 
   let foundUrl = null;
   // Ищем первый существующий файл
@@ -3414,23 +3412,29 @@ function playWavFile(url, taskName, taskDesc, btn) {
 }
 
 function speakTTSFallback(taskName, taskDesc, btn) {
-  if (!Speech || typeof Speech.speak !== 'function') {
-    if (btn) btn.classList.remove('playing');
-    if (typeof toast === 'function') toast('Озвучка недоступна', 'error');
+  if (btn) btn.classList.remove('playing');
+  if (!('speechSynthesis' in window)) {
+    if (typeof toast === 'function') toast('Озвучка не поддерживается браузером', 'error');
     return;
   }
-  if (!Speech.hasRussianVoice()) {
-    if (btn) btn.classList.remove('playing');
-    if (typeof toast === 'function') toast('Русский голос не установлен', 'error');
-    return;
-  }
+  
+  window.speechSynthesis.cancel();
   const text = `${taskName}. ${taskDesc || ''}`;
-  Speech.speak(text, {
-    onEnd: () => { if (btn) btn.classList.remove('playing'); },
-    onError: () => { if (btn) btn.classList.remove('playing'); }
-  });
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'ru-RU';
+  u.rate = 0.9;
+  
+  const voices = window.speechSynthesis.getVoices();
+  const ruVoice = voices.find(v => v.lang.startsWith('ru') || v.name.includes('Russian'));
+  if (ruVoice) u.voice = ruVoice;
+
+  u.onstart = () => { if (btn) btn.classList.add('playing'); };
+  u.onend = () => { if (btn) btn.classList.remove('playing'); };
+  u.onerror = () => { if (btn) btn.classList.remove('playing'); };
+  
+  window.speechSynthesis.speak(u);
 }
-   
+
 // Старт
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', boot);
