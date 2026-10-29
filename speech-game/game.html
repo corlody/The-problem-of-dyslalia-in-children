@@ -1761,22 +1761,122 @@ function closeTaskImage(e) {
 }
 
 /* ============================================================
-   speakTask + WAV-кэш из папки saund
+   УЛУЧШЕННЫЙ ЗВУКОВОЙ ДВИЖОК (Кубик и Костёр)
+   ============================================================ */
+// Добавь эту функцию рядом с playTone
+function playNoise(duration, vol = 0.1) {
+  try {
+    if (!audioCtx) audioCtx = new AudioCtx();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const bufferSize = audioCtx.sampleRate * duration;
+    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+    const noise = audioCtx.createBufferSource();
+    noise.buffer = buffer;
+    const gain = audioCtx.createGain();
+    gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+    noise.connect(gain);
+    gain.connect(audioCtx.destination);
+    noise.start();
+  } catch(e) {}
+}
+
+// Обновляем функцию playSound, чтобы кубик звучал как настоящий, и добавим звук костра
+function playSound(type) {
+  try { if (state && state.soundEffects === false) return; } catch (e) {}
+  
+  if (type === 'roll') {
+    // Звук тряски кубика (короткие шумовые всплески)
+    playNoise(0.05, 0.2);
+    setTimeout(() => playNoise(0.05, 0.15), 100);
+    setTimeout(() => playNoise(0.08, 0.1), 200);
+  } else if (type === 'success') {
+    playTone(600, 0.1, 'sine', 0.1);
+    setTimeout(() => playTone(800, 0.3, 'sine', 0.1), 100);
+  } else if (type === 'fail') {
+    playTone(300, 0.2, 'sawtooth', 0.1);
+    setTimeout(() => playTone(200, 0.3, 'sawtooth', 0.1), 150);
+  } else if (type === 'fire') {
+    // Звук потрескивания костра
+    playNoise(0.1, 0.15);
+    setTimeout(() => playNoise(0.05, 0.1), 150);
+    setTimeout(() => playNoise(0.08, 0.12), 300);
+    setTimeout(() => playNoise(0.05, 0.08), 500);
+  } else if (type === 'click') {
+    playTone(800, 0.05, 'sine', 0.05);
+  }
+}
+
+/* ============================================================
+   УМНЫЙ ПОИСК WAV И ОЗВУЧКА
    ============================================================ */
 const _wavCache = {};
 
-async function hasWavForTask(taskId) {
-  if (!taskId) return false;
+// Нормализация текста: убирает ё, скобки, лишние пробелы
+function normalizeAudioName(str) {
+  if (!str) return '';
+  return str.toLowerCase().replace(/ё/g, 'е').replace(/\(.*?\)/g, '').replace(/[^а-яa-z0-9\s]/g, '').trim().replace(/\s+/g, ' ');
+}
+
+// Ищем файл по всем возможным названиям (как в index.html)
+async function findAudioUrl(task) {
+  const taskId = task.id || task.name;
+  const taskName = task.name || '';
+  
   if (_wavCache[taskId] !== undefined) return _wavCache[taskId];
-  const url = `saund/${encodeURIComponent(taskId)}.wav`;
-  try {
-    const r = await fetch(url, { method: 'HEAD' });
-    _wavCache[taskId] = r.ok;
-    return r.ok;
-  } catch (e) {
-    _wavCache[taskId] = false;
-    return false;
+
+  const rawName = taskName.replace(/'/g, ""); 
+  const normName = normalizeAudioName(taskName);
+  
+  const candidates = [
+    `${rawName}.wav`,
+    `${rawName.replace(/ё/g, 'е')}.wav`,
+    `${rawName.replace(/\s*\(.*?\)\s*/g, '')}.wav`,
+    `${normName}.wav`,
+    `${taskId}.wav`
+  ];
+
+  const uniqueCandidates = [...new Set(candidates)];
+  const basePath = 'saund/'; // Твоя папка
+
+  for (const fileName of uniqueCandidates) {
+    const url = basePath + encodeURIComponent(fileName);
+    try {
+      const res = await fetch(url, { method: 'HEAD' });
+      if (res.ok) {
+        _wavCache[taskId] = url;
+        return url;
+      }
+    } catch (e) {}
   }
+  
+  _wavCache[taskId] = null;
+  return null;
+}
+
+async function speakTask(task, reps) {
+  const btn = document.getElementById('btnSpeak');
+  if (btn) btn.classList.add('speaking');
+
+  const audioUrl = await findAudioUrl(task);
+
+  if (audioUrl) {
+    const audio = new Audio(audioUrl);
+    audio.onended = () => btn && btn.classList.remove('speaking');
+    audio.onerror = () => {
+      console.warn('[speakTask] WAV error, fallback to TTS');
+      _speakWithTTS(task, reps, btn);
+    };
+    try {
+      await audio.play();
+      return;
+    } catch (e) {
+      console.warn('[speakTask] WAV play blocked, fallback to TTS:', e);
+    }
+  }
+  _speakWithTTS(task, reps, btn);
 }
 
 async function speakTask(task, reps) {
