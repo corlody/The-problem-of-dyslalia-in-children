@@ -3337,6 +3337,24 @@ function spawnWinterStars() {
 // УМНАЯ ОЗВУЧКА КАРТОЧЕК (Русские названия + TTS Fallback)
 // ============================================================
 const _cardAudioCache = {}; 
+let currentAudio = null;
+let currentPlayingBtn = null;
+
+// Функция для мгновенной остановки любого текущего звука
+function stopCurrentAudio() {
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    currentAudio = null;
+  }
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+  }
+  if (currentPlayingBtn) {
+    currentPlayingBtn.classList.remove('playing');
+    currentPlayingBtn = null;
+  }
+}
 
 // Нормализация текста: убирает ё, скобки, лишние пробелы
 function normalizeAudioName(str) {
@@ -3351,8 +3369,14 @@ function normalizeAudioName(str) {
 }
 
 window.playCardAudio = async function(taskId, taskName, taskDesc) {
+  // 1. Сначала останавливаем всё, что играло до этого
+  stopCurrentAudio();
+  
   const btn = document.getElementById(`btn-speak-${taskId}`);
-  if (btn) btn.classList.add('playing');
+  if (btn) {
+    btn.classList.add('playing');
+    currentPlayingBtn = btn;
+  }
 
   // Если файл уже искали ранее — берем из кэша
   if (_cardAudioCache[taskId] !== undefined) {
@@ -3377,7 +3401,7 @@ window.playCardAudio = async function(taskId, taskName, taskDesc) {
   ];
 
   const uniqueCandidates = [...new Set(candidates)];
-  const basePath = 'saund/'; // ВНИМАНИЕ: Твоя папка называется saund!
+  const basePath = 'saund/'; // Твоя папка
 
   let foundUrl = null;
   // Ищем первый существующий файл
@@ -3388,6 +3412,9 @@ window.playCardAudio = async function(taskId, taskName, taskDesc) {
       if (res.ok) { foundUrl = url; break; }
     } catch (e) {}
   }
+
+  // Если пользователь уже нажал на другую кнопку, пока мы искали файл — прерываемся
+  if (currentPlayingBtn !== btn) return;
 
   _cardAudioCache[taskId] = foundUrl;
 
@@ -3400,21 +3427,38 @@ window.playCardAudio = async function(taskId, taskName, taskDesc) {
 };
 
 function playWavFile(url, taskName, taskDesc, btn) {
+  // Если пользователь уже переключился на другое аудио — прерываемся
+  if (currentPlayingBtn !== btn) return;
+  
   const audio = new Audio(url);
-  audio.onended = () => { if (btn) btn.classList.remove('playing'); };
+  currentAudio = audio; // Сохраняем текущий объект
+  
+  audio.onended = () => {
+    if (btn) btn.classList.remove('playing');
+    if (currentAudio === audio) currentAudio = null;
+    if (currentPlayingBtn === btn) currentPlayingBtn = null;
+  };
+  
   audio.onerror = () => {
     console.warn(`Файл ${url} битый, используем TTS`);
-    speakTTSFallback(taskName, taskDesc, btn);
+    if (currentAudio === audio) currentAudio = null;
+    if (currentPlayingBtn === btn) speakTTSFallback(taskName, taskDesc, btn);
   };
+  
   audio.play().catch(e => {
-    speakTTSFallback(taskName, taskDesc, btn);
+    if (currentAudio === audio) currentAudio = null;
+    if (currentPlayingBtn === btn) speakTTSFallback(taskName, taskDesc, btn);
   });
 }
 
 function speakTTSFallback(taskName, taskDesc, btn) {
-  if (btn) btn.classList.remove('playing');
+  // Если пользователь уже переключился — прерываемся
+  if (btn && currentPlayingBtn !== btn) return;
+
   if (!('speechSynthesis' in window)) {
+    if (btn) btn.classList.remove('playing');
     if (typeof toast === 'function') toast('Озвучка не поддерживается браузером', 'error');
+    if (currentPlayingBtn === btn) currentPlayingBtn = null;
     return;
   }
   
@@ -3429,8 +3473,14 @@ function speakTTSFallback(taskName, taskDesc, btn) {
   if (ruVoice) u.voice = ruVoice;
 
   u.onstart = () => { if (btn) btn.classList.add('playing'); };
-  u.onend = () => { if (btn) btn.classList.remove('playing'); };
-  u.onerror = () => { if (btn) btn.classList.remove('playing'); };
+  u.onend = () => { 
+    if (btn) btn.classList.remove('playing'); 
+    if (currentPlayingBtn === btn) currentPlayingBtn = null;
+  };
+  u.onerror = () => { 
+    if (btn) btn.classList.remove('playing'); 
+    if (currentPlayingBtn === btn) currentPlayingBtn = null;
+  };
   
   window.speechSynthesis.speak(u);
 }
