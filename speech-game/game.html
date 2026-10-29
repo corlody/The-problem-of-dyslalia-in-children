@@ -860,19 +860,43 @@ function playTone(freq, duration, type = 'sine', vol = 0.1) {
   } catch (e) {}
 }
 
+function playNoise(duration, vol = 0.1) {
+  try {
+    if (!audioCtx) audioCtx = new AudioCtx();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const bufferSize = audioCtx.sampleRate * duration;
+    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+    const noise = audioCtx.createBufferSource();
+    noise.buffer = buffer;
+    const gain = audioCtx.createGain();
+    gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+    noise.connect(gain);
+    gain.connect(audioCtx.destination);
+    noise.start();
+  } catch(e) {}
+}
+
 function playSound(type) {
   try { if (state && state.soundEffects === false) return; } catch (e) {}
   
   if (type === 'roll') {
-    playTone(300, 0.1, 'square', 0.05);
-    setTimeout(() => playTone(400, 0.1, 'square', 0.05), 100);
-    setTimeout(() => playTone(500, 0.15, 'square', 0.05), 200);
+    playNoise(0.05, 0.2);
+    setTimeout(() => playNoise(0.05, 0.15), 100);
+    setTimeout(() => playNoise(0.08, 0.1), 200);
   } else if (type === 'success') {
     playTone(600, 0.1, 'sine', 0.1);
     setTimeout(() => playTone(800, 0.3, 'sine', 0.1), 100);
   } else if (type === 'fail') {
     playTone(300, 0.2, 'sawtooth', 0.1);
     setTimeout(() => playTone(200, 0.3, 'sawtooth', 0.1), 150);
+  } else if (type === 'fire') {
+    playNoise(0.1, 0.15);
+    setTimeout(() => playNoise(0.05, 0.1), 150);
+    setTimeout(() => playNoise(0.08, 0.12), 300);
+    setTimeout(() => playNoise(0.05, 0.08), 500);
   } else if (type === 'click') {
     playTone(800, 0.05, 'sine', 0.05);
   }
@@ -1266,7 +1290,6 @@ async function startGame() {
   currentSessionId = null;
   physicalAwaitingNext = true;
 
-  // Трекинг сессии для исследования
   currentMoveNumber = 0;
   currentRollResult = 0;
   currentCellBeforeTask = 0;
@@ -1282,7 +1305,6 @@ async function startGame() {
   await loadTasks();
   resetUsedTasks();
 
-  // Настройка автоозвучки в физической версии
   const autoSpeakEl = document.getElementById('physAutoSpeak');
   if (autoSpeakEl) {
     autoSpeakEl.checked = localStorage.getItem('phys_auto_speak') === '1';
@@ -1360,9 +1382,6 @@ async function startGame() {
   saveResearchSession(false);
 }
 
-/* ============================================================
-   physicalNextTask → асинхронная + WAV-озвучка из папки saund
-   ============================================================ */
 async function physicalNextTask() {
   if (!physicalAwaitingNext) return;
   physicalAwaitingNext = false;
@@ -1402,10 +1421,9 @@ async function physicalNextTask() {
 
   const autoSpeak = document.getElementById('physAutoSpeak')?.checked || false;
   if (autoSpeak) {
-    const taskId = task.id || task.name;
-    const hasWav = await hasWavForTask(taskId);
-    if (hasWav) {
-      const audio = new Audio(`saund/${encodeURIComponent(taskId)}.wav`);
+    const audioUrl = await findAudioUrl(task);
+    if (audioUrl) {
+      const audio = new Audio(audioUrl);
       audio.play().catch(() => {
         _speakWithTTS(task, reps, null);
       });
@@ -1479,7 +1497,6 @@ async function loadSession(index) {
   sessionTasks = session.tasks || [];
   sessionStartTime = session.startedAt || new Date().toISOString();
 
-  // ВОССТАНОВИТЬ счётчики ходов и research-сессии
   currentMoveNumber = session.moves || (session.stats && session.stats.moves) || 0;
   currentResearchSessionId = session.researchSessionId || Date.now();
   currentSessionStartMs = session.startedAt ? new Date(session.startedAt).getTime() : Date.now();
@@ -1661,8 +1678,10 @@ function moveCurrentPlayer(steps) {
     updateAllChips(); updateTurnUI();
     if (extraMessage) addLog(`<span class="highlight">${extraMessage}</span>`);
     addLog(`🎲 ${p.name} выбросил ${steps} → клетка ${p.cell + 1}`);
+    
+    // 👇 ВОТ СЮДА ДОБАВЛЕН ЗВУК КОСТРА 👇
     if (isCampfire) {
-      playSound('fire');
+      playSound('fire'); 
       addLog(`🔥 <span class="highlight">Костёр!</span> ${p.name} получает доп. ход!`);
       setTimeout(() => {
         canRoll = true;
@@ -1762,66 +1781,15 @@ function closeTaskImage(e) {
 }
 
 /* ============================================================
-   УЛУЧШЕННЫЙ ЗВУКОВОЙ ДВИЖОК (Кубик и Костёр)
-   ============================================================ */
-// Добавь эту функцию рядом с playTone
-function playNoise(duration, vol = 0.1) {
-  try {
-    if (!audioCtx) audioCtx = new AudioCtx();
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-    const bufferSize = audioCtx.sampleRate * duration;
-    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-    const data = buffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
-    const noise = audioCtx.createBufferSource();
-    noise.buffer = buffer;
-    const gain = audioCtx.createGain();
-    gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
-    noise.connect(gain);
-    gain.connect(audioCtx.destination);
-    noise.start();
-  } catch(e) {}
-}
-
-// Обновляем функцию playSound, чтобы кубик звучал как настоящий, и добавим звук костра
-function playSound(type) {
-  try { if (state && state.soundEffects === false) return; } catch (e) {}
-  
-  if (type === 'roll') {
-    // Звук тряски кубика (короткие шумовые всплески)
-    playNoise(0.05, 0.2);
-    setTimeout(() => playNoise(0.05, 0.15), 100);
-    setTimeout(() => playNoise(0.08, 0.1), 200);
-  } else if (type === 'success') {
-    playTone(600, 0.1, 'sine', 0.1);
-    setTimeout(() => playTone(800, 0.3, 'sine', 0.1), 100);
-  } else if (type === 'fail') {
-    playTone(300, 0.2, 'sawtooth', 0.1);
-    setTimeout(() => playTone(200, 0.3, 'sawtooth', 0.1), 150);
-  } else if (type === 'fire') {
-    // Звук потрескивания костра
-    playNoise(0.1, 0.15);
-    setTimeout(() => playNoise(0.05, 0.1), 150);
-    setTimeout(() => playNoise(0.08, 0.12), 300);
-    setTimeout(() => playNoise(0.05, 0.08), 500);
-  } else if (type === 'click') {
-    playTone(800, 0.05, 'sine', 0.05);
-  }
-}
-
-/* ============================================================
-   УМНЫЙ ПОИСК WAV И ОЗВУЧКА
+   speakTask + УМНЫЙ ПОИСК WAV (как в index.html)
    ============================================================ */
 const _wavCache = {};
 
-// Нормализация текста: убирает ё, скобки, лишние пробелы
 function normalizeAudioName(str) {
   if (!str) return '';
   return str.toLowerCase().replace(/ё/g, 'е').replace(/\(.*?\)/g, '').replace(/[^а-яa-z0-9\s]/g, '').trim().replace(/\s+/g, ' ');
 }
 
-// Ищем файл по всем возможным названиям (как в index.html)
 async function findAudioUrl(task) {
   const taskId = task.id || task.name;
   const taskName = task.name || '';
@@ -1865,30 +1833,6 @@ async function speakTask(task, reps) {
 
   if (audioUrl) {
     const audio = new Audio(audioUrl);
-    audio.onended = () => btn && btn.classList.remove('speaking');
-    audio.onerror = () => {
-      console.warn('[speakTask] WAV error, fallback to TTS');
-      _speakWithTTS(task, reps, btn);
-    };
-    try {
-      await audio.play();
-      return;
-    } catch (e) {
-      console.warn('[speakTask] WAV play blocked, fallback to TTS:', e);
-    }
-  }
-  _speakWithTTS(task, reps, btn);
-}
-
-async function speakTask(task, reps) {
-  const btn = document.getElementById('btnSpeak');
-  if (btn) btn.classList.add('speaking');
-
-  const taskId = task.id || task.name;
-  const hasWav = await hasWavForTask(taskId);
-
-  if (hasWav) {
-    const audio = new Audio(`saund/${encodeURIComponent(taskId)}.wav`);
     audio.onended = () => btn && btn.classList.remove('speaking');
     audio.onerror = () => {
       console.warn('[speakTask] WAV error, fallback to TTS');
@@ -2180,7 +2124,6 @@ function completeTask(success) {
   }
 }
 
-// Аварийная разблокировка — если что-то пошло не так
 function forceUnlockRoll() {
   isProcessing = false;
   isMoving = false;
@@ -2474,7 +2417,6 @@ function saveResearchSession(finalize = false) {
     const startDate = sessionStartTime ? new Date(sessionStartTime) : now;
     const firstPlayer = players[0] || { name: 'Игрок', age: 0 };
 
-    // Считаем ТОЛЬКО уникальные ходы (по moveNumber)
     const uniqueMoves = new Set();
     sessionTasks.forEach(t => {
       if (t.moveNumber && t.moveNumber > 0) uniqueMoves.add(t.moveNumber);
