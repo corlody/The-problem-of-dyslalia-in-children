@@ -2209,6 +2209,38 @@ footer {
     padding-right: max(0px, env(safe-area-inset-right));
   }
 }
+/* ============================================================
+   КНОПКА ОЗВУЧКИ КАРТОЧЕК
+   ============================================================ */
+.btn-speak-card {
+  margin-top: 12px;
+  padding: 8px 16px;
+  border-radius: 980px;
+  border: 2px solid rgba(16,185,129,.3);
+  background: rgba(16,185,129,.15);
+  color: var(--green);
+  font-size: .85rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: var(--transition);
+}
+.btn-speak-card:hover {
+  background: rgba(16,185,129,.25);
+  transform: translateY(-2px);
+}
+.btn-speak-card.playing {
+  animation: pulseSpeak 1s infinite;
+  background: var(--green);
+  color: #fff;
+}
+@keyframes pulseSpeak {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,.4); }
+  50% { box-shadow: 0 0 0 12px rgba(16,185,129,0); }
+}
 </style>
 </head>
 <body>
@@ -2884,6 +2916,7 @@ import {
   initCore, t, toast, state, unlockAchievement, logAction
 } from './js/core.js';
 import './js/ai_assistant.js';
+import * as Speech from './js/speech.js';
 import './js/speech.js';
 
 // ============================================================
@@ -2927,18 +2960,35 @@ function renderGroup(containerId, countId, arr, colorClass, badgeText, badgeClas
   let html = '';
   for (const card of items) {
     const hasImg = !!card.img;
+    // Используем стандартный onerror для надежности
     const imgBlock = hasImg
-      ? `<div style="margin-top:10px;">${imgWithFallback(card.img, card.name, 'width:100%;max-height:180px;object-fit:contain;border-radius:10px;background:#fff;padding:6px;')}</div>`
+      ? `<div style="margin-top:12px;"><img src="${card.img}" alt="${card.name||''}" style="width:100%;max-height:220px;object-fit:contain;border-radius:12px;background:#fff;padding:8px;" onerror="this.onerror=null;this.src='images/tasks/_placeholder.svg';"></div>`
       : '';
+      
     const appliesTo = (card.applies_to || []).join(', ');
     const soundBadge = appliesTo && appliesTo !== 'all'
       ? `<span class="card-badge" style="background:rgba(124,58,237,0.15);color:var(--purple-light);border:1px solid rgba(124,58,237,0.25);">${appliesTo}</span>`
       : '';
+      
+    const inGame = (typeof tasksInGameIds !== 'undefined' && tasksInGameIds.has(card.id))
+      ? `<span class="badge-in-game" title="Используется в игре" style="background:rgba(6,182,212,.15);color:var(--cyan);border:1px solid rgba(6,182,212,.3);font-size:.65rem;padding:2px 8px;border-radius:30px;font-weight:700;margin-left:4px;">🎮 в игре</span>`
+      : '';
+
+    // Безопасное экранирование кавычек для вызова функции
+    const safeName = (card.name || '').replace(/'/g, "\\'");
+    const safeDesc = (card.desc || '').replace(/'/g, "\\'");
+    
+    // Та самая кнопка
+    const speakBtn = `
+      <button class="btn-speak-card" id="btn-speak-${card.id}" onclick="playCardAudio('${card.id}', '${safeName}', '${safeDesc}')">
+        <i class="fas fa-volume-up"></i> Озвучить
+      </button>
+    `;
 
     html += `
       <div class="card ${colorClass}">
         <div class="card-title">
-          <span>${card.name}</span>
+          <span>${card.name} ${inGame}</span>
           <span style="display:flex;gap:6px;flex-wrap:wrap;">
             ${soundBadge}
             <span class="card-badge ${badgeClass}">${badgeText}</span>
@@ -2946,6 +2996,7 @@ function renderGroup(containerId, countId, arr, colorClass, badgeText, badgeClas
         </div>
         <div class="card-desc">${card.desc || ''}</div>
         ${imgBlock}
+        ${speakBtn}
       </div>`;
   }
   container.innerHTML = html;
@@ -3284,6 +3335,102 @@ function spawnWinterStars() {
   }
 }
 
+// ============================================================
+// УМНАЯ ОЗВУЧКА КАРТОЧЕК (Русские названия + TTS Fallback)
+// ============================================================
+const _cardAudioCache = {}; 
+
+// Нормализация текста: убирает ё, скобки, лишние пробелы
+function normalizeAudioName(str) {
+  if (!str) return '';
+  return str
+    .toLowerCase()
+    .replace(/ё/g, 'е')
+    .replace(/\(.*?\)/g, '') // убираем текст в скобках
+    .replace(/[^а-яa-z0-9\s]/g, '') // убираем спецсимволы
+    .trim()
+    .replace(/\s+/g, ' '); // убираем двойные пробелы
+}
+
+window.playCardAudio = async function(taskId, taskName, taskDesc) {
+  const btn = document.getElementById(`btn-speak-${taskId}`);
+  if (btn) btn.classList.add('playing');
+
+  // Если файл уже искали ранее — берем из кэша
+  if (_cardAudioCache[taskId] !== undefined) {
+    if (_cardAudioCache[taskId]) {
+      playWavFile(_cardAudioCache[taskId], taskName, taskDesc, btn);
+    } else {
+      speakTTSFallback(taskName, taskDesc, btn);
+    }
+    return;
+  }
+
+  // Создаем список возможных имен файлов
+  const rawName = taskName.replace(/'/g, ""); 
+  const normName = normalizeAudioName(taskName);
+  
+  const candidates = [
+    `${rawName}.wav`,                  // Точное: "Лошадка.wav"
+    `${rawName.replace(/ё/g, 'е')}.wav`, // Без ё: "Пулемет.wav"
+    `${rawName.replace(/\s*\(.*?\)\s*/g, '')}.wav`, // Без скобок: "Окошко.wav"
+    `${normName}.wav`,                 // Нормализованное: "пулемет.wav"
+    `${taskId}.wav`                    // Английский ID: "loshadka.wav"
+  ];
+
+  const uniqueCandidates = [...new Set(candidates)];
+  const basePath = 'sound/'; // Твоя папка
+
+  let foundUrl = null;
+  // Ищем первый существующий файл
+  for (const fileName of uniqueCandidates) {
+    const url = basePath + encodeURIComponent(fileName);
+    try {
+      const res = await fetch(url, { method: 'HEAD' });
+      if (res.ok) { foundUrl = url; break; }
+    } catch (e) {}
+  }
+
+  _cardAudioCache[taskId] = foundUrl;
+
+  if (foundUrl) {
+    playWavFile(foundUrl, taskName, taskDesc, btn);
+  } else {
+    console.log(`Аудио для "${taskName}" не найдено, используем TTS`);
+    speakTTSFallback(taskName, taskDesc, btn);
+  }
+};
+
+function playWavFile(url, taskName, taskDesc, btn) {
+  const audio = new Audio(url);
+  audio.onended = () => { if (btn) btn.classList.remove('playing'); };
+  audio.onerror = () => {
+    console.warn(`Файл ${url} битый, используем TTS`);
+    speakTTSFallback(taskName, taskDesc, btn);
+  };
+  audio.play().catch(e => {
+    speakTTSFallback(taskName, taskDesc, btn);
+  });
+}
+
+function speakTTSFallback(taskName, taskDesc, btn) {
+  if (!Speech || typeof Speech.speak !== 'function') {
+    if (btn) btn.classList.remove('playing');
+    if (typeof toast === 'function') toast('Озвучка недоступна', 'error');
+    return;
+  }
+  if (!Speech.hasRussianVoice()) {
+    if (btn) btn.classList.remove('playing');
+    if (typeof toast === 'function') toast('Русский голос не установлен', 'error');
+    return;
+  }
+  const text = `${taskName}. ${taskDesc || ''}`;
+  Speech.speak(text, {
+    onEnd: () => { if (btn) btn.classList.remove('playing'); },
+    onError: () => { if (btn) btn.classList.remove('playing'); }
+  });
+}
+   
 // Старт
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', boot);
