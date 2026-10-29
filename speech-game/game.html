@@ -837,6 +837,47 @@ const MODES = [
   { id:'endless', emoji:'♾️', name:'Бесконечный', desc:'Без финиша.' }
 ];
 
+// ============================================================
+// ЗВУКОВОЙ ДВИЖОК (Web Audio API — работает без файлов)
+// ============================================================
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let audioCtx = null;
+
+function playTone(freq, duration, type = 'sine', vol = 0.1) {
+  try {
+    if (!audioCtx) audioCtx = new AudioCtx();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + duration);
+  } catch (e) {}
+}
+
+function playSound(type) {
+  try { if (state && state.soundEffects === false) return; } catch (e) {}
+  
+  if (type === 'roll') {
+    playTone(300, 0.1, 'square', 0.05);
+    setTimeout(() => playTone(400, 0.1, 'square', 0.05), 100);
+    setTimeout(() => playTone(500, 0.15, 'square', 0.05), 200);
+  } else if (type === 'success') {
+    playTone(600, 0.1, 'sine', 0.1);
+    setTimeout(() => playTone(800, 0.3, 'sine', 0.1), 100);
+  } else if (type === 'fail') {
+    playTone(300, 0.2, 'sawtooth', 0.1);
+    setTimeout(() => playTone(200, 0.3, 'sawtooth', 0.1), 150);
+  } else if (type === 'click') {
+    playTone(800, 0.05, 'sine', 0.05);
+  }
+}
+  
 let players = [];
 let activePlayerIndex = 0;
 let selectedCount = 1;
@@ -1574,6 +1615,7 @@ function rollDice() {
   cube.style.transform = `rotateX(${rotations[result].x + extraRoundsX}deg) rotateY(${rotations[result].y + extraRoundsY}deg)`;
   document.getElementById('diceValue').textContent = result;
   haptic(15);
+  playSound('roll');
   logAction('roll:' + result);
   if (window.AIAssistant) window.AIAssistant.notifyAction('roll');
   setTimeout(() => moveCurrentPlayer(result), 1200);
@@ -1914,6 +1956,7 @@ function completeTask(success) {
     const taskType = currentTask._type || 'artic';
 
     if (success) {
+      playSound('success');
       p.tasksCompleted++;
       modeState.score += 10;
       addLog(`✅ <span class="success">${p.name} выполнил "${currentTask.name}" (${reps} раз)</span>`);
@@ -1968,6 +2011,7 @@ function completeTask(success) {
         setTimeout(() => { isProcessing = false; try { nextTurn(); } catch (e) { console.error(e); forceUnlockRoll(); } }, 400);
       }
     } else {
+      playSound('fail');
       addLog(`❌ <span class="fail">${p.name} не выполнил "${currentTask.name}"</span>`);
       const endedAt = new Date().toISOString();
       const durationMs = Date.now() - (currentTaskStartedAt || Date.now());
